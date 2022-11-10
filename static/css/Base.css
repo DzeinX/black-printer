@@ -1,0 +1,219 @@
+/*html {
+        background-image: url(../static/images/VoGU.jpg);
+        background-repeat: no-repeat;
+        backdrop-filter: blur(5px);
+        filter: alpha(opacity=50);
+        background-position: center center;
+        background-attachment: fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }*/
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+.submenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    -webkit-transition: 0.5s ease-in-out;
+    -moz-transition: 0.5s ease-in-out;
+    -o-transition: 0.5s ease-in-out;
+    transition: 0.5s ease-in-out;
+}
+
+.navigation ul {
+    background: lightblue;
+    border-radius: 5px;
+}
+
+.navigation .submenu {
+    display: none;
+    background: lightblue;
+    border-radius: 0 !important;
+}
+
+.navigation ul li:hover .submenu {
+    display: block;
+}
+
+.topmenu > li:last-child {
+    margin-right: 0;
+}
+
+.topmenu > li {
+    display: inline-block;
+    margin-right: 20px;
+    position: relative;
+}
+
+.topmenu li:hover .submenu {
+    display: block;
+    width: 240px !important;
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+footer {
+    background-color: gainsboro;
+    height: 200px;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px !important;
+    margin-bottom: 20px !important;
+}
+
+.main_div {
+    width: 70%;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.align-center {
+    display: inline;
+    width: 250px;
+    margin: 20px;
+}
+
+.form, h1 {
+    width: 250px;
+    padding: 10px;
+    margin: 0 auto;
+    background-color: gainsboro;
+    border-radius: 10px;
+
+}
+
+.enter {
+    width: 195px;
+    border-radius: 4px;
+    height: 30px;
+    border-width: 1px;
+    border-color: darkgray;
+
+}
+
+body {
+    font-family: -apple-system, monospace;
+}
+
+.delete_btn {
+    border-radius: 50%;
+    border-width: 1px;
+    border-color: darkred;
+    background: indianred;
+    color: darkred;
+    height: 24px;
+    width: 24px;
+    text-align: center;
+}
+
+input {
+    cursor: pointer;
+}
+
+.add_btn {
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: darkgreen;
+    background: lightgreen;
+    color: darkgreen;
+    margin: 7px 0 0 0;
+    padding: 5px;
+}
+
+.add_field {
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: darkgoldenrod;
+    background: gold;
+    color: darkgoldenrod;
+    margin: 7px 0 7px 0;
+    padding: 5px;
+}
+
+table {
+    border: 2px solid black;
+    border-collapse: collapse;
+    width: 100%;
+    background-color: gainsboro;
+}
+
+th {
+    text-align: center;
+    background: lightblue;
+    border-bottom: 2px solid black;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+
+td {
+    text-align: left;
+    border: 1px solid black;
+}
+
+.msg {
+    background: indianred;
+    color: darkred;
+    text-align: center;
+    border-radius: 5px;
+    margin: 0 auto;
+}
+
+.line {
+    width: 95%;
+    height: 2px;
+    background: #E4E4E4;
+    text-align: center;
+    margin: 10px auto;
+    display: block;
+}
+
+.sch_bar {
+    background: lightblue;
+    margin-bottom: 10px;
+    border-radius: 1px;
+    display: block;
+    padding: 10px;
+}
+
+.ctr {
+    text-align: justify-all;
+}
+
+.btn_clr {
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: darkred;
+    background: indianred;
+    color: darkred;
+    text-align: center;
+}
+
+.btn_clr:hover {
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: darkred;
+    background: rgba(205,34,42,0.64);
+    color: darkred;
+    text-align: center;
+}

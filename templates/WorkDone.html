@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Work done{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
+    <script>
+        let items = {{ count_wd }};
+
+        function AddItemC(id_btn_div, ctr_num) {
+            const div = document.getElementById("itemsC" + id_btn_div);
+            const button = document.getElementById("ac" + id_btn_div);
+            items++;
+            let newitem = document.createElement("div");
+            let id = "dc" + items;
+            newitem.setAttribute("id", id);
+            newitem.innerHTML = `
+            <label for="c${items}">Выберите тип сделанной работы:</label>
+            <select id="c${items}" name="type_work${ctr_num}" placeholder="Выберите тип работы" style="width: 240px" required>
+                <option value="NAN" selected>--Не-выбрано--</option>
+                <option value="refuelling">Заравка</option>
+                <option value="magnet_roller_rep">Замена магнитного вала</option>
+                <option value="charge_shaft_rep">Замена вала заряда</option>
+                <option value="drum_rep">Замена фотобарабана</option>
+                <option value="chip_rep">Замена чипа</option>
+                <option value="doctor_blade_rep">Замена дозирующего лезвия</option>
+            </select>
+            <label for="ic${items}">Цена услуги:</label>
+            <input id="ic${items}" type="number" name="price${ctr_num}" class="enter"  value="0" required>
+            Рублей
+            <input type="button" value="✕" class="delete_btn" onclick="RemoveItem('dc${items}');" id="rc${items}"><br>`;
+
+            div.insertBefore(newitem, button);
+        }
+
+        function AddItemP(id_btn_div, ctr_num) {
+            const div = document.getElementById("itemsP" + id_btn_div);
+            const button = document.getElementById("ap" + id_btn_div);
+            items++;
+            let newitem = document.createElement("div");
+            let id = "dp" + items;
+            newitem.setAttribute("id", id);
+            newitem.innerHTML = `
+            <label for="p${items}">Выберите тип сделанной работы:</label>
+            <select id="p${items}" name="type_work${ctr_num}" placeholder="Выберите тип работы" style="width: 240px" required>
+                <option value="NAN" selected>--Не-выбрано--</option>
+                <option value="squeegee_rep">Замена ракеля</option>
+                <option value="thermal_film_rep">Замена термоплёнки</option>
+                <option value="paper_feed_roller_rep">Замена ролика подачи бумаги</option>
+            </select>
+            <label for="ip${items}">Цена услуги:</label>
+            <input id="ip${items}" type="number" name="price${ctr_num}" class="enter"  value="0" required>
+            Рублей
+            <input type="button" value="✕" class="delete_btn" onclick="RemoveItem('dp${items}');" id="rp${items}"><br>`;
+
+            div.insertBefore(newitem, button);
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>Проделанные работы</h1>
+    {% for msg in get_flashed_messages() %}
+        <div class="msg">
+            <h4>{{ msg }}</h4>
+        </div>
+    {% endfor %}
+    <form method="post">
+        {% for cartridge in cartridges %}
+            {% if not cartridge.work_done %}
+                <details>
+                    <summary>
+                        <strong>Картридж</strong><br>
+                        Номер: {{ cartridge.number }}<br>
+                        Модели:
+                        {% for model in cartridge.cartridge_models %}
+                            {{ model.model }}<br>
+                        {% endfor %}
+                    </summary>
+                    <div style="background-color: linen" id="itemsC{{ loop.index }}">
+                        Тип сделанной работы:<br>
+                        <div id="dc{{ loop.index }}">
+                            <label for="{{ loop.index }}">Выберите тип сделанной работы:</label>
+                            <select id="{{ loop.index }}"
+                                    name="type_work{{ cartridge.number }}"
+                                    placeholder="Выберите тип работы"
+                                    style="width: 240px"
+                                    required>
+                                <option value="NAN" selected>--Не-выбрано--</option>
+                                <option value="refuelling">Заравка</option>
+                                <option value="magnet_roller_rep">Замена магнитного вала</option>
+                                <option value="charge_shaft_rep">Замена вала заряда</option>
+                                <option value="drum_rep">Замена фотобарабана</option>
+                                <option value="chip_rep">Замена чипа</option>
+                                <option value="doctor_blade_rep">Замена дозирующего лезвия</option>
+                            </select>
+                            <label for="ic{{ loop.index }}">Цена услуги:</label>
+                            <input id="ic{{ loop.index }}" type="number" name="price{{ cartridge.number }}" class="enter"
+                                   value="0">
+                            Рублей
+                            <input type="button" value="✕" class="delete_btn" onclick="RemoveItem('dc{{ loop.index }}');"
+                                   id="rc{{ loop.index }}"><br>
+                        </div>
+                        <input type="button" value="Добавить поле" class="add_field"
+                               onclick="AddItemC({{ loop.index }}, {{ cartridge.number }});" id="ac{{ loop.index }}"><br>
+                        <input type="hidden" value="{{ cartridge.number }}" name="cartridge_num">
+                        <input type="hidden" value="Добрынин И.А." name="user">
+                    </div>
+                </details>
+            {% endif %}
+        {% endfor %}
+
+        {% for printer in printers %}
+            {% if not printer.work_done %}
+                <details>
+                    <summary>
+                        <strong>Принтер</strong><br>
+                        Номер интвентаря: {{ printer.num_inventory }}<br>
+                        Имя: {{ printer.name }}
+                    </summary>
+                    <div style="background-color: linen" id="itemsP{{ loop.index }}">
+                        Тип сделанной работы:<br>
+                        <div id="dp{{ loop.index }}">
+                            <label for="p{{ loop.index }}">Выберите тип сделанной работы:</label>
+                            <select id="p{{ loop.index }}"
+                                    name="type_work{{ printer.num_inventory }}"
+                                    placeholder="Выберите тип работы"
+                                    style="width: 240px"
+                                    required>
+                                <option value="NAN" selected>--Не-выбрано--</option>
+                                <option value="squeegee_rep">Замена ракеля</option>
+                                <option value="thermal_film_rep">Замена термоплёнки</option>
+                                <option value="paper_feed_roller_rep">Замена ролика подачи бумаги</option>
+                            </select>
+                            <label for="ip{{ loop.index }}">Цена услуги:</label>
+                            <input id="ip{{ loop.index }}" type="number" name="price{{ printer.num_inventory }}" class="enter"
+                                   value="0">
+                            Рублей
+                            <input type="button" value="✕" class="delete_btn" onclick="RemoveItem('dp{{ loop.index }}');"
+                                   id="rp{{ loop.index }}"><br>
+                        </div>
+                        <input type="button" value="Добавить поле" class="add_field"
+                               onclick="AddItemP({{ loop.index }}, {{ printer.num_inventory }});" id="ap{{ loop.index }}"><br>
+                        <input type="hidden" value="{{ printer.num_inventory }}" name="num_inventory">
+                        <input type="hidden" value="Добрынин И.А." name="user">
+                    </div>
+                </details>
+            {% endif %}
+        {% endfor %}
+        <input type="submit" value="Выполнено" class="add_btn">
+    </form>
+{% endblock %}

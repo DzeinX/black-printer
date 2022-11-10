@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block CSS %}{{ url_for('static', filename='css/select2.min.css') }}{% endblock %}
+{% block title %}Update cartridge{% endblock %}
+
+{% block script %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+    <script src="{{url_for('static', filename='js/SelectInput.js')}}"></script>
+    <script src="{{url_for('static', filename='js/RemoveItem.js')}}"></script>
+    <script>
+        let items = {{ counter_models }};
+
+        function AddItem() {
+            const div = document.getElementById("items");
+            const button = document.getElementById("add");
+            items++;
+            let newitem = document.createElement("div");
+            let id = "d" + items;
+            newitem.setAttribute("id", id);
+            newitem.innerHTML = `
+                <select name="model"
+                        id="${items}"
+                        class="select"
+                        placeholder="Выберите модель" required>
+                    {% for el in list_models %}
+                        {% if not (el.model in list_models) %}
+                            <option>{{ el.model }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select><input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}"><br>`;
+
+            div.insertBefore(newitem, button);
+
+            $('select').select2({
+                placeholder: "Select Model",
+                allowClear: true
+            });
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>Картридж:</h1>
+    {% for msg in get_flashed_messages() %}
+        <p class="msg"><strong>{{ msg }}</strong></p>
+    {% endfor %}
+    <a href={{ request.referrer }}>Назад</a>
+    <form method="POST" id="form">
+        <div class=form id="items">
+            {% for model in cartridge.cartridge_models %}
+                <div id="d{{ loop.index }}">
+                    <label for="{{ loop.index }}">Модель: </label><select name="model"
+                                                                          id="{{ loop.index }}"
+                                                                          class="select"
+                                                                          placeholder="Выберите модель" required>
+                    {% for el in list_models %}
+                        {% if model.model == el.model %}
+                            <option selected>{{ el.model }}</option>
+                        {% else %}
+                            <option>{{ el.model }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select><input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d{{ loop.index }}');"
+                           id='r{{ loop.index }}'><br>
+                </div>
+            {% endfor %}
+
+            <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
+
+            <label for="number">Номер </label><input type="number"
+                                                     name="number"
+                                                     id="number"
+                                                     class="#"
+                                                     required
+                                                     value="{{ cartridge.number }}"><br>
+
+            <input type="submit" value="Обновить" class="add_btn">
+        </div>
+    </form>
+{% endblock %}

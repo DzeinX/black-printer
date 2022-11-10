@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Models{% endblock %}
+
+{% block script %}
+    <script>
+        let items = {{ counter_models }};
+
+        function AddItem() {
+            const div = document.getElementById("items");
+            const button = document.getElementById("add");
+            items++;
+            console.log(items)
+            let newitem = document.createElement("div")
+            let id = "d" + items
+            newitem.setAttribute("id", id)
+            newitem.innerHTML = `
+                <label for="${items}">${items} </label>
+                <input id="${items}"
+                       type="text"
+                       value=""
+                       name="model"><input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}"><br>`;
+
+            div.insertBefore(newitem, button);
+        }
+
+        function RemoveItem(id_div) {
+            const div = document.getElementById(id_div);
+            div.remove();
+            items--;
+        }
+
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>Модели:</h1>
+    <div class="align-center">
+        <form method="POST">
+            <div class="form" id="items" style="width: 270px !important;">
+                {% for message in get_flashed_messages() %}
+                    <p style="color: darkred"><strong>{{ message }}</strong></p>
+                {% endfor %}
+                {% set counter = namespace(value=1) %}
+                {% for model in list_models %}
+                    <div id="d{{ loop.index }}">
+                        <label for="{{ loop.index }}">{{ counter.value }} </label>
+                        <input id="{{ loop.index }}"
+                               type="text"
+                               value="{{ model.model }}"
+                               name="model"><input type="button" value="✕" class="delete_btn"
+                                                   onclick="RemoveItem('d{{ loop.index }}');"
+                                                   id="r{{ loop.index }}"><br>
+                    </div>
+                    {% set counter.value = counter.value + 1 %}
+                {% endfor %}
+                <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
+                <input type="submit" value="Обновить" class="add_btn">
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+
+

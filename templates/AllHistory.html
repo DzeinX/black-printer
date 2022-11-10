@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}All history{% endblock %}
+
+{% block script %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <h1>История статусов</h1>
+    {% for msg in get_flashed_messages() %}
+        <div class="msg">
+            <h2>{{ msg }}</h2>
+        </div>
+    {% endfor %}
+    <div class="sch_bar">
+        <div class="ctr">
+            <label for="search"><strong>Поиск по таблице:</strong></label><br>
+            <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+        </div>
+        <div class="line"></div>
+        <strong>Поиск по статусу:</strong><br>
+        <div class="ctr">
+            Картриджи:
+            <input type="radio" name="status" value="в резерве">В резерве
+            <input type="radio" name="status" value="принят в заправку">Принят в заправку
+            <input type="radio" name="status" value="в заправке">В заправке
+            <input type="radio" name="status" value="выдан">Выдан
+            <input type="radio" name="status" value="в подразделении">В подразделении<br>
+            Принтеры:
+            <input type="radio" name="status" value="принят в ремонт">Принят в ремонт
+            <input type="radio" name="status" value="в ремонте">В ремонте
+            <input type="radio" name="status" value="получен из ремонта">Получен из ремонта
+            <input type="radio" name="status" value="восстановлен">Восстановлен
+            <input type="radio" name="status" value="добавлен">Добавлен<br>
+        </div>
+        <div class="line"></div>
+        <strong>Поиск по наименованию:</strong><br>
+        <div class="ctr">
+            <input type="radio" name="naming" value="картридж">Картриджи
+            <input type="radio" name="naming" value="принтер">Принтеры
+        </div>
+        <input type="button" id="btn_off" class="btn_clr" value="Снять выделение">
+    </div>
+    <table id="mytable">
+        <colgroup>
+            <col span="1" style="width: 5%;">
+            <col span="1" style="width: 10%;">
+            <col span="1" style="width: 20%;">
+            <col span="1" style="width: 30%;">
+            <col span="1" style="width: 35%;">
+        </colgroup>
+        <thead>
+        <tr>
+            <th>№</th>
+            <th>Наименование</th>
+            <th>Номер/Номер инвентаря<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"><br>
+            </th>
+            <th>Статус</th>
+            <th>Дата<br><input type="text" placeholder="Начните вводить" id="sch5" class="enter"><br></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% set all_statuses = namespace(value=(statuses_in_cartridges + statuses_in_printers)) %}
+
+        {% set counter = namespace(value=1) %}
+        {% for htry in all_statuses.value %}
+            <tr>
+                <td class="1">{{ counter.value }}</td>
+                <td class="2">
+                    {% if htry.cartridge_id != NAN %}
+                        Картридж
+                    {% else %}
+                        Принтер
+                    {% endif %}
+                </td>
+                <td class="3">
+                    {% if htry.cartridge_id != NAN %}
+                        {{ Cartridges.query.get(htry.cartridge_id).number }}
+                    {% else %}
+                        {{ Printer.query.get(htry.printer_id).num_inventory }}
+                    {% endif %}
+                </td>
+                <td class="4">{{ htry.status }}</td>
+                <td class="5">
+                    Дата: {{ htry.date.date() }}<br>
+                    Время: {{ htry.date.time() }}
+                </td>
+            </tr>
+            {% set counter.value = counter.value + 1 %}
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

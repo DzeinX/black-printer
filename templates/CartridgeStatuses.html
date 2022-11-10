@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Cartridge statuses{% endblock %}
+
+{% block script %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <h1>
+        {% for model in cartridge.cartridge_models %}
+            {{ model.model }} <br>
+        {% endfor %}
+        статусы:</h1><br>
+    <a href={{ request.referrer }}>Назад</a><br>
+    {% if statuses|length > 0 %}
+        <label for="search">Поиск по таблице:</label><br>
+        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+        Поиск по статусу:<br>
+        <input type="radio" name="status" value="в резерве">В резерве
+        <input type="radio" name="status" value="принят в заправку">Принят в заправку
+        <input type="radio" name="status" value="в заправке">В заправке
+        <input type="radio" name="status" value="выдан">Выдан
+        <input type="radio" name="status" value="восстановлен">Восстановлен
+        <input type="radio" name="status" value="добавлен">Добавлен
+        <input type="button" id="btn_off" value="Снять выделение">
+        <table id="mytable">
+            <colgroup>
+                <col span="1" style="width: 5%;">
+                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 30%;">
+                <col span="1" style="width: 25%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Дата<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th>Пользователь<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th>Статус</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = namespace(value=1) %}
+            {% for status in statuses %}
+                {% if status.cartridge_id == id %}
+                    <tr>
+                        <td class="1">
+                            {{ counter.value }}
+                        </td>
+                        <td class="2">
+                            Дата: {{ status.date.date() }}
+                            Время: {{ status.date.time() }}
+                        </td>
+                        <td class="3">
+                            {{ status.user }}
+                        </td>
+                        <td class="4">
+                            {{ status.status }}
+                        </td>
+                    </tr>
+                    {% set counter.value = counter.value + 1 %}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h2>NAN</h2>
+    {% endif %}
+{% endblock %}

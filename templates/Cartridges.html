@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block CSS %}../static/css/select2.min.css{% endblock %}
+{% block title %}Cartridges{% endblock %}
+
+{% block script %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script>
+        let items = 1;
+
+        function AddItem() {
+            const div = document.getElementById("items");
+            const button = document.getElementById("add");
+            items++;
+            let newitem = document.createElement("div");
+            let id = "d" + items;
+            newitem.setAttribute("id", id);
+            newitem.innerHTML = `
+            <select name="model"
+                    class="select"
+                    id="${items}"
+                    placeholder="Выберите модель" required>
+                {% for el in list_models %}
+                    {% if not (el.model in list_models) %}
+                        <option>{{ el.model }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select><input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}"><br>`;
+
+            div.insertBefore(newitem, button);
+
+            $('select').select2({
+                placeholder: "Select Model",
+                allowClear: true
+            });
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>Картриджы: </h1>
+    <div class="align-center" style="background-color: gray">
+        <form method="POST">
+            <div class="form" id="items">
+                {% for msg in get_flashed_messages() %}
+                    <div class="msg">
+                        {{ msg }}
+                    </div>
+                {% endfor %}
+                <label for="1">Модели: </label><br>
+                <div id="d1">
+                    <select name="model"
+                            class="select"
+                            id="1" required>
+                        {% for el in list_models %}
+                            {% if not (el.model in list_models) %}
+                                <option>{{ el.model }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select><input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d1');" id="r1"><br>
+                </div>
+
+                <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
+
+                <label for="number">Номер: </label><br>
+                <input type="number"
+                       name="number"
+                       id="number"
+                       class="enter"
+                       placeholder="Введите номер"><br>
+
+                <label for="user">Пользователь: </label><br>
+                <input type="text"
+                       name="user"
+                       id="user"
+                       class="enter" required><br>
+                <input type="submit" value="Добавить" class="add_btn">
+            </div>
+        </form>
+    </div>
+    {% if cartridges|length > 0 %}
+        Поиск по таблице:<br>
+        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+        Поиск по статусу:<br>
+        <input type="radio" name="status" value="в резерве">В резерве
+        <input type="radio" name="status" value="принят в заправку">Принят в заправку
+        <input type="radio" name="status" value="в заправке">В заправке
+        <input type="radio" name="status" value="выдан">Выдан
+        <input type="radio" name="status" value="восстановлен">Восстановлен
+        <input type="radio" name="status" value="добавлен">Добавлен
+        <input type="button" id="btn_off" value="Снять выделение">
+        <table style="width: 100%" id="mytable">
+            <colgroup>
+                <col span="1" style="width: 5%;">
+                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 30%;">
+                <col span="1" style="width: 25%;">
+                <col span="1" style="width: 30%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Номер<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th>Модели<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = namespace(value=1) %}
+            {% for cartridge in cartridges %}
+                {% if (cartridge.efficiency != 0) %}
+                    <tr>
+                        <td class="1">
+                            {{ counter.value }}
+                        </td>
+                        <td class="2">
+                            {{ cartridge.number }}
+                        </td>
+                        <td class="3">
+                            {% for model in cartridge.cartridge_models %}
+                                {{ loop.index }}) {{ model.model }}<br>
+                            {% endfor %}
+                        </td>
+                        <td class="4">
+                            {{ cartridge.status }}
+                        </td>
+                        <td  class="5">
+                            <a href="/cartridge/{{ cartridge.id }}/update">Изменить</a>
+                            <a href="/cartridge/{{ cartridge.id }}/delete">Удалить</a>
+                            <a href="/cartridge/{{ cartridge.id }}/statuses">Статусы</a>
+                        </td>
+                    </tr>
+                    {% set counter.value = counter.value + 1 %}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h1>NAN</h1>
+    {% endif %}
+{% endblock %}

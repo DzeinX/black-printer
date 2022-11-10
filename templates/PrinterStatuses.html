@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Printer statuses{% endblock %}
+
+{% block script %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <h1>{{ printer.name }} статусы: </h1><br>
+    <a href={{ request.referrer }}>Назад</a><br>
+    {% if statuses|length > 0 %}
+        <label for="search">Поиск по таблице:</label><br>
+        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+        Поиск по статусу:<br>
+        <input type="radio" name="status" value="в подразделении">В подразделении
+        <input type="radio" name="status" value="принят в ремонт">Принят в ремонт
+        <input type="radio" name="status" value="в ремонте">В ремонте
+        <input type="radio" name="status" value="получен из ремонта">Получен из ремонта
+        <input type="radio" name="status" value="восстановлен">Восстановлен
+        <input type="radio" name="status" value="добавлен">Добавлен
+        <input type="button" id="btn_off" value="Снять выделение">
+        <table id="mytable">
+            <colgroup>
+                <col span="1" style="width: 5%;">
+                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 30%;">
+                <col span="1" style="width: 25%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Дата<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"><br></th>
+                <th>Пользователь<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"><br></th>
+                <th>Статус<br></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = namespace(value=1) %}
+            {% for status in statuses %}
+                {% if status.printer_id == id %}
+                    <tr>
+                        <td class="1">
+                            {{ counter.value }}
+                        </td>
+                        <td class="2">
+                            {{ status.date.date() }}
+                        </td>
+                        <td class="3">
+                            {{ status.user }}
+                        </td>
+                        <td class="4">
+                            {{ status.status }}
+                        </td>
+                    </tr>
+                    {% set counter.value = counter.value + 1 %}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h2>NAN</h2>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Update printer{% endblock %}
+
+{% block body %}
+    <h1>Принтер:</h1>
+    <a href={{ request.referrer }}>Назад</a>
+    <div class="align-center" style="background-color: gray">
+        <form method="POST">
+            <div class="form">
+                <label for="name">Имя принтера </label><input type="text"
+                                                              name="name"
+                                                              id="name"
+                                                              class="#"
+                                                              value="{{ printer.name }}"
+                                                              placeholder="Введите имя" required>
+                <br>
+                <label for="num_inventory">Номер инвентаря </label><input type="text"
+                                                                          name="num_inventory"
+                                                                          id="num_inventory"
+                                                                          class="#"
+                                                                          value="{{ printer.num_inventory }}"
+                                                                          placeholder="Введите номер" required>
+                <br>
+                <label for="location">Подразделение </label><input type="text"
+                                                                   name="location"
+                                                                   id="location"
+                                                                   class="#"
+                                                                   value="{{ printer.location }}"
+                                                                   placeholder="Введите подразделение" required>
+                <br>
+                <input type="submit" value="Обновить" class="add_btn">
+            </div>
+        </form>
+    </div>
+{% endblock %}
