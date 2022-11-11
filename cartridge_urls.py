@@ -5,6 +5,7 @@ from flask import flash
 from flask import Blueprint
 from models import *
 from tabs_that_appear import *
+from ScanFunctions import TypeVar
 
 
 cartridge_urls = Blueprint('cartridge_urls', __name__)
@@ -18,6 +19,17 @@ def add_models():
     if request.method == "POST":
         list_models = request.form.getlist('model')
 
+        var_check = TypeVar(list_models, var_type='str')
+        if var_check[1]:
+            list_models = var_check[0][0]
+        else:
+            if isinstance(var_check[0], str):
+                flash(var_check[0])
+                return redirect(request.referrer)
+            else:
+                flash('Incorrect value')
+                return redirect(request.referrer)
+
         if len(list_models) == 0:
             flash('Нельзя удалить все модели')
             return redirect(request.referrer)
@@ -25,7 +37,8 @@ def add_models():
         ListModels.query.delete()
         try:
             for model in list_models:
-                if model != '' and not (model.isspace()):
+
+                if model != '' and not model.isspace():
                     model = ListModels(model=model)
                     db.session.add(model)
         except:
@@ -36,7 +49,7 @@ def add_models():
             return redirect("/add_models")
         except:
             flash('Не удалось добавить модель')
-            return render_template('main.html')
+            return redirect('/')
     else:
         return render_template("AddModels.html",
                                list_models=list_models,
@@ -54,6 +67,28 @@ def update_cartridge(id):
     if request.method == "POST":
         cartridge_models = request.form.getlist('model')
         number = request.form['number']
+
+        var_check = TypeVar(cartridge_models, var_type='str')
+        if var_check[1]:
+            cartridge_models = var_check[0][0]
+        else:
+            if isinstance(var_check[0], str):
+                flash(var_check[0])
+                return redirect(request.referrer)
+            else:
+                flash('Incorrect value')
+                return redirect(request.referrer)
+
+        var_check = TypeVar(number, var_type='int')
+        if var_check[1]:
+            number = var_check[0][0]
+        else:
+            if isinstance(var_check[0], str):
+                flash(var_check[0])
+                return redirect(request.referrer)
+            else:
+                flash('Incorrect value')
+                return redirect(request.referrer)
 
         if len(Cartridges.query.filter(Cartridges.number == number).all()) > 1:
             flash('Такой номер уже есть')
@@ -104,6 +139,17 @@ def cartridges():
         date_of_status = DateStatusCartridge(status=status,
                                              user=user)
         cartridge_models = request.form.getlist('model')
+
+        var_check = TypeVar(number, var_type='int')
+        if var_check[1]:
+            number = var_check[0][0]
+        else:
+            if isinstance(var_check[0], str):
+                flash(var_check[0])
+                return redirect(request.referrer)
+            else:
+                flash('Incorrect value')
+                return redirect(request.referrer)
 
         if len(cartridge_models) == 0:
             flash('Не выбрана ни одна модель')
@@ -216,11 +262,26 @@ def brought_a_cartridge():
 
                 db.session.add(brought_a_cartridge)
         else:
+            location = request.form['location']
+            learning_campus = request.form['learning_campus']
+            cabinet = request.form['cabinet']
+            user = request.form['user']
+
+            var_check = TypeVar(location, learning_campus, cabinet, var_type='str')
+            if var_check[1]:
+                location = var_check[0][0]
+                learning_campus = var_check[0][1]
+                cabinet = var_check[0][2]
+            else:
+                if isinstance(var_check[0], str):
+                    flash(var_check[0])
+                    return redirect(request.referrer)
+                else:
+                    flash('Incorrect value')
+                    return redirect(request.referrer)
+
             for number in cartridge_number:
-                location = request.form['location']
-                learning_campus = request.form['learning_campus']
-                cabinet = request.form['cabinet']
-                user = request.form['user']
+
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
 
                 brought_a_cartridge = BroughtACartridge(location=location,
@@ -387,12 +448,28 @@ def issuance_cartridges():
 
                 db.session.add(issuance)
         else:
+            user = request.form['user']
+            location = request.form['location']
+            learning_campus = request.form['learning_campus']
+            cabinet = request.form['cabinet']
+
+            var_check = TypeVar(location, learning_campus, cabinet, var_type='str')
+            if var_check[1]:
+                location = var_check[0][0]
+                learning_campus = var_check[0][1]
+                cabinet = var_check[0][2]
+            else:
+                if isinstance(var_check[0], str):
+                    flash(var_check[0])
+                    return redirect(request.referrer)
+                else:
+                    flash('Incorrect value')
+                    return redirect(request.referrer)
+
             for number in cartridge_number:
-                user = request.form['user']
-                location = request.form['location']
-                learning_campus = request.form['learning_campus']
-                cabinet = request.form['cabinet']
+
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
+
                 issuance = CartridgeIssuance(user=user,
                                              location=location,
                                              learning_campus=learning_campus,
