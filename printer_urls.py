@@ -5,6 +5,7 @@ from flask import Blueprint
 from flask import flash
 from models import *
 from tabs_that_appear import *
+from ScanFunctions import TypeVar
 
 
 printer_urls = Blueprint('printer_urls', __name__)
@@ -15,9 +16,26 @@ def update_printer(id):
     printer = Printer.query.get(id)
 
     if request.method == "POST":
-        printer.name = request.form['name']
-        printer.num_inventory = request.form['num_inventory']
-        printer.location = request.form['location']
+        name = request.form['name']
+        num_inventory = request.form['num_inventory']
+        location = request.form['location']
+        learning_campus = request.form['learning_campus']
+        cabinet = request.form['cabinet']
+
+        var_check = TypeVar(name, num_inventory, location, learning_campus, cabinet, var_type='str')
+        if var_check[1]:
+            printer.name = var_check[0][0]
+            printer.num_inventory = var_check[0][1]
+            printer.location_now = var_check[0][2]
+            printer.learning_campus_now = var_check[0][3]
+            printer.cabinet_now = var_check[0][4]
+        else:
+            if isinstance(var_check[0], str):
+                flash(var_check[0])
+                return redirect(request.referrer)
+            else:
+                flash('Incorrect value')
+                return redirect(request.referrer)
 
         try:
             db.session.commit()
@@ -41,6 +59,22 @@ def printers():
         location = request.form['location']
         learning_campus = request.form['learning_campus']
         cabinet = request.form['cabinet']
+
+        var_check = TypeVar(name, num_inventory, location, learning_campus, cabinet, var_type='str')
+        if var_check[1]:
+            printer.name = var_check[0][0]
+            printer.num_inventory = var_check[0][1]
+            printer.location_now = var_check[0][2]
+            printer.learning_campus_now = var_check[0][3]
+            printer.cabinet_now = var_check[0][4]
+        else:
+            if isinstance(var_check[0], str):
+                flash(var_check[0])
+                return redirect(request.referrer)
+            else:
+                flash('Incorrect value')
+                return redirect(request.referrer)
+
         status = "Добавлен"
         user = request.form['user']
         date_of_status = DateStatusPrinter(status=status,
@@ -160,11 +194,26 @@ def brought_a_printer():
 
                 db.session.add(brought_a_printer)
         else:
+            location = request.form['location']
+            learning_campus = request.form['learning_campus']
+            cabinet = request.form['cabinet']
+            user = request.form['user']
+
+            var_check = TypeVar(location, learning_campus, cabinet, var_type='str')
+            if var_check[1]:
+                location = var_check[0][0]
+                learning_campus = var_check[0][1]
+                cabinet = var_check[0][2]
+            else:
+                if isinstance(var_check[0], str):
+                    flash(var_check[0])
+                    return redirect(request.referrer)
+                else:
+                    flash('Incorrect value')
+                    return redirect(request.referrer)
+
             for number in printer_num:
-                location = request.form['location']
-                learning_campus = request.form['learning_campus']
-                cabinet = request.form['cabinet']
-                user = request.form['user']
+
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
 
                 brought_a_printer = BroughtAPrinter(location=location,
@@ -336,11 +385,26 @@ def issuance_printers():
 
                 db.session.add(issuance)
         else:
+            user = request.form[f'user']
+            location = request.form[f'location']
+            learning_campus = request.form[f'learning_campus']
+            cabinet = request.form[f'cabinet']
+
+            var_check = TypeVar(location, learning_campus, cabinet, var_type='str')
+            if var_check[1]:
+                location = var_check[0][0]
+                learning_campus = var_check[0][1]
+                cabinet = var_check[0][2]
+            else:
+                if isinstance(var_check[0], str):
+                    flash(var_check[0])
+                    return redirect(request.referrer)
+                else:
+                    flash('Incorrect value')
+                    return redirect(request.referrer)
+
             for number in printer_num:
-                user = request.form[f'user']
-                location = request.form[f'location']
-                learning_campus = request.form[f'learning_campus']
-                cabinet = request.form[f'cabinet']
+
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
 
                 printer.location_now = location

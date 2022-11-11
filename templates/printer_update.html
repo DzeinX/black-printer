@@ -8,26 +8,40 @@
     <div class="align-center" style="background-color: gray">
         <form method="POST">
             <div class="form">
-                <label for="name">Имя принтера </label><input type="text"
-                                                              name="name"
-                                                              id="name"
-                                                              class="#"
-                                                              value="{{ printer.name }}"
-                                                              placeholder="Введите имя" required>
-                <br>
-                <label for="num_inventory">Номер инвентаря </label><input type="text"
-                                                                          name="num_inventory"
-                                                                          id="num_inventory"
-                                                                          class="#"
-                                                                          value="{{ printer.num_inventory }}"
-                                                                          placeholder="Введите номер" required>
-                <br>
-                <label for="location">Подразделение </label><input type="text"
-                                                                   name="location"
-                                                                   id="location"
-                                                                   class="#"
-                                                                   value="{{ printer.location }}"
-                                                                   placeholder="Введите подразделение" required>
+                <label for="name">Имя принтера: </label><input type="text"
+                                                               name="name"
+                                                               id="name"
+                                                               class="enter"
+                                                               value="{{ printer.name }}"
+                                                               placeholder="Введите имя" required><br>
+
+                <label for="num_inventory">Номер инвентаря: </label><input type="text"
+                                                                           name="num_inventory"
+                                                                           id="num_inventory"
+                                                                           class="enter"
+                                                                           value="{{ printer.num_inventory }}"
+                                                                           placeholder="Введите номер" required><br>
+
+                <label for="location">Подразделение: </label><input type="text"
+                                                                    name="location"
+                                                                    id="location"
+                                                                    class="enter"
+                                                                    value="{{ printer.location_now }}"
+                                                                    placeholder="Введите подразделение" required><br>
+
+                <label for="learning_campus">Учебный корпус: </label><input type="text"
+                                                                            name="learning_campus"
+                                                                            id="learning_campus"
+                                                                            class="enter"
+                                                                            value="{{ printer.learning_campus_now }}"
+                                                                            placeholder="Введите корпус" required><br>
+
+                <label for="cabinet">Кабинет: </label><input type="text"
+                                                             name="cabinet"
+                                                             id="cabinet"
+                                                             class="enter"
+                                                             value="{{ printer.cabinet_now }}"
+                                                             placeholder="Введите кабинет" required><br>
                 <br>
                 <input type="submit" value="Обновить" class="add_btn">
             </div>

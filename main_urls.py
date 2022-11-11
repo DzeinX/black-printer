@@ -5,6 +5,7 @@ from flask import redirect
 from flask import flash
 from models import *
 from tabs_that_appear import *
+from ScanFunctions import TypeVar
 
 main_urls = Blueprint('main_urls', __name__)
 
@@ -49,6 +50,17 @@ def work_done():
             type_works_c = request.form.getlist(f'type_work{num}')
             prices_c = request.form.getlist(f'price{num}')
             user_c = request.form['user']
+
+            var_check = TypeVar(prices_c, var_type='int')
+            if var_check[1]:
+                prices_c = var_check[0][0]
+            else:
+                if isinstance(var_check[0], str):
+                    flash(var_check[0])
+                    return redirect(request.referrer)
+                else:
+                    flash('Incorrect value')
+                    return redirect(request.referrer)
 
             for wrk in type_works_c:
                 if wrk == 'NAN':
@@ -102,8 +114,6 @@ def work_done():
                     db.session.add(wdc)
                 else:
                     flash('Цена за услугу равна нулю')
-                    return redirect(request.referrer)
-                print(type_works_c, prices_c)
 
         for num in num_inventory:
             type_works_p = request.form.getlist(f'type_work{num}')
@@ -149,7 +159,6 @@ def work_done():
                 else:
                     flash('Цена за услугу равна нулю')
                     return redirect(request.referrer)
-                print(type_works_p, prices_p)
 
         try:
             if (not len(type_works_c) == 0 or not len(prices_c) == 0) or (

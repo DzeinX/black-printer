@@ -12,8 +12,8 @@ association_table = db.Table('association', db.Model.metadata,
 class Printer(db.Model):
     __tablename__ = "printer"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Integer, nullable=False)
-    num_inventory = db.Column(db.Integer, nullable=False, unique=True)
+    name = db.Column(db.String(50), nullable=False)
+    num_inventory = db.Column(db.String(50), nullable=False, unique=True)
     date_added = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     status = db.Column(db.String(15), nullable=False)
     location_now = db.Column(db.String(50), nullable=False)
