@@ -10,8 +10,10 @@
 {% block body %}
     <h1>Удалённые картриджи</h1>
     {% if cartridges|length > 0 %}
-        <label for="search">Поиск по таблице:</label><br>
-        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+        <div class="sch_bar">
+            <label for="search"><strong>Поиск по таблице:</strong></label><br>
+            <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+        </div>
         <table style="width: 100%" id="mytable">
             <colgroup>
                 <col span="1" style="width: 5%;">

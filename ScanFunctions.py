@@ -1,5 +1,4 @@
 def ItIsInt(arg, ans) -> bool:
-
     if isinstance(arg, list):
         lt = []
         for ell_lt in arg:
@@ -51,7 +50,6 @@ def ItIsInt(arg, ans) -> bool:
 
 
 def ItIsStr(arg, ans):
-
     if isinstance(arg, list):
         lt = []
         for ell_lt in arg:
@@ -62,7 +60,6 @@ def ItIsStr(arg, ans):
 
 
 def ItIsFloat(arg, ans) -> bool:
-
     if isinstance(arg, list):
         lt = []
         for ell_lt in arg:
@@ -105,7 +102,6 @@ def ItIsFloat(arg, ans) -> bool:
 
 
 def ItIsBool(arg, ans) -> bool:
-
     if isinstance(arg, list):
         lt = []
         for ell_lt in arg:

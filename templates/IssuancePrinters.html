@@ -50,7 +50,7 @@
 
 
 {% block body %}
-    <h1 style="width: 330px !important;">Выдача в подразделение:</h1>
+    <h1>Выдача в подразделение:</h1>
     <div class="align-center">
         <form method="POST" id="1">
             <div class="form" id="items">
@@ -111,69 +111,70 @@
     </div>
     <form method="POST" id="2">
         <input type="hidden" name="id_form" value="2">
-        <div>
-            <label for="search">Поиск по таблице:</label><br>
+        <div class="sch_bar">
+            <label for="search"><strong>Поиск по таблице:</strong></label><br>
             <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-            <table style="width: 100%" id="mytable">
-                <colgroup>
-                    <col span="1" style="width: 5%;">
-                    <col span="1" style="width: 10%;">
-                    <col span="1" style="width: 30%;">
-                    <col span="1" style="width: 30%;">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>№</th>
-                    <th>Имя принтера<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"><br></th>
-                    <th>Номер инвентаря<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"><br></th>
-                    <th>Принесён из...<br><input type="text" placeholder="Начните вводить" id="sch4" class="enter"><br></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% set counter = namespace(value=1) %}
-                {% for printer in printers %}
-                    {% if printer.status == "Получен из ремонта" or printer.status == "Восстановлен" %}
-                        {% if (printer.efficiency != 0) and
-                        BroughtAPrinter.query.filter(BroughtAPrinter.printer_id == printer.id).all()|length > 0 %}
-                            <tr>
-                                <td class="1">
-                                    {{ counter.value }}
-                                    <label>
-                                        <input type="checkbox" name="num_inventory" value="{{ printer.num_inventory }}">
-                                    </label>
-                                </td>
-                                <td class="2">
-                                    {{ printer.name }}
-                                </td>
-                                <td class="3">
-                                    {{ printer.num_inventory }}
-                                </td>
-                                <td class="4">
-                                    {% set brought_a_printer = BroughtAPrinter.query.filter(BroughtAPrinter.printer_id == printer.id).all()[-1] %}
-                                    Подразделение: {{ brought_a_printer.location }}<br>
-                                    Корпус: {{ brought_a_printer.learning_campus }}<br>
-                                    Кабинет: {{ brought_a_printer.cabinet }}<br>
-                                    <input type="hidden"
-                                           name="location{{ printer.num_inventory }}"
-                                           value="{{ brought_a_printer.location }}">
-                                    <input type="hidden"
-                                           name="learning_campus{{ printer.num_inventory }}"
-                                           value="{{ brought_a_printer.learning_campus }}">
-                                    <input type="hidden"
-                                           name="cabinet{{ printer.num_inventory }}"
-                                           value="{{ brought_a_printer.cabinet }}">
-                                    <input type="hidden"
-                                           name="user{{ printer.num_inventory }}"
-                                           value="Добрынин И.А.">
-                                </td>
-                            </tr>
-                            {% set counter.value = counter.value + 1 %}
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
-                </tbody>
-            </table>
-            <input type="submit" value="Выдать" class="add_btn">
         </div>
+        <table style="width: 100%" id="mytable">
+            <colgroup>
+                <col span="1" style="width: 5%;">
+                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 30%;">
+                <col span="1" style="width: 30%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Имя принтера<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"><br></th>
+                <th>Номер инвентаря<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"><br>
+                </th>
+                <th>Принесён из...<br><input type="text" placeholder="Начните вводить" id="sch4" class="enter"><br></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = namespace(value=1) %}
+            {% for printer in printers %}
+                {% if printer.status == "Получен из ремонта" or printer.status == "Восстановлен" %}
+                    {% if (printer.efficiency != 0) and
+                        BroughtAPrinter.query.filter(BroughtAPrinter.printer_id == printer.id).all()|length > 0 %}
+                        <tr>
+                            <td class="1">
+                                {{ counter.value }}
+                                <label>
+                                    <input type="checkbox" name="num_inventory" value="{{ printer.num_inventory }}">
+                                </label>
+                            </td>
+                            <td class="2">
+                                {{ printer.name }}
+                            </td>
+                            <td class="3">
+                                {{ printer.num_inventory }}
+                            </td>
+                            <td class="4">
+                                {% set brought_a_printer = BroughtAPrinter.query.filter(BroughtAPrinter.printer_id == printer.id).all()[-1] %}
+                                Подразделение: {{ brought_a_printer.location }}<br>
+                                Корпус: {{ brought_a_printer.learning_campus }}<br>
+                                Кабинет: {{ brought_a_printer.cabinet }}<br>
+                                <input type="hidden"
+                                       name="location{{ printer.num_inventory }}"
+                                       value="{{ brought_a_printer.location }}">
+                                <input type="hidden"
+                                       name="learning_campus{{ printer.num_inventory }}"
+                                       value="{{ brought_a_printer.learning_campus }}">
+                                <input type="hidden"
+                                       name="cabinet{{ printer.num_inventory }}"
+                                       value="{{ brought_a_printer.cabinet }}">
+                                <input type="hidden"
+                                       name="user{{ printer.num_inventory }}"
+                                       value="Добрынин И.А.">
+                            </td>
+                        </tr>
+                        {% set counter.value = counter.value + 1 %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" value="Выдать" class="add_btn">
     </form>
 {% endblock %}

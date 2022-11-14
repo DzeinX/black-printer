@@ -29,13 +29,16 @@ $(document).ready(function () {
     $('#btn_off').click(function () {
         $('input[name="status"]').prop('checked', false)
         $('input[name="naming"]').prop('checked', false)
-        console.log($('#search').val(''))
-        console.log($('#sch1').val(''))
-        console.log($('#sch2').val(''))
-        console.log($('#sch3').val(''))
-        console.log($('#sch4').val(''))
-        console.log($('#sch5').val(''))
+        $('input[name="naming_wd"]').prop('checked', false)
+        $('#search').val('')
+        $('#search_work_done').val('')
+        $('#sch1').val('')
+        $('#sch2').val('')
+        $('#sch3').val('')
+        $('#sch4').val('')
+        $('#sch5').val('')
         $("#mytable tbody tr").show()
+        $(".dtls").show()
     });
 
     $("#sch1").keyup(function () {
@@ -68,5 +71,27 @@ $(document).ready(function () {
         $.each($("#mytable tbody tr td[class='6']"), function_coll);
     });
 
+    $('#search_work_done').keyup(function() {
+        _this = this;
+        console.log(1)
+        $.each($('.dtls'), function () {
+            console.log(2)
+            if ($(this).text().toLowerCase().indexOf($(_this).val().toLowerCase()) === -1)
+                $(this).hide();
+            else
+                $(this).show();
+        });
+    });
+
+    $('input[name="naming_wd"]').click(function () {
+        _this = this;
+        $.each($('.dtls'), function () {
+            console.log(2)
+            if ($(this).text().toLowerCase().indexOf($(_this).val().toLowerCase()) === -1)
+                $(this).hide();
+            else
+                $(this).show();
+        });
+    })
 });
 

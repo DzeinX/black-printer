@@ -62,11 +62,11 @@ def printers():
 
         var_check = TypeVar(name, num_inventory, location, learning_campus, cabinet, var_type='str')
         if var_check[1]:
-            printer.name = var_check[0][0]
-            printer.num_inventory = var_check[0][1]
-            printer.location_now = var_check[0][2]
-            printer.learning_campus_now = var_check[0][3]
-            printer.cabinet_now = var_check[0][4]
+            name = var_check[0][0]
+            num_inventory = var_check[0][1]
+            location_now = var_check[0][2]
+            learning_campus_now = var_check[0][3]
+            cabinet_now = var_check[0][4]
         else:
             if isinstance(var_check[0], str):
                 flash(var_check[0])
@@ -82,9 +82,9 @@ def printers():
 
         printer = Printer(name=name,
                           num_inventory=num_inventory,
-                          location_now=location,
-                          learning_campus_now=learning_campus,
-                          cabinet_now=cabinet,
+                          location_now=location_now,
+                          learning_campus_now=learning_campus_now,
+                          cabinet_now=cabinet_now,
                           status=status)
 
         printer.date_of_status.append(date_of_status)

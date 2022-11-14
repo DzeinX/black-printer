@@ -5,10 +5,10 @@
 
 {% block script %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="{{url_for('static', filename='js/select2.min.js')}}"></script>
-    <script src="{{url_for('static', filename='js/RemoveItem.js')}}"></script>
-    <script src="{{url_for('static', filename='js/SelectInput.js')}}"></script>
-    <script src="{{url_for('static', filename='js/TableSearch.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
     <script>
         let items = 1;
 
@@ -26,6 +26,7 @@
                     class="select"
                     required>
                 {% for cartridge in cartridges %}
+
                 {% if cartridge.status == "Выдан" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
                         <option value="{{ cartridge.number }}">
                             {{ cartridge.number }}
@@ -113,72 +114,72 @@
     </div>
     <form method="POST">
         <input type="hidden" name="id_form" value="2">
-        <div>
-            <label for="search">Поиск по таблице:</label><br>
+        <div class="sch_bar">
+            <label for="search"><strong> Поиск по таблице:</strong> </label><br>
             <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-            <table style="width: 100%" id="mytable">
-                <colgroup>
-                    <col span="1" style="width: 5%;">
-                    <col span="1" style="width: 10%;">
-                    <col span="1" style="width: 30%;">
-                    <col span="1" style="width: 30%;">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>№</th>
-                    <th>Номер<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
-                    <th>Модели<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
-                    <th>Отдали в<br><input type="text" placeholder="Начните вводить" id="sch4" class="enter"><br></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% set counter = namespace(value=1) %}
-                {% for cartridge in cartridges %}
-                    {% if cartridge.status == "Выдан" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
-                        {% if (cartridge.efficiency != 0) and
-                        CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()|length > 0 %}
-                            <tr>
-                                <td class="1">
-                                    {{ counter.value }}
-                                    <label>
-                                        <input type="checkbox" class="checkboxClass" name="cartridge_number"
-                                               value="{{ cartridge.number }}">
-                                    </label>
-                                </td>
-                                <td class="2">
-                                    {{ cartridge.number }}
-                                </td>
-                                <td class="3">
-                                    {% for model in cartridge.cartridge_models %}
-                                        {{ loop.index }}) {{ model.model }}<br>
-                                    {% endfor %}
-                                </td>
-                                <td class="4">
-                                    {% set cartridge_issuance = CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()[-1] %}
-                                    Подразделение: {{ cartridge_issuance.location }}<br>
-                                    Корпус: {{ cartridge_issuance.learning_campus }}<br>
-                                    Кабинет: {{ cartridge_issuance.cabinet }}<br>
-                                    <input type="hidden"
-                                           name="location{{ cartridge.number }}"
-                                           value="{{ cartridge_issuance.location }}">
-                                    <input type="hidden"
-                                           name="learning_campus{{ cartridge.number }}"
-                                           value="{{ cartridge_issuance.learning_campus }}">
-                                    <input type="hidden"
-                                           name="cabinet{{ cartridge.number }}"
-                                           value="{{ cartridge_issuance.cabinet }}">
-                                    <input type="hidden"
-                                           name="user{{ cartridge.number }}"
-                                           value="Добрынин И.А.">
-                                </td>
-                            </tr>
-                            {% set counter.value = counter.value + 1 %}
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
-                </tbody>
-            </table>
-            <input type="submit" value="Полученно" class="add_btn">
         </div>
+        <table style="width: 100%" id="mytable">
+            <colgroup>
+                <col span="1" style="width: 5%;">
+                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 30%;">
+                <col span="1" style="width: 30%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Номер<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th>Модели<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th>Отдали в<br><input type="text" placeholder="Начните вводить" id="sch4" class="enter"><br></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = namespace(value=1) %}
+            {% for cartridge in cartridges %}
+                {% if cartridge.status == "Выдан" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
+                    {% if (cartridge.efficiency != 0) and
+                        CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()|length > 0 %}
+                        <tr>
+                            <td class="1">
+                                {{ counter.value }}
+                                <label>
+                                    <input type="checkbox" class="checkboxClass" name="cartridge_number"
+                                           value="{{ cartridge.number }}">
+                                </label>
+                            </td>
+                            <td class="2">
+                                {{ cartridge.number }}
+                            </td>
+                            <td class="3">
+                                {% for model in cartridge.cartridge_models %}
+                                    {{ loop.index }}) {{ model.model }}<br>
+                                {% endfor %}
+                            </td>
+                            <td class="4">
+                                {% set cartridge_issuance = CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()[-1] %}
+                                Подразделение: {{ cartridge_issuance.location }}<br>
+                                Корпус: {{ cartridge_issuance.learning_campus }}<br>
+                                Кабинет: {{ cartridge_issuance.cabinet }}<br>
+                                <input type="hidden"
+                                       name="location{{ cartridge.number }}"
+                                       value="{{ cartridge_issuance.location }}">
+                                <input type="hidden"
+                                       name="learning_campus{{ cartridge.number }}"
+                                       value="{{ cartridge_issuance.learning_campus }}">
+                                <input type="hidden"
+                                       name="cabinet{{ cartridge.number }}"
+                                       value="{{ cartridge_issuance.cabinet }}">
+                                <input type="hidden"
+                                       name="user{{ cartridge.number }}"
+                                       value="Добрынин И.А.">
+                            </td>
+                        </tr>
+                        {% set counter.value = counter.value + 1 %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" value="Полученно" class="add_btn">
     </form>
 {% endblock %}

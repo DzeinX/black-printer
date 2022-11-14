@@ -209,6 +209,8 @@ class WorkDoneCartridges(db.Model):
     sum_price = db.Column(db.Float, nullable=False, default=0)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user = db.Column(db.String(40), nullable=True)
+    num_arg = db.Column(db.String(15), nullable=False)
+    date_arg = db.Column(db.DateTime, nullable=False)
 
     cartridge_id = db.Column(db.Integer, db.ForeignKey("cartridges.id"))
 
@@ -225,6 +227,8 @@ class WorkDonePrinters(db.Model):
     sum_price = db.Column(db.Float, nullable=False, default=0)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user = db.Column(db.String(40), nullable=True)
+    num_arg = db.Column(db.String(15), nullable=False)
+    date_arg = db.Column(db.DateTime, nullable=False)
 
     cartridge_id = db.Column(db.Integer, db.ForeignKey("printer.id"))
 

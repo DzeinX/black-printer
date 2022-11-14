@@ -58,16 +58,24 @@
     </div>
 
     {% if printers|length > 0 %}
-        <label for="search">Поиск по таблице:</label><br>
-        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-        Поиск по статусу:<br>
-        <input type="radio" name="status" value="в подразделении">В подразделении
-        <input type="radio" name="status" value="принят в ремонт">Принят в ремонт
-        <input type="radio" name="status" value="в ремонте">В ремонте
-        <input type="radio" name="status" value="получен из ремонта">Получен из ремонта
-        <input type="radio" name="status" value="восстановлен">Восстановлен
-        <input type="radio" name="status" value="добавлен">Добавлен
-        <input type="button" id="btn_off" value="Снять выделение">
+        <div class="sch_bar">
+            <div class="ctr">
+                <label for="search"><strong>Поиск по таблице:</strong></label><br>
+                <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+            </div>
+            <div class="line"></div>
+            <div class="ctr">
+                <strong>Поиск по статусу:></strong><br>
+                <input type="radio" name="status" value="в подразделении">В подразделении
+                <input type="radio" name="status" value="принят в ремонт">Принят в ремонт
+                <input type="radio" name="status" value="в ремонте">В ремонте
+                <input type="radio" name="status" value="получен из ремонта">Получен из ремонта
+                <input type="radio" name="status" value="восстановлен">Восстановлен
+                <input type="radio" name="status" value="добавлен">Добавлен<br>
+            </div>
+            <div class="line"></div>
+            <input type="button" id="btn_off" value="Снять выделение" class="btn_clr">
+        </div>
         <table style="width: 100%" id="mytable">
             <colgroup>
                 <col span="1" style="width: 5%;">
@@ -81,7 +89,8 @@
             <tr>
                 <th>№</th>
                 <th>Имя принтера<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"><br></th>
-                <th>Номер инвентаря<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"><br></th>
+                <th>Номер инвентаря<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"><br>
+                </th>
                 <th>Статус</th>
                 <th>Локация</th>
                 <th></th>
@@ -119,6 +128,6 @@
             </tbody>
         </table>
     {% else %}
-        <h1>NAN</h1>
+        <h1>Принтеров пока что нету</h1>
     {% endif %}
 {% endblock %}

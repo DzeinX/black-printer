@@ -10,8 +10,10 @@
 {% block body %}
     <h1>Удалённые принтеры</h1>
     {% if printers|length > 0 %}
-        <label for="search">Поиск по таблице:</label><br>
-        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+        <div class="sch_bar">
+            <label for="search"><strong>Поиск по таблице:</strong></label><br>
+            <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+        </div>
         <table id="mytable">
             <colgroup>
                 <col span="1" style="width: 5%;">
@@ -23,7 +25,8 @@
             <tr>
                 <th>№</th>
                 <th>Имя<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"><br></th>
-                <th>Инвентарный номер<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"><br></th>
+                <th>Инвентарный номер<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"><br>
+                </th>
                 <th></th>
             </tr>
             </thead>

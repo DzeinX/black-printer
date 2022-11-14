@@ -11,16 +11,24 @@
     <h1>{{ printer.name }} статусы: </h1><br>
     <a href={{ request.referrer }}>Назад</a><br>
     {% if statuses|length > 0 %}
-        <label for="search">Поиск по таблице:</label><br>
-        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-        Поиск по статусу:<br>
-        <input type="radio" name="status" value="в подразделении">В подразделении
-        <input type="radio" name="status" value="принят в ремонт">Принят в ремонт
-        <input type="radio" name="status" value="в ремонте">В ремонте
-        <input type="radio" name="status" value="получен из ремонта">Получен из ремонта
-        <input type="radio" name="status" value="восстановлен">Восстановлен
-        <input type="radio" name="status" value="добавлен">Добавлен
-        <input type="button" id="btn_off" value="Снять выделение">
+        <div class="sch_bar">
+            <div class="ctr">
+                <label for="search"><strong>Поиск по таблице:</strong></label><br>
+                <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+            </div>
+            <div class="line"></div>
+            <div class="ctr">
+                <strong>Поиск по статусу:</strong><br>
+                <input type="radio" name="status" value="в подразделении">В подразделении
+                <input type="radio" name="status" value="принят в ремонт">Принят в ремонт
+                <input type="radio" name="status" value="в ремонте">В ремонте
+                <input type="radio" name="status" value="получен из ремонта">Получен из ремонта
+                <input type="radio" name="status" value="восстановлен">Восстановлен
+                <input type="radio" name="status" value="добавлен">Добавлен
+            </div>
+            <div class="line"></div>
+            <input type="button" id="btn_off" value="Снять выделение" class="btn_clr">
+        </div>
         <table id="mytable">
             <colgroup>
                 <col span="1" style="width: 5%;">

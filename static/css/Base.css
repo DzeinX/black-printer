@@ -78,6 +78,9 @@ h1 {
     text-align: center;
     margin-top: 20px !important;
     margin-bottom: 20px !important;
+    width: auto !important;
+    background-color: gainsboro;
+    border-radius: 10px;
 }
 
 .main_div {
@@ -207,6 +210,7 @@ td {
     background: indianred;
     color: darkred;
     text-align: center;
+    padding: 5px;
 }
 
 .btn_clr:hover {
@@ -216,4 +220,33 @@ td {
     background: rgba(205,34,42,0.64);
     color: darkred;
     text-align: center;
+    padding: 5px;
+}
+
+.add_wrk {
+    background: lightblue;
+    margin-bottom: 10px;
+    border-radius: 1px;
+    display: block;
+    padding: 10px;
+}
+
+.details {
+    background: lightblue;
+    border-radius: 3px;
+    padding: 2px 5px;
+
+}
+
+.sum_details {
+    background: linen;
+    border-radius: 3px;
+    padding: 2px 5px;
+}
+
+.div_dtls {
+    background: gainsboro;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin: 2px;
 }

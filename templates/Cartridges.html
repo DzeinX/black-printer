@@ -83,16 +83,24 @@
         </form>
     </div>
     {% if cartridges|length > 0 %}
-        Поиск по таблице:<br>
-        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-        Поиск по статусу:<br>
-        <input type="radio" name="status" value="в резерве">В резерве
-        <input type="radio" name="status" value="принят в заправку">Принят в заправку
-        <input type="radio" name="status" value="в заправке">В заправке
-        <input type="radio" name="status" value="выдан">Выдан
-        <input type="radio" name="status" value="восстановлен">Восстановлен
-        <input type="radio" name="status" value="добавлен">Добавлен
-        <input type="button" id="btn_off" value="Снять выделение">
+        <div class="sch_bar">
+            <div class="ctr">
+                <strong>Поиск по таблице:</strong><br>
+                <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+            </div>
+            <div class="line"></div>
+            <div class="ctr">
+                <strong>Поиск по статусу:</strong><br>
+                <input type="radio" name="status" value="в резерве">В резерве
+                <input type="radio" name="status" value="принят в заправку">Принят в заправку
+                <input type="radio" name="status" value="в заправке">В заправке
+                <input type="radio" name="status" value="выдан">Выдан
+                <input type="radio" name="status" value="восстановлен">Восстановлен
+                <input type="radio" name="status" value="добавлен">Добавлен<br>
+            </div>
+            <div class="line"></div>
+            <input type="button" id="btn_off" value="Снять выделение" class="btn_clr">
+        </div>
         <table style="width: 100%" id="mytable">
             <colgroup>
                 <col span="1" style="width: 5%;">
@@ -129,7 +137,7 @@
                         <td class="4">
                             {{ cartridge.status }}
                         </td>
-                        <td  class="5">
+                        <td class="5">
                             <a href="/cartridge/{{ cartridge.id }}/update">Изменить</a>
                             <a href="/cartridge/{{ cartridge.id }}/delete">Удалить</a>
                             <a href="/cartridge/{{ cartridge.id }}/statuses">Статусы</a>
@@ -141,6 +149,6 @@
             </tbody>
         </table>
     {% else %}
-        <h1>NAN</h1>
+        <h1>Картриджей пока что нету</h1>
     {% endif %}
 {% endblock %}
