@@ -53,13 +53,14 @@
                             {{ counter.value }}
                         </td>
                         <td class="2">
-                            {{ status.date.date() }}
+                            Дата: {{ status.date.date() }}<br>
+                            Время: {{ status.date.time() }}
                         </td>
                         <td class="3">
                             {{ status.user }}
                         </td>
                         <td class="4">
-                            {{ status.status }}
+                            {{ status.action }}
                         </td>
                     </tr>
                     {% set counter.value = counter.value + 1 %}

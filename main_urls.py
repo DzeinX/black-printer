@@ -62,16 +62,19 @@ def main_page():
 
 @main_urls.route('/all_history')
 def all_history():
-    statuses_in_cartridges = DateStatusCartridge.query.all()
-    statuses_in_printers = DateStatusPrinter.query.all()
-    cartridges = Cartridges.query.all()
-
+    history_cartridges = HistoryCartridge.query.all()
+    history_printers = HistoryPrinter.query.all()
+    history_works = HistoryWorks.query.all()
+    history_checks = HistoryChecks.query.all()
+    history_contracts = HistoryContracts.query.all()
+    all_history = history_printers + history_cartridges + history_works + history_checks + history_contracts
     return render_template("AllHistory.html",
-                           statuses_in_cartridges=statuses_in_cartridges,
-                           statuses_in_printers=statuses_in_printers,
-                           cartridges=cartridges,
+                           all_history=all_history,
                            Cartridges=Cartridges,
-                           Printer=Printer)
+                           Printer=Printer,
+                           WorkList=WorkList,
+                           CheckLists=CheckLists,
+                           ListsOfContracts=ListsOfContracts)
 
 
 @main_urls.route('/active_contract', methods=['GET', 'POST'])
@@ -120,10 +123,11 @@ def active_contract():
         db.session.add(contract)
 
         try:
-            action = f"Создание нового договора {contract.date_contract.date()}"
+            action = f"Создан новый договор"
             user = "Добрынин И.А."
-            ah = AllHistory(action=action,
-                            user=user)
+            ah = HistoryContracts(action=action,
+                                  user=user)
+            contract.history_contracts_id.append(ah)
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -155,10 +159,11 @@ def close_contract(contract_id):
     contract.active = False
 
     try:
-        action = f"Закрытие контракта {contract.name}"
+        action = f"Закрытие договора"
         user = "Добрынин И.А."
-        ah = AllHistory(action=action,
-                        user=user)
+        ah = HistoryContracts(action=action,
+                              user=user)
+        contract.history_contracts_id.append(ah)
         db.session.add(ah)
     except:
         flash('При создании статуса произошла ошибка')
@@ -194,10 +199,11 @@ def new_check(contract_id):
         db.session.add(check)
 
         try:
-            action = f"Создание счёта для договора {contract.name}"
+            action = f"Создание счёта для договора"
             user = "Добрынин И.А."
-            ah = AllHistory(action=action,
-                            user=user)
+            ah = HistoryContracts(action=action,
+                                  user=user)
+            contract.history_contracts_id.append(ah)
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -222,11 +228,14 @@ def close_check(check_id):
 
     if check.sum == check_price:
         check.active = False
+        contract = ListsOfContracts.query.get(check.list_of_contracts_id)
+
         try:
-            action = f"Закрытие счёта {check.date_check.date()}"
+            action = f"Закрытие счёта у договора"
             user = "Добрынин И.А."
-            ah = AllHistory(action=action,
-                            user=user)
+            ah = HistoryContracts(action=action,
+                                  user=user)
+            contract.history_contracts_id.append(ah)
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -248,12 +257,14 @@ def close_check(check_id):
 def reopen_check(check_id):
     check = CheckLists.query.get(check_id)
     check.active = True
+    contract = ListsOfContracts.query.get(check.list_of_contracts_id)
 
     try:
-        action = f"Переоткрытие счёта {check.date_check.date()}"
+        action = f"Переоткрытие счёта у договора"
         user = "Добрынин И.А."
-        ah = AllHistory(action=action,
-                        user=user)
+        ah = HistoryContracts(action=action,
+                              user=user)
+        contract.history_contracts_id.append(ah)
         db.session.add(ah)
     except:
         flash('При создании статуса произошла ошибка')
@@ -295,10 +306,11 @@ def check_more(check_id):
             check.work_lists_id.append(work)
 
         try:
-            action = f"Добавление проделанных работ к {check.date_check.date()}"
+            action = f"Добавление проделанных работ к счёту"
             user = "Добрынин И.А."
-            ah = AllHistory(action=action,
-                            user=user)
+            ah = HistoryChecks(action=action,
+                               user=user)
+            check.history_check_list_id.append(ah)
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -308,6 +320,7 @@ def check_more(check_id):
             db.session.commit()
             return redirect(request.referrer)
         except:
+            flash('При обновлении счёта произошла ошибка')
             return render_template("main.html")
     else:
         return render_template('CheckMore.html',
@@ -401,19 +414,19 @@ def list_of_completed_works():
 
                 pr_0.work_done = True
 
-        db.session.add(work_list)
-
         try:
-            action = f"Создание проделанных работ {work_list.date_work.date()}"
+            action = f"Создание проделанных работ"
             user = "Добрынин И.А."
-            ah = AllHistory(action=action,
-                            user=user)
+            ah = HistoryWorks(action=action,
+                              user=user)
+            work_list.history_work_id.append(ah)
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
             return render_template("main.html")
 
         try:
+            db.session.add(work_list)
             db.session.commit()
             return redirect(request.referrer)
         except:

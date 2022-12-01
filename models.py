@@ -8,17 +8,6 @@ association_table_1 = db.Table('association', db.Model.metadata,
                                db.Column('ListModels_id', db.Integer, db.ForeignKey('ListModels.id')))
 
 
-class AllHistory(db.Model):
-    __tablename__ = "AllHistory"
-    id = db.Column(db.Integer, primary_key=True)
-    action = db.Column(db.String(50), nullable=False)
-    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-    user = db.Column(db.String(50), nullable=False)
-
-    def __repr__(self):
-        return '<AllHistory %r>' % self.id
-
-
 class Printer(db.Model):
     __tablename__ = "printer"
     id = db.Column(db.Integer, primary_key=True)
@@ -32,7 +21,7 @@ class Printer(db.Model):
     efficiency = db.Column(db.Boolean, nullable=False, default=True)
     work_done = db.Column(db.Boolean, nullable=False, default=True)
 
-    date_of_status = db.relationship("DateStatusPrinter")
+    date_of_status = db.relationship("HistoryPrinter")
     brought_a_printer_id = db.relationship("BroughtAPrinter")
     repair_id = db.relationship("Repair")
     reception_from_a_repair_id = db.relationship("ReceptionFromARepairing")
@@ -52,7 +41,7 @@ class Cartridges(db.Model):
     efficiency = db.Column(db.Boolean, nullable=False, default=True)
     work_done = db.Column(db.Boolean, nullable=False, default=True)
 
-    date_of_status = db.relationship("DateStatusCartridge")
+    date_of_status = db.relationship("HistoryCartridge")
     cartridge_models = db.relationship("ListModels", secondary=association_table_1)
     brought_a_cartridge_id = db.relationship("BroughtACartridge")
     refueling_id = db.relationship("Refueling")
@@ -64,30 +53,30 @@ class Cartridges(db.Model):
         return '<Cartridges %r>' % self.id
 
 
-class DateStatusPrinter(db.Model):
-    __tablename__ = "DateStatusPrinter"
+class HistoryPrinter(db.Model):
+    __tablename__ = "HistoryPrinter"
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-    status = db.Column(db.String(15), nullable=False)
+    action = db.Column(db.String(15), nullable=False)
     user = db.Column(db.String(25))
 
     printer_id = db.Column(db.Integer, db.ForeignKey("printer.id"))
 
     def __repr__(self):
-        return '<DateStatusPrinter %r>' % self.id
+        return '<HistoryPrinter %r>' % self.id
 
 
-class DateStatusCartridge(db.Model):
-    __tablename__ = "DateStatusCartridge"
+class HistoryCartridge(db.Model):
+    __tablename__ = "HistoryCartridge"
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-    status = db.Column(db.String(15), nullable=False)
+    action = db.Column(db.String(15), nullable=False)
     user = db.Column(db.String(25))
 
     cartridge_id = db.Column(db.Integer, db.ForeignKey("cartridges.id"))
 
     def __repr__(self):
-        return '<DateStatusCartridge %r>' % self.id
+        return '<HistoryCartridge %r>' % self.id
 
 
 class ListModels(db.Model):
@@ -293,6 +282,7 @@ class WorkList(db.Model):
 
     work_list_cartridges_id = db.relationship('WorkListsCartridges')
     work_list_printers_id = db.relationship('WorkListsPrinters')
+    history_work_id = db.relationship("HistoryWorks")
 
     def __repr__(self):
         return '<WorkList %r>' % self.id
@@ -307,7 +297,9 @@ class CheckLists(db.Model):
     active = db.Column(db.Boolean, nullable=False)
 
     list_of_contracts_id = db.Column(db.Integer, db.ForeignKey("ListsOfContracts.id"))
+
     work_lists_id = db.relationship("WorkList")
+    history_check_list_id = db.relationship("HistoryChecks")
 
     def __repr__(self):
         return '<CheckLists %r>' % self.id
@@ -323,6 +315,46 @@ class ListsOfContracts(db.Model):
     active = db.Column(db.Boolean, nullable=False)
 
     check_lists_id = db.relationship("CheckLists")
+    history_contracts_id = db.relationship("HistoryContracts")
 
     def __repr__(self):
         return '<ListOfContracts %r>' % self.id
+
+
+class HistoryWorks(db.Model):
+    __tablename__ = "HistoryWorks"
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
+    action = db.Column(db.String(15), nullable=False)
+    user = db.Column(db.String(25))
+
+    work_list_id = db.Column(db.Integer, db.ForeignKey("WorkList.id"))
+
+    def __repr__(self):
+        return '<HistoryWorks %r>' % self.id
+
+
+class HistoryChecks(db.Model):
+    __tablename__ = "HistoryChecks"
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
+    action = db.Column(db.String(15), nullable=False)
+    user = db.Column(db.String(25))
+
+    check_list_id = db.Column(db.Integer, db.ForeignKey("CheckLists.id"))
+
+    def __repr__(self):
+        return '<HistoryChecks %r>' % self.id
+
+
+class HistoryContracts(db.Model):
+    __tablename__ = "HistoryContracts"
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
+    action = db.Column(db.String(15), nullable=False)
+    user = db.Column(db.String(25))
+
+    lists_of_contracts_id = db.Column(db.Integer, db.ForeignKey("ListsOfContracts.id"))
+
+    def __repr__(self):
+        return '<HistoryContracts %r>' % self.id

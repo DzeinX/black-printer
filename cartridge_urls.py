@@ -145,6 +145,12 @@ def update_cartridge(id):
                 model = ListModels.query.filter(ListModels.model == model).first()
                 cartridge.cartridge_models.append(model)
 
+        user = "Добрынин И.А."
+        date_of_status = HistoryCartridge(action="изменён",
+                                          user=user)
+        cartridge.date_of_status.append(date_of_status)
+        db.session.add(date_of_status)
+
         try:
             db.session.commit()
             return redirect('/cartridges')
@@ -160,7 +166,7 @@ def update_cartridge(id):
 
 @cartridge_urls.route('/cartridge/<int:id>/statuses')
 def cartridge_status(id):
-    statuses = DateStatusCartridge.query.order_by(DateStatusCartridge.date.desc()).all()
+    statuses = HistoryCartridge.query.order_by(HistoryCartridge.date.desc()).all()
     cartridge = Cartridges.query.get(id)
     return render_template("CartridgeStatuses.html",
                            statuses=statuses,
@@ -174,11 +180,11 @@ def cartridges():
     cartridges = Cartridges.query.order_by(Cartridges.date_added.desc()).all()
 
     if request.method == 'POST':
-        status = "В резерве"
+        action = "В резерве"
         number = request.form['number']
         user = request.form['user']
-        date_of_status = DateStatusCartridge(status=status,
-                                             user=user)
+        date_of_status = HistoryCartridge(action=action,
+                                          user=user)
         cartridge_models = request.form.getlist('model')
 
         var_check = TypeVar(number, var_type='int')
@@ -200,7 +206,7 @@ def cartridges():
             flash('Такой номер уже есть')
             return redirect(request.referrer)
 
-        cartridge = Cartridges(status=status,
+        cartridge = Cartridges(status=action,
                                number=number)
         cartridge.date_of_status.append(date_of_status)
 
@@ -226,12 +232,12 @@ def delete_cartridge(id):
     cartridge = Cartridges.query.get_or_404(id)
     try:
         user = "Добрынин И.А."
-        status = DateStatusCartridge(status="Удалён",
-                                     cartridge_id=id,
-                                     user=user)
+        action = HistoryCartridge(action="Удалён",
+                                  cartridge_id=id,
+                                  user=user)
         cartridge.efficiency = 0
         cartridge.status = "Удалён"
-        db.session.add(status)
+        db.session.add(action)
         db.session.add(cartridge)
         db.session.commit()
         return redirect('/cartridges')
@@ -245,12 +251,12 @@ def resume_cartridge(id):
     cartridge = Cartridges.query.get_or_404(id)
     try:
         user = "Добрынин И.А."
-        status = DateStatusCartridge(status="Восстановлен",
-                                     cartridge_id=id,
-                                     user=user)
+        action = HistoryCartridge(action="Восстановлен",
+                                  cartridge_id=id,
+                                  user=user)
         cartridge.efficiency = 1
         cartridge.status = "Восстановлен"
-        db.session.add(status)
+        db.session.add(action)
         db.session.add(cartridge)
         db.session.commit()
         return redirect(request.referrer)
@@ -292,8 +298,8 @@ def brought_a_cartridge():
                                                         user=user)
 
                 cartridge.status = "Принят в заправку"
-                date_of_status = DateStatusCartridge(status="Принят в заправку",
-                                                     user=user)
+                date_of_status = HistoryCartridge(action="Принят в заправку",
+                                                  user=user)
                 cartridge.date_of_status.append(date_of_status)
                 cartridge.brought_a_cartridge_id.append(brought_a_cartridge)
 
@@ -326,8 +332,8 @@ def brought_a_cartridge():
                                                         user=user)
 
                 cartridge.status = "Принят в заправку"
-                date_of_status = DateStatusCartridge(status="Принят в заправку",
-                                                     user=user)
+                date_of_status = HistoryCartridge(action="Принят в заправку",
+                                                  user=user)
                 cartridge.date_of_status.append(date_of_status)
                 cartridge.brought_a_cartridge_id.append(brought_a_cartridge)
 
@@ -364,8 +370,8 @@ def refueling():
                 refueling = Refueling(user=user)
 
                 cartridge.status = "В заправке"
-                date_of_status = DateStatusCartridge(status="В заправке",
-                                                     user=user)
+                date_of_status = HistoryCartridge(action="В заправке",
+                                                  user=user)
                 cartridge.date_of_status.append(date_of_status)
                 cartridge.refueling_id.append(refueling)
 
@@ -377,8 +383,8 @@ def refueling():
                 refueling = Refueling(user=user)
 
                 cartridge.status = "В заправке"
-                date_of_status = DateStatusCartridge(status="В заправке",
-                                                     user=user)
+                date_of_status = HistoryCartridge(action="В заправке",
+                                                  user=user)
                 cartridge.date_of_status.append(date_of_status)
                 cartridge.refueling_id.append(refueling)
 
@@ -414,8 +420,8 @@ def receptionFromARefuelling():
                 reception_from_a_refueling = ReceptionFromARefueling(user=user)
 
                 cartridge.status = "В резерве"
-                date_of_status = DateStatusCartridge(status="В резерве",
-                                                     user=user)
+                date_of_status = HistoryCartridge(action="В резерве",
+                                                  user=user)
                 cartridge.date_of_status.append(date_of_status)
                 cartridge.reception_from_a_refueling_id.append(reception_from_a_refueling)
 
@@ -429,8 +435,8 @@ def receptionFromARefuelling():
                 reception_from_a_refueling = ReceptionFromARefueling(user=user)
 
                 cartridge.status = "В резерве"
-                date_of_status = DateStatusCartridge(status="В резерве",
-                                                     user=user)
+                date_of_status = HistoryCartridge(action="В резерве",
+                                                  user=user)
                 cartridge.date_of_status.append(date_of_status)
                 cartridge.reception_from_a_refueling_id.append(reception_from_a_refueling)
 
@@ -474,8 +480,8 @@ def issuance_cartridges():
                                              cabinet=cabinet)
 
                 cartridge.status = "Выдан"
-                date_of_status = DateStatusCartridge(status="Выдан",
-                                                     user=user)
+                date_of_status = HistoryCartridge(action="Выдан",
+                                                  user=user)
                 cartridge.date_of_status.append(date_of_status)
                 cartridge.issuance_id.append(issuance)
 
@@ -508,8 +514,8 @@ def issuance_cartridges():
                                              cabinet=cabinet)
 
                 cartridge.status = "Выдан"
-                date_of_status = DateStatusCartridge(status="Выдан",
-                                                     user=user)
+                date_of_status = HistoryCartridge(action="Выдан",
+                                                  user=user)
                 cartridge.date_of_status.append(date_of_status)
                 cartridge.issuance_id.append(issuance)
 

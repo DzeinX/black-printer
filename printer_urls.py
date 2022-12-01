@@ -7,7 +7,6 @@ from models import *
 from tabs_that_appear import *
 from ScanFunctions import TypeVar
 
-
 printer_urls = Blueprint('printer_urls', __name__)
 
 
@@ -119,17 +118,17 @@ def printers():
                 flash('Incorrect value')
                 return redirect(request.referrer)
 
-        status = "Добавлен"
+        action = "Добавлен"
         user = request.form['user']
-        date_of_status = DateStatusPrinter(status=status,
-                                           user=user)
+        date_of_status = HistoryPrinter(action=action,
+                                        user=user)
 
         printer = Printer(name=name,
                           num_inventory=num_inventory,
                           location_now=location_now,
                           learning_campus_now=learning_campus_now,
                           cabinet_now=cabinet_now,
-                          status=status)
+                          status=action)
 
         printer.date_of_status.append(date_of_status)
 
@@ -147,7 +146,7 @@ def printers():
 
 @printer_urls.route('/printer/<int:id>/statuses')
 def printers_status(id):
-    statuses = DateStatusPrinter.query.order_by(DateStatusPrinter.date.desc()).all()
+    statuses = HistoryPrinter.query.order_by(HistoryPrinter.date.desc()).all()
     printer = Printer.query.get(id)
     return render_template("PrinterStatuses.html",
                            statuses=statuses,
@@ -160,12 +159,12 @@ def delete_printer(id):
     printer = Printer.query.get_or_404(id)
     try:
         user = "Добрынин И.А."
-        status = DateStatusPrinter(status="Удалён",
-                                   printer_id=id,
-                                   user=user)
+        action = HistoryPrinter(action="Удалён",
+                                printer_id=id,
+                                user=user)
         printer.efficiency = 0
         printer.status = "Удалён"
-        db.session.add(status)
+        db.session.add(action)
         db.session.add(printer)
         db.session.commit()
         return redirect('/printers')
@@ -179,12 +178,12 @@ def resume_printer(id):
     printer = Printer.query.get_or_404(id)
     try:
         user = "Добрынин И.А."
-        status = DateStatusPrinter(status="Восстановлен",
-                                   printer_id=id,
-                                   user=user)
+        action = HistoryPrinter(action="Восстановлен",
+                                printer_id=id,
+                                user=user)
         printer.efficiency = 1
         printer.status = "Восстановлен"
-        db.session.add(status)
+        db.session.add(action)
         db.session.add(printer)
         db.session.commit()
         return redirect(request.referrer)
@@ -227,8 +226,8 @@ def brought_a_printer():
                                                     user=user)
 
                 printer.status = "Принят в ремонт"
-                date_of_status = DateStatusPrinter(status="Принят в ремонт",
-                                                   user=user)
+                date_of_status = HistoryPrinter(action="Принят в ремонт",
+                                                user=user)
                 printer.date_of_status.append(date_of_status)
                 printer.brought_a_printer_id.append(brought_a_printer)
 
@@ -253,7 +252,6 @@ def brought_a_printer():
                     return redirect(request.referrer)
 
             for number in printer_num:
-
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
 
                 brought_a_printer = BroughtAPrinter(location=location,
@@ -262,8 +260,8 @@ def brought_a_printer():
                                                     user=user)
 
                 printer.status = "Принят в ремонт"
-                date_of_status = DateStatusPrinter(status="Принят в ремонт",
-                                                   user=user)
+                date_of_status = HistoryPrinter(action="Принят в ремонт",
+                                                user=user)
                 printer.date_of_status.append(date_of_status)
                 printer.brought_a_printer_id.append(brought_a_printer)
 
@@ -301,8 +299,8 @@ def repairing():
                 repair = Repair(user=user)
 
                 printer.status = "В ремонте"
-                date_of_status = DateStatusPrinter(status="В ремонте",
-                                                   user=user)
+                date_of_status = HistoryPrinter(action="В ремонте",
+                                                user=user)
                 printer.date_of_status.append(date_of_status)
                 printer.repair_id.append(repair)
 
@@ -314,8 +312,8 @@ def repairing():
                 repair = Repair(user=user)
 
                 printer.status = "В ремонте"
-                date_of_status = DateStatusPrinter(status="В ремонте",
-                                                   user=user)
+                date_of_status = HistoryPrinter(action="В ремонте",
+                                                user=user)
                 printer.date_of_status.append(date_of_status)
                 printer.repair_id.append(repair)
 
@@ -351,8 +349,8 @@ def receptionFromARepairing():
                 reception_from_a_repairing = ReceptionFromARepairing(user=user)
 
                 printer.status = "Получен из ремонта"
-                date_of_status = DateStatusPrinter(status="Получен из ремонта",
-                                                   user=user)
+                date_of_status = HistoryPrinter(action="Получен из ремонта",
+                                                user=user)
                 printer.date_of_status.append(date_of_status)
                 printer.reception_from_a_repair_id.append(reception_from_a_repairing)
 
@@ -366,8 +364,8 @@ def receptionFromARepairing():
                 reception_from_a_repairing = ReceptionFromARepairing(user=user)
 
                 printer.status = "Получен из ремонта"
-                date_of_status = DateStatusPrinter(status="Получен из ремонта",
-                                                   user=user)
+                date_of_status = HistoryPrinter(action="Получен из ремонта",
+                                                user=user)
                 printer.date_of_status.append(date_of_status)
                 printer.reception_from_a_repair_id.append(reception_from_a_repairing)
 
@@ -416,8 +414,8 @@ def issuance_printers():
                                            cabinet=cabinet)
 
                 printer.status = "В подразделении"
-                date_of_status = DateStatusPrinter(status="В подразделении",
-                                                   user=user)
+                date_of_status = HistoryPrinter(action="В подразделении",
+                                                user=user)
                 printer.date_of_status.append(date_of_status)
                 printer.issuance_id.append(issuance)
 
@@ -442,7 +440,6 @@ def issuance_printers():
                     return redirect(request.referrer)
 
             for number in printer_num:
-
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
 
                 printer.location_now = location
@@ -455,8 +452,8 @@ def issuance_printers():
                                            cabinet=cabinet)
 
                 printer.status = "В подразделении"
-                date_of_status = DateStatusPrinter(status="В подразделении",
-                                                   user=user)
+                date_of_status = HistoryPrinter(action="В подразделении",
+                                                user=user)
                 printer.date_of_status.append(date_of_status)
                 printer.issuance_id.append(issuance)
 
