@@ -4,7 +4,7 @@
 
 {% block script %}
     <script>
-        let items = {{ counter_models }};
+        let items = {{ counter_works }};
 
         function AddItem() {
             const div = document.getElementById("items");
@@ -20,7 +20,7 @@
                        type="text"
                        value=""
                        class="enter"
-                       name="model"><input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}"><br>`;
+                       name="works"><input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}"><br>`;
 
             div.insertBefore(newitem, button);
         }
@@ -35,7 +35,7 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Модели:</h1>
+    <h1>Типы работ:</h1>
     <div class="align-center">
         <form method="POST">
             <div class="form" id="items" style="width: 270px !important;">
@@ -43,13 +43,13 @@
                     <p style="color: darkred"><strong>{{ message }}</strong></p>
                 {% endfor %}
                 {% set counter = namespace(value=1) %}
-                {% for model in list_models %}
+                {% for work in all_works_printers %}
                     <div id="d{{ loop.index }}">
                         <label for="{{ loop.index }}">{{ counter.value }} </label>
                         <input id="{{ loop.index }}"
                                type="text"
-                               value="{{ model.model }}"
-                               name="model"
+                               value="{{ work.work }}"
+                               name="works"
                                class="enter"><input type="button" value="✕" class="delete_btn"
                                                    onclick="RemoveItem('d{{ loop.index }}');"
                                                    id="r{{ loop.index }}"><br>

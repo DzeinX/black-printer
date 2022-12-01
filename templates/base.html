@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="{% block CSS %}{% endblock %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icons8-печать-50.png') }}">
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
 </head>
@@ -56,18 +57,31 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="/add_models" class="nav-link">Добавить модели</a>
+                    <a class="nav-link">Добавить V</a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a href="/add_models" class="nav-link">Модели</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/add_works_cartridges" class="nav-link">Тип работ картриждей</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/add_works_printers" class="nav-link">Тип работ принтеров</a>
+                        </li>
+                    </ul>
                 </li>
                 <li class="nav-item">
                     <a href="/all_history" class="nav-link">Вся история</a>
                 </li>
-                {% if not is_work_done %}
                 <li class="nav-item">
-                    <a href="/work_done" 
-                       style="color: black !important; background-color: lightgoldenrodyellow !important; border-radius: 4px !important;" 
-                       class="nav-link"><img src="../static/images/warning.png" style="width: 16px; height: 16px;" alt="warning">Проделанные работы</a>
+                    <a href="/progress_report" class="nav-link">Отчёт</a>
                 </li>
-                {% endif %}
+                <li class="nav-item">
+                    <a href="/list_of_completed_works" class="nav-link">Проделанные работы</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/active_contract" class="nav-link">Активный договор</a>
+                </li>
             </ul>
         </header>
     </div>

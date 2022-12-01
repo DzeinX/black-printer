@@ -7,8 +7,52 @@ from models import *
 from tabs_that_appear import *
 from ScanFunctions import TypeVar
 
-
 cartridge_urls = Blueprint('cartridge_urls', __name__)
+
+
+@cartridge_urls.route('/add_works_cartridges', methods=['GET', 'POST'])
+def add_works_cartridges():
+    all_works_cartridges = AllWorksCartridges.query.all()
+    counter_works = len(all_works_cartridges)
+
+    if request.method == "POST":
+        all_works_cartridges = request.form.getlist('works')
+
+        var_check = TypeVar(all_works_cartridges, var_type='str')
+        if var_check[1]:
+            all_works_cartridges = var_check[0][0]
+        else:
+            if isinstance(var_check[0], str):
+                flash(var_check[0])
+                return redirect(request.referrer)
+            else:
+                flash('Incorrect value')
+                return redirect(request.referrer)
+
+        if len(all_works_cartridges) == 0:
+            flash('Нельзя удалить все модели')
+            return redirect(request.referrer)
+
+        AllWorksCartridges.query.delete()
+        try:
+            for work in all_works_cartridges:
+
+                if work != '' and not work.isspace():
+                    model = AllWorksCartridges(work=work)
+                    db.session.add(model)
+        except:
+            return f"Не удалось сохранить изменения"
+
+        try:
+            db.session.commit()
+            return redirect("/add_works_cartridges")
+        except:
+            flash('Не удалось добавить тип работ')
+            return render_template("main.html")
+    else:
+        return render_template("AddWorksCartridges.html",
+                               all_works_cartridges=all_works_cartridges,
+                               counter_works=counter_works)
 
 
 @cartridge_urls.route('/add_models', methods=['GET', 'POST'])
@@ -49,12 +93,11 @@ def add_models():
             return redirect("/add_models")
         except:
             flash('Не удалось добавить модель')
-            return redirect('/')
+            return render_template("main.html")
     else:
         return render_template("AddModels.html",
                                list_models=list_models,
-                               counter_models=counter_models,
-                               is_work_done=IsWorkDone())
+                               counter_models=counter_models)
 
 
 @cartridge_urls.route('/cartridge/<int:id>/update', methods=['GET', 'POST'])
@@ -107,13 +150,12 @@ def update_cartridge(id):
             return redirect('/cartridges')
         except:
             flash('При обновлении картриджа произошла ошибка')
-            return render_template('main.html')
+            return render_template("main.html")
     else:
         return render_template("cartridge_update.html",
                                cartridge=cartridge,
                                list_models=list_models,
-                               counter_models=counter_models,
-                               is_work_done=IsWorkDone())
+                               counter_models=counter_models)
 
 
 @cartridge_urls.route('/cartridge/<int:id>/statuses')
@@ -123,8 +165,7 @@ def cartridge_status(id):
     return render_template("CartridgeStatuses.html",
                            statuses=statuses,
                            id=id,
-                           cartridge=cartridge,
-                           is_work_done=IsWorkDone())
+                           cartridge=cartridge)
 
 
 @cartridge_urls.route('/cartridges', methods=['GET', 'POST'])
@@ -173,12 +214,11 @@ def cartridges():
             return redirect('/cartridges')
         except:
             flash('При создании картриджа произошла ошибка')
-            return render_template('main.html')
+            return render_template("main.html")
     else:
         return render_template("Cartridges.html",
                                cartridges=cartridges,
-                               list_models=list_models,
-                               is_work_done=IsWorkDone())
+                               list_models=list_models)
 
 
 @cartridge_urls.route('/cartridge/<int:id>/delete')
@@ -197,8 +237,7 @@ def delete_cartridge(id):
         return redirect('/cartridges')
     except:
         flash('Ошибка удаления картриджа')
-        return render_template('main.html',
-                               is_work_done=IsWorkDone())
+        return render_template('main.html')
 
 
 @cartridge_urls.route('/cartridge/<int:id>/resume')
@@ -217,16 +256,14 @@ def resume_cartridge(id):
         return redirect(request.referrer)
     except:
         flash('Ошибка восстановления картриджа')
-        return render_template('main.html',
-                               is_work_done=IsWorkDone())
+        return render_template('main.html')
 
 
 @cartridge_urls.route('/deleted_cartridges')
 def deleted_cartridges():
     cartridges = Cartridges.query.all()
     return render_template('DeletedCartridges.html',
-                           cartridges=cartridges,
-                           is_work_done=IsWorkDone())
+                           cartridges=cartridges)
 
 
 @cartridge_urls.route('/brought_a_cartridge', methods=['GET', 'POST'])
@@ -281,7 +318,6 @@ def brought_a_cartridge():
                     return redirect(request.referrer)
 
             for number in cartridge_number:
-
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
 
                 brought_a_cartridge = BroughtACartridge(location=location,
@@ -302,12 +338,11 @@ def brought_a_cartridge():
             return redirect('/cartridges')
         except:
             flash('Не удалось отправить форму')
-            return render_template('main.html')
+            return render_template("main.html")
     else:
         return render_template('BroughtACartridge.html',
                                cartridges=cartridges,
-                               CartridgeIssuance=CartridgeIssuance,
-                               is_work_done=IsWorkDone())
+                               CartridgeIssuance=CartridgeIssuance)
 
 
 @cartridge_urls.route('/refueling', methods=['GET', 'POST'])
@@ -354,11 +389,10 @@ def refueling():
             return redirect('/cartridges')
         except:
             flash('Не удалось отправить форму')
-            return render_template('main.html')
+            return render_template("main.html")
     else:
         return render_template('Refueling.html',
-                               cartridges=cartridges,
-                               is_work_done=IsWorkDone())
+                               cartridges=cartridges)
 
 
 @cartridge_urls.route('/reception_from_a_refuelling', methods=['GET', 'POST'])
@@ -409,11 +443,10 @@ def receptionFromARefuelling():
             return redirect('/cartridges')
         except:
             flash('Не удалось отправить форму')
-            return render_template('main.html')
+            return render_template("main.html")
     else:
         return render_template('ReceptionFromARefuelling.html',
-                               cartridges=cartridges,
-                               is_work_done=IsWorkDone())
+                               cartridges=cartridges)
 
 
 @cartridge_urls.route('/issuance_cartridges', methods=['GET', 'POST'])
@@ -467,7 +500,6 @@ def issuance_cartridges():
                     return redirect(request.referrer)
 
             for number in cartridge_number:
-
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
 
                 issuance = CartridgeIssuance(user=user,
@@ -488,9 +520,8 @@ def issuance_cartridges():
             return redirect('/cartridges')
         except:
             flash('Не удалось отправить форму')
-            return render_template('main.html')
+            return render_template("main.html")
     else:
         return render_template('IssuanceCartridges.html',
                                cartridges=cartridges,
-                               BroughtACartridge=BroughtACartridge,
-                               is_work_done=IsWorkDone())
+                               BroughtACartridge=BroughtACartridge)

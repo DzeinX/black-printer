@@ -108,11 +108,11 @@ h1 {
 
 .enter {
     width: 195px;
-    border-radius: 4px;
-    height: 30px;
+    border-radius: 15px;
+    height: 28px;
     border-width: 1px;
     border-color: darkgray;
-
+    margin: 4px;
 }
 
 body {
@@ -189,6 +189,7 @@ td {
     text-align: center;
     margin: 10px auto;
     display: block;
+    border-radius: 1px;
 }
 
 .sch_bar {

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}New check{% endblock %}
+
+{% block script %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
+    <script>
+
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>Новый счёт для {{ contract.name }}</h1>
+    {% for msg in get_flashed_messages() %}
+        <div class="msg">
+            <h4>{{ msg }}</h4>
+        </div>
+    {% endfor %}
+    <div class="align-center">
+        <form method="POST">
+            <div class="form" id="items" style="width: 270px !important;">
+                <label for="sum_check">Сумма счёта:</label><br>
+                <input type="number" name="sum" id="sum_check" class="enter"><br>
+                <label for="date_check">Дата счёта</label>
+                <input type="date" name="date_check" class="enter" id="date_check">
+                <input type="submit" value="Добавить" class="add_btn">
+            </div>
+        </form>
+    </div>
+{% endblock %}

@@ -11,6 +11,51 @@ from ScanFunctions import TypeVar
 printer_urls = Blueprint('printer_urls', __name__)
 
 
+@printer_urls.route('/add_works_printers', methods=['GET', 'POST'])
+def add_works_printers():
+    all_works_printers = AllWorksPrinters.query.all()
+    counter_works = len(all_works_printers)
+
+    if request.method == "POST":
+        all_works_printers = request.form.getlist('works')
+
+        var_check = TypeVar(all_works_printers, var_type='str')
+        if var_check[1]:
+            all_works_printers = var_check[0][0]
+        else:
+            if isinstance(var_check[0], str):
+                flash(var_check[0])
+                return redirect(request.referrer)
+            else:
+                flash('Incorrect value')
+                return redirect(request.referrer)
+
+        if len(all_works_printers) == 0:
+            flash('Нельзя удалить все модели')
+            return redirect(request.referrer)
+
+        AllWorksPrinters.query.delete()
+        try:
+            for work in all_works_printers:
+
+                if work != '' and not work.isspace():
+                    model = AllWorksPrinters(work=work)
+                    db.session.add(model)
+        except:
+            return f"Не удалось сохранить изменения"
+
+        try:
+            db.session.commit()
+            return redirect("/add_works_printers")
+        except:
+            flash('Не удалось добавить тип работ')
+            return render_template("main.html")
+    else:
+        return render_template("AddWorksPrinters.html",
+                               all_works_printers=all_works_printers,
+                               counter_works=counter_works)
+
+
 @printer_urls.route('/printer/<int:id>/update', methods=['GET', 'POST'])
 def update_printer(id):
     printer = Printer.query.get(id)
@@ -42,16 +87,15 @@ def update_printer(id):
             return redirect('/printers')
         except:
             flash('При обновлении принтера произошла ошибка')
-            return render_template('main.html')
+            return render_template("main.html")
     else:
         return render_template("printer_update.html",
-                               printer=printer,
-                               is_work_done=IsWorkDone())
+                               printer=printer)
 
 
 @printer_urls.route('/printers', methods=['GET', 'POST'])
 def printers():
-    printer = Printer.query.order_by(Printer.date_added.desc()).all()
+    printers = Printer.query.order_by(Printer.date_added.desc()).all()
 
     if request.method == 'POST':
         name = request.form['name']
@@ -95,10 +139,10 @@ def printers():
             return redirect('/printers')
         except:
             flash('При добавлении принтера произошла ошибка')
-            return render_template('main.html')
+            return render_template("main.html")
+
     return render_template("Printers.html",
-                           printers=printer,
-                           is_work_done=IsWorkDone())
+                           printers=printers)
 
 
 @printer_urls.route('/printer/<int:id>/statuses')
@@ -108,8 +152,7 @@ def printers_status(id):
     return render_template("PrinterStatuses.html",
                            statuses=statuses,
                            id=id,
-                           printer=printer,
-                           is_work_done=IsWorkDone())
+                           printer=printer)
 
 
 @printer_urls.route('/printer/<int:id>/delete')
@@ -128,8 +171,7 @@ def delete_printer(id):
         return redirect('/printers')
     except:
         flash('Ошибка удаления принтера')
-        return render_template('main.html',
-                               is_work_done=IsWorkDone())
+        return render_template('main.html')
 
 
 @printer_urls.route('/printer/<int:id>/resume')
@@ -148,8 +190,7 @@ def resume_printer(id):
         return redirect(request.referrer)
     except:
         flash('Ошибка восстановления принтера')
-        return render_template('main.html',
-                               is_work_done=IsWorkDone())
+        return render_template('main.html')
 
 
 @printer_urls.route('/deleted_printers')
@@ -157,8 +198,7 @@ def deleted_printers():
     printers = Printer.query.all()
 
     return render_template('DeletedPrinters.html',
-                           printers=printers,
-                           is_work_done=IsWorkDone())
+                           printers=printers)
 
 
 @printer_urls.route('/brought_a_printer', methods=['GET', 'POST'])
@@ -234,12 +274,12 @@ def brought_a_printer():
             return redirect('/printers')
         except:
             flash('Не удалось отправить форму')
-            return render_template('main.html')
+            return render_template("main.html")
+
     else:
         return render_template('BroughtAPrinter.html',
                                printers=printers,
-                               PrinterIssuance=PrinterIssuance,
-                               is_work_done=IsWorkDone())
+                               PrinterIssuance=PrinterIssuance)
 
 
 @printer_urls.route('/repairing', methods=['GET', 'POST'])
@@ -286,11 +326,10 @@ def repairing():
             return redirect('/printers')
         except:
             flash('Не удалось отправить форму')
-            return render_template('main.html')
+            return render_template("main.html")
     else:
         return render_template('Repairing.html',
-                               printers=printers,
-                               is_work_done=IsWorkDone())
+                               printers=printers)
 
 
 @printer_urls.route('/reception_from_a_repairing', methods=['GET', 'POST'])
@@ -341,11 +380,10 @@ def receptionFromARepairing():
             return redirect('/printers')
         except:
             flash('Не удалось отправить форму')
-            return render_template('main.html')
+            return render_template("main.html")
     else:
         return render_template('ReceptionFromARepair.html',
-                               printers=printers,
-                               is_work_done=IsWorkDone())
+                               printers=printers)
 
 
 @printer_urls.route('/issuance_printers', methods=['GET', 'POST'])
@@ -429,9 +467,8 @@ def issuance_printers():
             return redirect('/printers')
         except:
             flash('Не удалось отправить форму')
-            return render_template('main.html')
+            return render_template("main.html")
     else:
         return render_template('IssuancePrinters.html',
                                printers=printers,
-                               BroughtAPrinter=BroughtAPrinter,
-                               is_work_done=IsWorkDone())
+                               BroughtAPrinter=BroughtAPrinter)

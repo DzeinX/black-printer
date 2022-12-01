@@ -71,27 +71,24 @@ $(document).ready(function () {
         $.each($("#mytable tbody tr td[class='6']"), function_coll);
     });
 
-    $('#search_work_done').keyup(function() {
+    $('#search_progress_report').keyup(function() {
         _this = this;
-        console.log(1)
         $.each($('.dtls'), function () {
-            console.log(2)
-            if ($(this).text().toLowerCase().indexOf($(_this).val().toLowerCase()) === -1)
+            if ($(this).text().toLowerCase().substring(79, 100).indexOf($(_this).val().toLowerCase()) === -1)
                 $(this).hide();
             else
                 $(this).show();
         });
     });
 
-    $('input[name="naming_wd"]').click(function () {
+    $('#search_locw').keyup(function() {
         _this = this;
         $.each($('.dtls'), function () {
-            console.log(2)
-            if ($(this).text().toLowerCase().indexOf($(_this).val().toLowerCase()) === -1)
+            if ($(this).text().toLowerCase().substring(38, 48).indexOf($(_this).val().toLowerCase()) === -1)
                 $(this).hide();
             else
                 $(this).show();
-        });
-    })
+        });search_locw
+    });
 });
 
