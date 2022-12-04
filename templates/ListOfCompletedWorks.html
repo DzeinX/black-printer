@@ -113,7 +113,7 @@
                     {% endif %}
                     {% endfor %}
                     <label>
-                    Дата договора:
+                    Дата списка работ:
                     <input type="date"
                            name="date_work"
                            class="enter"
@@ -220,7 +220,7 @@
     <input type="button" value="Добавить" class="add_field" id="add_work_done" onclick="AddCheck();">
         {% for work in wl %}
             <div id="d{{ loop.index }}" style="background: lightblue; margin: 5px; padding: 5px" class="dtls">
-                <h4>Проделанные работы {{ work.number }} ({{ work.date_work.date() }}):</h4>
+                <h4>Проделанные работы {{ work.number }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
                 Общая сумма:{{ wd_prices[loop.index - 1] }}<br>
                 <table>
                     <thead>

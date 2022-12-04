@@ -62,14 +62,9 @@ def main_page():
 
 @main_urls.route('/all_history')
 def all_history():
-    history_cartridges = HistoryCartridge.query.all()
-    history_printers = HistoryPrinter.query.all()
-    history_works = HistoryWorks.query.all()
-    history_checks = HistoryChecks.query.all()
-    history_contracts = HistoryContracts.query.all()
-    all_history = history_printers + history_cartridges + history_works + history_checks + history_contracts
+    all_htry = AllHistory.query.order_by(AllHistory.date.desc()).all()
     return render_template("AllHistory.html",
-                           all_history=all_history,
+                           all_htry=all_htry,
                            Cartridges=Cartridges,
                            Printer=Printer,
                            WorkList=WorkList,
@@ -123,11 +118,14 @@ def active_contract():
         db.session.add(contract)
 
         try:
-            action = f"Создан новый договор"
+            action_h = "Создан"
+            type_h = "договор"
+            name_h = f"{name}"
             user = "Добрынин И.А."
-            ah = HistoryContracts(action=action,
-                                  user=user)
-            contract.history_contracts_id.append(ah)
+            ah = AllHistory(action=action_h,
+                            type=type_h,
+                            name=name_h,
+                            user=user)
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -159,11 +157,14 @@ def close_contract(contract_id):
     contract.active = False
 
     try:
-        action = f"Закрытие договора"
+        action_h = "Закрыт"
+        type_h = "договор"
+        name_h = f"{contract.name}"
         user = "Добрынин И.А."
-        ah = HistoryContracts(action=action,
-                              user=user)
-        contract.history_contracts_id.append(ah)
+        ah = AllHistory(action=action_h,
+                        type=type_h,
+                        name=name_h,
+                        user=user)
         db.session.add(ah)
     except:
         flash('При создании статуса произошла ошибка')
@@ -199,11 +200,14 @@ def new_check(contract_id):
         db.session.add(check)
 
         try:
-            action = f"Создание счёта для договора"
+            action_h = "Создан"
+            type_h = "счёт"
+            name_h = f"{date_check.date().strftime('%d.%m.%Y')}"
             user = "Добрынин И.А."
-            ah = HistoryContracts(action=action,
-                                  user=user)
-            contract.history_contracts_id.append(ah)
+            ah = AllHistory(action=action_h,
+                            type=type_h,
+                            name=name_h,
+                            user=user)
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -228,14 +232,16 @@ def close_check(check_id):
 
     if check.sum == check_price:
         check.active = False
-        contract = ListsOfContracts.query.get(check.list_of_contracts_id)
 
         try:
-            action = f"Закрытие счёта у договора"
+            action_h = "Закрыт"
+            type_h = "счёт"
+            name_h = f"{check.date_check.date().strftime('%d.%m.%Y')}"
             user = "Добрынин И.А."
-            ah = HistoryContracts(action=action,
-                                  user=user)
-            contract.history_contracts_id.append(ah)
+            ah = AllHistory(action=action_h,
+                            type=type_h,
+                            name=name_h,
+                            user=user)
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -257,14 +263,16 @@ def close_check(check_id):
 def reopen_check(check_id):
     check = CheckLists.query.get(check_id)
     check.active = True
-    contract = ListsOfContracts.query.get(check.list_of_contracts_id)
 
     try:
-        action = f"Переоткрытие счёта у договора"
+        action_h = "Переоткрыт"
+        type_h = "счёт"
+        name_h = f"{check.date_check.date().strftime('%d.%m.%Y')}"
         user = "Добрынин И.А."
-        ah = HistoryContracts(action=action,
-                              user=user)
-        contract.history_contracts_id.append(ah)
+        ah = AllHistory(action=action_h,
+                        type=type_h,
+                        name=name_h,
+                        user=user)
         db.session.add(ah)
     except:
         flash('При создании статуса произошла ошибка')
@@ -306,11 +314,14 @@ def check_more(check_id):
             check.work_lists_id.append(work)
 
         try:
-            action = f"Добавление проделанных работ к счёту"
+            action_h = "Пополнен"
+            type_h = "счёт"
+            name_h = f"{check.date_check.date().strftime('%d.%m.%Y')}"
             user = "Добрынин И.А."
-            ah = HistoryChecks(action=action,
-                               user=user)
-            check.history_check_list_id.append(ah)
+            ah = AllHistory(action=action_h,
+                            type=type_h,
+                            name=name_h,
+                            user=user)
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -415,11 +426,14 @@ def list_of_completed_works():
                 pr_0.work_done = True
 
         try:
-            action = f"Создание проделанных работ"
+            action_h = "Создан"
+            type_h = "список работ"
+            name_h = f"{work_list.date_work.date().strftime('%d.%m.%Y')}"
             user = "Добрынин И.А."
-            ah = HistoryWorks(action=action,
-                              user=user)
-            work_list.history_work_id.append(ah)
+            ah = AllHistory(action=action_h,
+                            type=type_h,
+                            name=name_h,
+                            user=user)
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -444,6 +458,61 @@ def list_of_completed_works():
                                all_wc=all_wc,
                                all_wp=all_wp,
                                wd_prices=wd_prices)
+
+
+@main_urls.route('/list_of_completed_works/<int:work_id>/update', methods=['GET', 'POST'])
+def update_work(work_id):
+    work = WorkList.query.get(work_id)
+    wlp = WorkListsPrinters.query.all()
+    wlc = WorkListsCartridges.query.all()
+
+    if request.method == "POST":
+        prices_c = request.form.getlist('prices_c')
+        prices_p = request.form.getlist('prices_p')
+        works_c_id = request.form.getlist('works_c_id')
+        works_p_id = request.form.getlist('works_p_id')
+
+        for wlc in work.work_list_cartridges_id:
+            for wpc in wlc.works_prices_cartridges_id:
+                for i in range(0, len(works_c_id)):
+                    if int(works_c_id[i]) == wpc.id:
+                        wpc.price = prices_c[i]
+                        break
+
+        for wlp in work.work_list_printers_id:
+            for wpp in wlp.works_prices_printers_id:
+                for i in range(0, len(works_p_id)):
+                    if int(works_p_id[i]) == wpp.id:
+                        wpp.price = prices_p[i]
+
+        try:
+            action_h = "Изменён"
+            type_h = "список работ"
+            name_h = f"{work.date_work.date().strftime('%d.%m.%Y')}"
+            user = "Добрынин И.А."
+            ah = AllHistory(action=action_h,
+                            type=type_h,
+                            name=name_h,
+                            user=user)
+            db.session.add(ah)
+        except:
+            flash('При создании статуса произошла ошибка')
+            return render_template("main.html")
+
+        try:
+            db.session.commit()
+            return redirect(request.referrer)
+        except:
+            return render_template("main.html")
+
+    return render_template("UpdateWork.html",
+                           work=work,
+                           AllWorksPrinters=AllWorksPrinters,
+                           AllWorksCartridges=AllWorksCartridges,
+                           Cartridges=Cartridges,
+                           Printer=Printer,
+                           wlc=wlc,
+                           wlp=wlp)
 
 
 @main_urls.route('/progress_report')
@@ -477,7 +546,6 @@ def progress_report_more(check_id, contract_id):
     wd_prices = []
     for el in wl:
         wd_prices.append(WorkDonePrice(el))
-    print(wl)
 
     return render_template('CheckMore.html',
                            check=check,

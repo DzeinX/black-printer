@@ -51,24 +51,21 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for status in statuses %}
-                {% if status.cartridge_id == id %}
-                    <tr>
-                        <td class="1">
-                            {{ counter.value }}
-                        </td>
-                        <td class="2">
-                            Дата: {{ status.date.date() }}<br>
-                            Время: {{ status.date.time() }}
-                        </td>
-                        <td class="3">
-                            {{ status.user }}
-                        </td>
-                        <td class="4">
-                            {{ status.action }}
-                        </td>
-                    </tr>
-                    {% set counter.value = counter.value + 1 %}
-                {% endif %}
+                <tr>
+                    <td class="1">
+                        {{ counter.value }}
+                    </td>
+                    <td class="2">
+                        {{ status.date.date().strftime("%d.%m.%Y") }} {{ status.date.time().strftime("%H:%M") }}
+                    </td>
+                    <td class="3">
+                        {{ status.user }}
+                    </td>
+                    <td class="4">
+                        {{ status.action }}
+                    </td>
+                </tr>
+                {% set counter.value = counter.value + 1 %}
             {% endfor %}
             </tbody>
         </table>

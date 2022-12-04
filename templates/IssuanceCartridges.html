@@ -28,7 +28,8 @@
                     class="select"
                     required>
                 {% for cartridge in cartridges %}
-                    {% if cartridge.status == "В резерве" or cartridge.status == "Восстановлен" %}
+
+                {% if cartridge.status == "В резерве" or cartridge.status == "Восстановлен" or cartridge.status == "Создан" %}
                         <option value="{{ cartridge.number }}">
                             {{ cartridge.number }}
                             <strong>||</strong>
@@ -96,7 +97,7 @@
                             class="select"
                             required>
                         {% for cartridge in cartridges %}
-                            {% if cartridge.status == "В резерве" or cartridge.status == "Восстановлен" %}
+                            {% if cartridge.status == "В резерве" or cartridge.status == "Восстановлен" or cartridge.status == "Создан" %}
                                 <option value="{{ cartridge.number }}">
                                     {{ cartridge.number }}
                                     <strong>||</strong>
@@ -120,68 +121,67 @@
             <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
         </div>
         <table style="width: 100%" id="mytable">
-            <table style="width: 100%" id="mytable">
-                <colgroup>
-                    <col span="1" style="width: 5%;">
-                    <col span="1" style="width: 10%;">
-                    <col span="1" style="width: 30%;">
-                    <col span="1" style="width: 30%;">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>№</th>
-                    <th>Номер<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
-                    <th>Модели<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
-                    <th>Приняли с<br><input type="text" placeholder="Начните вводить" id="sch4" class="enter"></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% set counter = namespace(value=1) %}
-                {% for cartridge in cartridges %}
-                    {% if cartridge.status == "В резерве" or cartridge.status == "Восстановлен" %}
-                        {% if (cartridge.efficiency != 0) and
+            <colgroup>
+                <col span="1" style="width: 5%;">
+                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 30%;">
+                <col span="1" style="width: 30%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Номер<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th>Модели<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th>Приняли с<br><input type="text" placeholder="Начните вводить" id="sch4" class="enter"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = namespace(value=1) %}
+            {% for cartridge in cartridges %}
+                {% if cartridge.status == "В резерве" or cartridge.status == "Восстановлен" or cartridge.status == "Создан"%}
+                    {% if (cartridge.efficiency != 0) and
                         BroughtACartridge.query.filter(BroughtACartridge.cartridge_number_id == cartridge.id).all()|length > 0 %}
-                            <tr>
-                                <td class="1">
-                                    {{ counter.value }}
-                                    <label>
-                                        <input type="checkbox" name="cartridge_number"
-                                               value="{{ cartridge.number }}">
-                                    </label>
-                                </td>
-                                <td class="2">
-                                    {{ cartridge.number }}
-                                </td>
-                                <td class="3">
-                                    {% for model in cartridge.cartridge_models %}
-                                        {{ loop.index }}) {{ model.model }}<br>
-                                    {% endfor %}
-                                </td>
-                                <td class="4">
-                                    {% set brought_a_cartridge = BroughtACartridge.query.filter(BroughtACartridge.cartridge_number_id == cartridge.id).all()[-1] %}
-                                    Подразделение: {{ brought_a_cartridge.location }}<br>
-                                    Корпус: {{ brought_a_cartridge.learning_campus }}<br>
-                                    Кабинет: {{ brought_a_cartridge.cabinet }}<br>
-                                    <input type="hidden"
-                                           name="location{{ cartridge.number }}"
-                                           value="{{ brought_a_cartridge.location }}">
-                                    <input type="hidden"
-                                           name="learning_campus{{ cartridge.number }}"
-                                           value="{{ brought_a_cartridge.learning_campus }}">
-                                    <input type="hidden"
-                                           name="cabinet{{ cartridge.number }}"
-                                           value="{{ brought_a_cartridge.cabinet }}">
-                                    <input type="hidden"
-                                           name="user{{ cartridge.number }}"
-                                           value="Добрынин И.А.">
-                                </td>
-                            </tr>
-                            {% set counter.value = counter.value + 1 %}
-                        {% endif %}
+                        <tr>
+                            <td class="1">
+                                {{ counter.value }}
+                                <label>
+                                    <input type="checkbox" name="cartridge_number"
+                                           value="{{ cartridge.number }}">
+                                </label>
+                            </td>
+                            <td class="2">
+                                {{ cartridge.number }}
+                            </td>
+                            <td class="3">
+                                {% for model in cartridge.cartridge_models %}
+                                    {{ loop.index }}) {{ model.model }}<br>
+                                {% endfor %}
+                            </td>
+                            <td class="4">
+                                {% set brought_a_cartridge = BroughtACartridge.query.filter(BroughtACartridge.cartridge_number_id == cartridge.id).all()[-1] %}
+                                Подразделение: {{ brought_a_cartridge.location }}<br>
+                                Корпус: {{ brought_a_cartridge.learning_campus }}<br>
+                                Кабинет: {{ brought_a_cartridge.cabinet }}<br>
+                                <input type="hidden"
+                                       name="location{{ cartridge.number }}"
+                                       value="{{ brought_a_cartridge.location }}">
+                                <input type="hidden"
+                                       name="learning_campus{{ cartridge.number }}"
+                                       value="{{ brought_a_cartridge.learning_campus }}">
+                                <input type="hidden"
+                                       name="cabinet{{ cartridge.number }}"
+                                       value="{{ brought_a_cartridge.cabinet }}">
+                                <input type="hidden"
+                                       name="user{{ cartridge.number }}"
+                                       value="Добрынин И.А.">
+                            </td>
+                        </tr>
+                        {% set counter.value = counter.value + 1 %}
                     {% endif %}
-                {% endfor %}
-                </tbody>
-            </table>
-            <input type="submit" value="Выдать" class="add_btn">
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" value="Выдать" class="add_btn">
     </form>
 {% endblock %}

@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
 
+{% block CSS %}../static/css/select2.min.css{% endblock %}
 {% block title %}All history{% endblock %}
 
 {% block script %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
 {% endblock %}
 
@@ -19,58 +22,69 @@
             <label for="search"><strong>Поиск по таблице:</strong></label><br>
             <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
         </div>
-        <div class="line"></div>
-        <strong>Поиск по статусу:</strong><br>
-        <div class="ctr">
-            Картриджи:
-            <input type="radio" name="status" value="в резерве">В резерве
-            <input type="radio" name="status" value="принят в заправку">Принят в заправку
-            <input type="radio" name="status" value="в заправке">В заправке
-            <input type="radio" name="status" value="выдан">Выдан
-            <input type="radio" name="status" value="в подразделении">В подразделении<br>
-            Принтеры:
-            <input type="radio" name="status" value="принят в ремонт">Принят в ремонт
-            <input type="radio" name="status" value="в ремонте">В ремонте
-            <input type="radio" name="status" value="получен из ремонта">Получен из ремонта
-            <input type="radio" name="status" value="восстановлен">Восстановлен
-            <input type="radio" name="status" value="добавлен">Добавлен<br>
-        </div>
-        <div class="line"></div>
-        <input type="button" id="btn_off" class="btn_clr" value="Снять выделение">
     </div>
     <table id="mytable">
         <colgroup>
             <col span="1" style="width: 5%;">
-            <col span="1" style="width: 70%;">
-            <col span="1" style="width: 25%;">
+            <col span="1" style="width: 20%;">
+            <col span="1" style="width: 20%;">
+            <col span="1" style="width: 20%;">
+            <col span="1" style="width: 20%;">
+            <col span="1" style="width: 15%;">
         </colgroup>
         <thead>
         <tr>
             <th>№</th>
-            <th>Действие</th>
+            <th>Действие<br>
+                <select type="text" id="sch2_s" class="select">
+                    <option></option>
+                    <option>Создан</option>
+                    <option>Пополнен</option>
+                    <option>Переоткрыт</option>
+                    <option>Закрыт</option>
+                    <option>Изменён</option>
+                    <option>Удалён</option>
+                    <option>Восстановлен</option>
+                    <option>Принят в заправку</option>
+                    <option>В заправке</option>
+                    <option>В резерве</option>
+                    <option>Выдан</option>
+                    <option>Принят в ремонт</option>
+                    <option>В ремонте</option>
+                    <option>Получен из ремонта</option>
+                </select><br></th>
+            <th>Тип<br>
+                <select type="text" id="sch3_s" class="select">
+                    <option></option>
+                    <option>Список работ</option>
+                    <option>Счёт</option>
+                    <option>Договор</option>
+                    <option>Картридж</option>
+                    <option>Принтер</option>
+                </select><br></th>
+            <th>Имя<br><input type="text" placeholder="Начните вводить" id="sch4" class="enter"><br></th>
             <th>Дата<br><input type="text" placeholder="Начните вводить" id="sch5" class="enter"><br></th>
+            <th>Пользователь<br><input type="text" placeholder="Начните вводить" id="sch6" class="enter"><br></th>
         </tr>
         </thead>
         <tbody>
-        {% for htry in all_history %}
+        {% for htry in all_htry %}
             <tr>
                 <td class="1">{{ loop.index }}</td>
+                <td class="2">
+                    {{ htry.action }}
+                </td>
+                <td class="3">
+                    {{ htry.type }}
+                </td>
                 <td class="4">
-                    {% if htry.cartridge_id != NAN %}
-                        Картридж {{ Cartridges.query.get(htry.cartridge_id).number }} {{ htry.action }}
-                    {% elif htry.printer_id != NAN %}
-                        Принтер {{ Printer.query.get(htry.printer_id).num_inventory }} {{ htry.action }}
-                    {% elif htry.work_list_id != NAN %}
-                        {{ htry.action }} ({{ WorkList.query.get(htry.work_list_id).date_work.date() }})
-                    {% elif htry.check_list_id != NAN %}
-                        {{ htry.action }} ({{ CheckLists.query.get(htry.check_list_id).date_check.date() }})
-                    {% else %}
-                        {{ htry.action }} {{ ListsOfContracts.query.get(htry.lists_of_contracts_id).name }}
-                    {% endif %}
+                    {{ htry.name }}
                 </td>
                 <td class="5">
-                    Дата: {{ htry.date.date() }}<br>
-                    Время: {{ htry.date.time() }}
+                    {{ htry.date.date().strftime("%d.%m.%Y") }} {{ htry.date.time().strftime("%H:%M") }}
+                </td>
+                <td class="6">
+                    {{ htry.user }}
                 </td>
             </tr>
         {% endfor %}

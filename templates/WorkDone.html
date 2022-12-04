@@ -21,7 +21,7 @@
     {% if last_contract != None %}
         <div style="background-color: lightblue">
             <h2>Номер активного договора:</h2>
-            <h4>{{ last_contract.name }} ({{ last_contract.date_contract.date() }}) на сумму {{ last_contract.sum }}
+            <h4>{{ last_contract.name }} ({{ last_contract.date_contract.date().strftime('%d.%m.%Y') }}) на сумму {{ last_contract.sum }}
                 Рублей</h4>
             <h5>Действительная сумма договора: {{ contract_price }} Рублей</h5>
             <strong>Счета:</strong><br>
@@ -32,7 +32,7 @@
                     {% if check.date_check == last_contract.date_contract %}
                         <strong>Дата от:</strong>Не указана
                     {% else %}
-                        <strong>Дата от:</strong>{{ check.date_check.date() }}
+                        <strong>Дата от:</strong>{{ check.date_check.date().strftime('%d.%m.%Y') }}
                     {% endif %}
                     {% if check.sum == 0 %}
                         <strong>Сумма счёта:</strong>Не указана

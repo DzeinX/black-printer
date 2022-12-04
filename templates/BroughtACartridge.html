@@ -27,7 +27,7 @@
                     required>
                 {% for cartridge in cartridges %}
 
-                {% if cartridge.status == "Выдан" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
+                {% if cartridge.status == "В подразделении" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
                         <option value="{{ cartridge.number }}">
                             {{ cartridge.number }}
                             <strong>||</strong>
@@ -94,7 +94,7 @@
                             class="select"
                             required>
                         {% for cartridge in cartridges %}
-                            {% if cartridge.status == "Выдан" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
+                            {% if cartridge.status == "В подразделении" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
                                 <!-- 'В резерве' вынести в отдельную форму приёма в ремонт -->
                                 <option value="{{ cartridge.number }}">
                                     {{ cartridge.number }}
@@ -136,7 +136,7 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for cartridge in cartridges %}
-                {% if cartridge.status == "Выдан" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
+                {% if cartridge.status == "В подразделении" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
                     {% if (cartridge.efficiency != 0) and
                         CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()|length > 0 %}
                         <tr>

@@ -25,7 +25,7 @@
             <h2>Номер договора:</h2>
             <details>
                 <summary>
-                    {{ contract.name }} {{ contract.date_contract.date() }}
+                    {{ contract.name }} {{ contract.date_contract.date().strftime('%d.%m.%Y') }}
                 </summary>
                 <strong>Счета:</strong><br>
                 {% for check in CheckLists.query.filter(CheckLists.list_of_contracts_id == contract.id) %}
@@ -33,7 +33,7 @@
                     {% if check.date_check == contract.date_contract %}
                         <strong>Дата от:</strong>Не указана
                     {% else %}
-                        <strong>Дата от:</strong>{{ check.date_check.date() }}
+                        <strong>Дата от:</strong>{{ check.date_check.date().strftime('%d.%m.%Y') }}
                     {% endif %}
                     {% if check.sum == 0 %}
                         <strong>Сумма счёта:</strong>Не указана

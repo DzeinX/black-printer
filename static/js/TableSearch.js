@@ -48,10 +48,21 @@ $(document).ready(function () {
 
     $("#sch2").keyup(function () {
         _this = this;
+        console.log(this);
+        $.each($("#mytable tbody tr td[class='2']"), function_coll);
+    });
+
+    $("#sch2_s").change(function () {
+        _this = this;
         $.each($("#mytable tbody tr td[class='2']"), function_coll);
     });
 
     $("#sch3").keyup(function () {
+        _this = this;
+        $.each($("#mytable tbody tr td[class='3']"), function_coll);
+    });
+
+    $("#sch3_s").change(function () {
         _this = this;
         $.each($("#mytable tbody tr td[class='3']"), function_coll);
     });

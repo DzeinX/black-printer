@@ -221,7 +221,7 @@
     </div>
     {% for work in wl %}
         <div id="d{{ loop.index }}" style="background: lightgreen; margin: 5px; padding: 5px" class="dtls">
-            <h4>Проделанные работы {{ work.number }} ({{ work.date_work.date() }}):</h4>
+            <h4>Проделанные работы {{ work.number }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
             Общая сумма: {{ wd_prices[loop.index - 1] }}<br>
             <table>
                 <thead>
@@ -297,6 +297,7 @@
                 {% endfor %}
                 </tbody>
             </table>
+            <a href="/list_of_completed_works/{{ work.id }}/update">Изменить</a>
         </div>
     {% endfor %}
     {% if check.active == 1 %}
@@ -305,8 +306,9 @@
                 <input type="hidden" value="" name="">
                 {% for work in wl_add %}
                     <div id="d{{ loop.index }}" style="background: lightblue; margin: 5px; padding: 5px" class="dtls">
-                        <input type="checkbox" value="{{ work.id }}" name="works">
-                        <h4>Проделанные работы {{ work.number }} ({{ work.date_work.date() }}):</h4>
+                        <label for="cb">Добавить список</label>
+                        <input type="checkbox" id="cb" value="{{ work.id }}" name="works">
+                        <h4>Проделанные работы {{ work.number }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
                         Общая сумма:<br>
                         <table>
                             <thead>
