@@ -1,7 +1,10 @@
 from datetime import datetime
+
+from flask_login import UserMixin, LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+manager = LoginManager()
 
 association_table_1 = db.Table('association', db.Model.metadata,
                                db.Column('cartridges_id', db.Integer, db.ForeignKey('cartridges.id')),
@@ -306,3 +309,15 @@ class ListsOfContracts(db.Model):
 
     def __repr__(self):
         return '<ListOfContracts %r>' % self.id
+
+
+class User(db.Model, UserMixin):
+    __tablename__ = "User"
+    id = db.Column(db.Integer, primary_key=True)
+    login = db.Column(db.String(64), nullable=False, unique=True)
+    password = db.Column(db.String(32), nullable=False)
+
+
+@manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)

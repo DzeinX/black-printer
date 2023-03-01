@@ -73,11 +73,7 @@
                        class="enter"
                        placeholder="Введите номер"><br>
 
-                <label for="user">Пользователь: </label><br>
-                <input type="text"
-                       name="user"
-                       id="user"
-                       class="enter" required><br>
+                <input type="hidden" name="user" value="{{ current_user.login }}">
                 <input type="submit" value="Добавить" class="add_btn">
             </div>
         </form>

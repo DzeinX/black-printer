@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <link rel="stylesheet" href="{% block CSS %}{% endblock %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    <link href=https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css rel="stylesheet"
           integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icons8-печать-50.png') }}">
     <meta charset="UTF-8">
@@ -16,71 +16,90 @@
                 <li class="nav-item">
                     <a href="/" class="nav-link active" aria-current="page">Главная</a>
                 </li>
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a href="/printers" class="nav-link">Принтеры V</a>
+                        <ul class="submenu">
+                            <li class="nav-item">
+                                <a href="/brought_a_printer" class="nav-link">Принесённые принтеры</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/repairing" class="nav-link">Отправить в ремонт</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/reception_from_a_repairing" class="nav-link">Принять из ремонта</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/issuance_printers" class="nav-link">Выдать в подразделение</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/deleted_printers" class="nav-link">Удалённые принтеры</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/cartridges" class="nav-link">Картриджы V</a>
+                        <ul class="submenu">
+                            <li class="nav-item">
+                                <a href="/brought_a_cartridge" class="nav-link">Принесённые картриджи</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/refueling" class="nav-link">Отправить в заправку</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/reception_from_a_refuelling" class="nav-link">Принять с заправки</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/issuance_cartridges" class="nav-link">Выдать в подразделение</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/deleted_cartridges" class="nav-link">Удалённые картриджи</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">Добавить V</a>
+                        <ul class="submenu">
+                            <li class="nav-item">
+                                <a href="/add_models" class="nav-link">Модели</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/add_works_cartridges" class="nav-link">Тип работ картриждей</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/add_works_printers" class="nav-link">Тип работ принтеров</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/all_history" class="nav-link">Вся история</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/progress_report" class="nav-link">Отчёт</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/list_of_completed_works" class="nav-link">Проделанные работы</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/active_contract" class="nav-link">Активный договор</a>
+                    </li>
+                {% endif %}
                 <li class="nav-item">
-                    <a href="/printers" class="nav-link">Принтеры V</a>
+                    <span class="nav-link">Профиль</span>
                     <ul class="submenu">
-                        <li class="nav-item">
-                            <a href="/brought_a_printer" class="nav-link">Принесённые принтеры</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/repairing" class="nav-link">Отправить в ремонт</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/reception_from_a_repairing" class="nav-link">Принять из ремонта</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/issuance_printers" class="nav-link">Выдать в подразделение</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/deleted_printers" class="nav-link">Удалённые принтеры</a>
-                        </li>
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item">
+                                <a href="/logout" class="nav-link">Выход</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a href="/login" class="nav-link">Вход</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/register" class="nav-link">Регистрация</a>
+                            </li>
+                        {% endif %}
                     </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="/cartridges" class="nav-link">Картриджы V</a>
-                    <ul class="submenu">
-                        <li class="nav-item">
-                            <a href="/brought_a_cartridge" class="nav-link">Принесённые картриджи</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/refueling" class="nav-link">Отправить в заправку</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/reception_from_a_refuelling" class="nav-link">Принять с заправки</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/issuance_cartridges" class="nav-link">Выдать в подразделение</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/deleted_cartridges" class="nav-link">Удалённые картриджи</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link">Добавить V</a>
-                    <ul class="submenu">
-                        <li class="nav-item">
-                            <a href="/add_models" class="nav-link">Модели</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/add_works_cartridges" class="nav-link">Тип работ картриждей</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/add_works_printers" class="nav-link">Тип работ принтеров</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="/all_history" class="nav-link">Вся история</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/progress_report" class="nav-link">Отчёт</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/list_of_completed_works" class="nav-link">Проделанные работы</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/active_contract" class="nav-link">Активный договор</a>
                 </li>
             </ul>
         </header>

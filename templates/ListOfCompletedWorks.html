@@ -22,6 +22,7 @@
             newitem.innerHTML = `
                 <h4>Проделанные работы:</h4>
                 <form method="POST">
+                <input type="hidden" name="user" value="{{ current_user.login }}">
                 {% set cartridges = namespace(value=Cartridges.query.all()) %}
                 {% for ctg in cartridges.value %}
                 {% if ctg.work_done == 0 %}
@@ -119,9 +120,6 @@
                            class="enter"
                            placeholder="Введите дату" required>
                     </label><br>
-                    <input type="hidden"
-                                 name="user"
-                                 value="Добрынин И.А.">
                     <input type="hidden"
                            name="num_work"
                            value="${counter}">

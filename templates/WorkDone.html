@@ -57,6 +57,7 @@
     {% else %}
         <div class="align-center" style="background-color: gray">
             <form method="POST">
+                <input type="hidden" name="user" value="{{ current_user.login }}">
                 <div class="form" id="items">
                     <label>Введите номер договора:<br><input type="text"
                                                              name="name"

@@ -121,9 +121,6 @@
                            placeholder="Введите дату" required>
                     </label><br>
                     <input type="hidden"
-                                 name="user"
-                                 value="Добрынин И.А.">
-                    <input type="hidden"
                            name="num_work"
                            value="${counter}">
                     <input type="submit"
@@ -297,19 +294,23 @@
                 {% endfor %}
                 </tbody>
             </table>
-            <a href="/list_of_completed_works/{{ work.id }}/update">Изменить</a>
+            {% if check.active == True %}
+                <a href="/list_of_completed_works/{{ work.id }}/update">Изменить</a>
+            {% endif %}
         </div>
     {% endfor %}
     {% if check.active == 1 %}
         <form method="POST">
+            <input type="hidden" name="user" value="{{ current_user.login }}">
             <div id="items">
                 <input type="hidden" value="" name="">
                 {% for work in wl_add %}
                     <div id="d{{ loop.index }}" style="background: lightblue; margin: 5px; padding: 5px" class="dtls">
                         <label for="cb">Добавить список</label>
                         <input type="checkbox" id="cb" value="{{ work.id }}" name="works">
-                        <h4>Проделанные работы {{ work.number }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
-                        Общая сумма:<br>
+                        <h4>Проделанные работы {{ work.number }}
+                            ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
+                        Общая сумма: {{ wl_prices[loop.index - 1] }}<br>
                         <table>
                             <thead>
                             <tr>

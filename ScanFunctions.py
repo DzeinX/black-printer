@@ -160,15 +160,15 @@ def TypeVar(*args, var_type) -> [list, bool] or [str, bool]:
 
 
 '''
-if __name__ == "__main__":
-    ans = []
-    answer = TypeVar([True, 10, -4, 'True'], 9, '-2', 'False', var_type='int')
+Запуск функции должен выглядеть подобным образом
+ans = []
+answer = TypeVar([True, 10, -4, 'True'], 9, '-2', 'False', var_type='int')
 
-    if answer[1]:
+if answer[1]:
+    print(answer[0])
+else:
+    if isinstance(answer[0], str):
         print(answer[0])
     else:
-        if isinstance(answer[0], str):
-            print(answer[0])
-        else:
-            print('Incorrect value')
+        print('Incorrect value')
 '''

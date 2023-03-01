@@ -6,8 +6,8 @@
 {% block script %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
-    <script src="{{url_for('static', filename='js/SelectInput.js')}}"></script>
-    <script src="{{url_for('static', filename='js/RemoveItem.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script>
         let items = {{ counter_models }};
 
@@ -47,6 +47,7 @@
     {% endfor %}
     <a href={{ request.referrer }}>Назад</a>
     <form method="POST" id="form">
+        <input type="hidden" name="user" value="{{ current_user.login }}">
         <div class=form id="items">
             {% for model in cartridge.cartridge_models %}
                 <div id="d{{ loop.index }}">
@@ -62,7 +63,7 @@
                         {% endif %}
                     {% endfor %}
                 </select><input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d{{ loop.index }}');"
-                           id='r{{ loop.index }}'><br>
+                                id='r{{ loop.index }}'><br>
                 </div>
             {% endfor %}
 

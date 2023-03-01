@@ -81,12 +81,8 @@
                        class="enter"
                        required><br>
 
-                <label for="user">Пользователь: </label><br>
-                <input type="text"
-                       name="user"
-                       id="user"
-                       class="enter"
-                       required><br> <!-- Убрать при появлении пользователей -->
+                <input type="hidden" name="user" value="{{ current_user.login }}">
+
                 <input type="hidden" name="id_form" value="1">
 
                 <div id="d1">
@@ -171,9 +167,7 @@
                                 <input type="hidden"
                                        name="cabinet{{ cartridge.number }}"
                                        value="{{ brought_a_cartridge.cabinet }}">
-                                <input type="hidden"
-                                       name="user{{ cartridge.number }}"
-                                       value="Добрынин И.А.">
+                                <input type="hidden" name="user" value="{{ current_user.login }}">
                             </td>
                         </tr>
                         {% set counter.value = counter.value + 1 %}

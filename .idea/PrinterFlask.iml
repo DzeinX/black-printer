@@ -15,6 +15,7 @@
     <orderEntry type="library" name="selectize" level="application" />
     <orderEntry type="library" name="jquery-latest" level="application" />
     <orderEntry type="library" name="bootstrap" level="application" />
+    <orderEntry type="library" name="bootstrap" level="application" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />

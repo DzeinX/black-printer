@@ -54,6 +54,7 @@ $(document).ready(function () {
 
     $("#sch2_s").change(function () {
         _this = this;
+        console.log('111')
         $.each($("#mytable tbody tr td[class='2']"), function_coll);
     });
 
@@ -99,7 +100,7 @@ $(document).ready(function () {
                 $(this).hide();
             else
                 $(this).show();
-        });search_locw
+        });
     });
 });
 

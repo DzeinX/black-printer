@@ -7,6 +7,7 @@
     <a href={{ request.referrer }}>Назад</a>
     <div class="align-center" style="background-color: gray">
         <form method="POST">
+            <input type="hidden" name="user" value="{{ current_user.login }}">
             <div class="form">
                 <label for="name">Имя принтера: </label><input type="text"
                                                                name="name"

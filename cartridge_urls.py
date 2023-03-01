@@ -3,6 +3,8 @@ from flask import redirect
 from flask import request
 from flask import flash
 from flask import Blueprint
+from flask_login import current_user, login_required
+
 from models import *
 from tabs_that_appear import *
 from ScanFunctions import TypeVar
@@ -10,7 +12,16 @@ from ScanFunctions import TypeVar
 cartridge_urls = Blueprint('cartridge_urls', __name__)
 
 
+@cartridge_urls.after_request
+def redirect_to_signin(response):
+    if response.status_code == 401:
+        return redirect('/login')
+    else:
+        return response
+
+
 @cartridge_urls.route('/add_works_cartridges', methods=['GET', 'POST'])
+@login_required
 def add_works_cartridges():
     all_works_cartridges = AllWorksCartridges.query.all()
     counter_works = len(all_works_cartridges)
@@ -56,6 +67,7 @@ def add_works_cartridges():
 
 
 @cartridge_urls.route('/add_models', methods=['GET', 'POST'])
+@login_required
 def add_models():
     list_models = ListModels.query.all()
     counter_models = len(list_models)
@@ -101,6 +113,7 @@ def add_models():
 
 
 @cartridge_urls.route('/cartridge/<int:id>/update', methods=['GET', 'POST'])
+@login_required
 def update_cartridge(id):
     cartridge = Cartridges.query.get(id)
     list_models = ListModels.query.all()
@@ -149,7 +162,7 @@ def update_cartridge(id):
             action_h = "Изменён"
             type_h = "картридж"
             name_h = f"{cartridge.number}"
-            user = "Добрынин И.А."
+            user = request.form['user']
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -174,6 +187,7 @@ def update_cartridge(id):
 
 
 @cartridge_urls.route('/cartridge/<int:id>/statuses')
+@login_required
 def cartridge_status(id):
     statuses = AllHistory.query.filter(AllHistory.cartridge_id == id).order_by(AllHistory.date.desc()).all()
     cartridge = Cartridges.query.get(id)
@@ -184,6 +198,7 @@ def cartridge_status(id):
 
 
 @cartridge_urls.route('/cartridges', methods=['GET', 'POST'])
+@login_required
 def cartridges():
     list_models = ListModels.query.all()
     cartridges = Cartridges.query.order_by(Cartridges.date_added.desc()).all()
@@ -248,6 +263,7 @@ def cartridges():
 
 
 @cartridge_urls.route('/cartridge/<int:id>/delete')
+@login_required
 def delete_cartridge(id):
     cartridge = Cartridges.query.get_or_404(id)
     try:
@@ -255,7 +271,7 @@ def delete_cartridge(id):
             action_h = "Удалён"
             type_h = "картридж"
             name_h = f"{cartridge.number}"
-            user = "Добрынин И.А."
+            user = current_user.login
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -277,6 +293,7 @@ def delete_cartridge(id):
 
 
 @cartridge_urls.route('/cartridge/<int:id>/resume')
+@login_required
 def resume_cartridge(id):
     cartridge = Cartridges.query.get_or_404(id)
     try:
@@ -284,7 +301,7 @@ def resume_cartridge(id):
             action_h = "Восстановлен"
             type_h = "картридж"
             name_h = f"{cartridge.number}"
-            user = "Добрынин И.А."
+            user = current_user.login
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -306,6 +323,7 @@ def resume_cartridge(id):
 
 
 @cartridge_urls.route('/deleted_cartridges')
+@login_required
 def deleted_cartridges():
     cartridges = Cartridges.query.all()
     return render_template('DeletedCartridges.html',
@@ -313,6 +331,7 @@ def deleted_cartridges():
 
 
 @cartridge_urls.route('/brought_a_cartridge', methods=['GET', 'POST'])
+@login_required
 def brought_a_cartridge():
     cartridges = Cartridges.query.all()
 
@@ -329,7 +348,7 @@ def brought_a_cartridge():
                 location = request.form[f'location{number}']
                 learning_campus = request.form[f'learning_campus{number}']
                 cabinet = request.form[f'cabinet{number}']
-                user = request.form[f'user{number}']
+                user = request.form['user']
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
 
                 brought_a_cartridge = BroughtACartridge(location=location,
@@ -343,7 +362,6 @@ def brought_a_cartridge():
                     action_h = "Принят в заправку"
                     type_h = "картридж"
                     name_h = f"{cartridge.number}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -390,7 +408,6 @@ def brought_a_cartridge():
                     action_h = "Принят в заправку"
                     type_h = "картридж"
                     name_h = f"{cartridge.number}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -418,6 +435,7 @@ def brought_a_cartridge():
 
 
 @cartridge_urls.route('/refueling', methods=['GET', 'POST'])
+@login_required
 def refueling():
     cartridges = Cartridges.query.all()
 
@@ -431,7 +449,7 @@ def refueling():
 
         if id_form == '2':
             for number in cartridge_number:
-                user = request.form[f'user{number}']
+                user = request.form[f'user']
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
                 refueling = Refueling(user=user)
 
@@ -441,7 +459,6 @@ def refueling():
                     action_h = "В заправке"
                     type_h = "картридж"
                     name_h = f"{cartridge.number}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -467,7 +484,6 @@ def refueling():
                     action_h = "В заправке"
                     type_h = "картридж"
                     name_h = f"{cartridge.number}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -494,6 +510,7 @@ def refueling():
 
 
 @cartridge_urls.route('/reception_from_a_refuelling', methods=['GET', 'POST'])
+@login_required
 def receptionFromARefuelling():
     cartridges = Cartridges.query.all()
 
@@ -507,7 +524,7 @@ def receptionFromARefuelling():
 
         if id_form == '2':
             for number in cartridge_number:
-                user = request.form[f'user{number}']
+                user = request.form['user']
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
                 reception_from_a_refueling = ReceptionFromARefueling(user=user)
 
@@ -517,7 +534,6 @@ def receptionFromARefuelling():
                     action_h = "В резерве"
                     type_h = "картридж"
                     name_h = f"{cartridge.number}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -545,7 +561,6 @@ def receptionFromARefuelling():
                     action_h = "В резерве"
                     type_h = "картридж"
                     name_h = f"{cartridge.number}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -574,6 +589,7 @@ def receptionFromARefuelling():
 
 
 @cartridge_urls.route('/issuance_cartridges', methods=['GET', 'POST'])
+@login_required
 def issuance_cartridges():
     cartridges = Cartridges.query.all()
 
@@ -587,7 +603,7 @@ def issuance_cartridges():
 
         if id_form == "2":
             for number in cartridge_number:
-                user = request.form[f'user{number}']
+                user = request.form[f'user']
                 location = request.form[f'location{number}']
                 learning_campus = request.form[f'learning_campus{number}']
                 cabinet = request.form[f'cabinet{number}']
@@ -603,7 +619,6 @@ def issuance_cartridges():
                     action_h = "В подразделении"
                     type_h = "картридж"
                     name_h = f"{cartridge.number}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -650,7 +665,6 @@ def issuance_cartridges():
                     action_h = "В подразделении"
                     type_h = "картридж"
                     name_h = f"{cartridge.number}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,

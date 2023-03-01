@@ -58,12 +58,7 @@
                 {% for msg in get_flashed_messages() %}
                     <p class="msg"><strong>{{ msg }}</strong></p>
                 {% endfor %}
-                <label for="user">Пользователь: </label><br>
-                <input type="text"
-                       name="user"
-                       id="user"
-                       class="enter"
-                       required><br> <!-- Убрать при появлении пользователей -->
+                <input type="hidden" name="user" value="{{ current_user.login }}">
 
                 <div id="d1">
                     <label for="1">Номер инвентаря<strong>||</strong>Имя: </label><br>
@@ -119,7 +114,7 @@
                                 <label>
                                     <input type="checkbox" name="num_inventory" value="{{ printer.num_inventory }}">
                                 </label>
-                                <input type="hidden" name="user{{ printer.num_inventory }}" value="Добрынин И.А.">
+                                <input type="hidden" name="user" value="{{ current_user.login }}">
                             </td>
                             <td class="2">
                                 {{ printer.name }}

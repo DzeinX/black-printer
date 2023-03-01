@@ -1,13 +1,12 @@
-from datetime import datetime
-
 from flask import Blueprint
 from flask import render_template
 from flask import request
 from flask import redirect
 from flask import flash
+from flask_login import current_user, login_required
+
 from models import *
 from tabs_that_appear import *
-from ScanFunctions import TypeVar
 
 main_urls = Blueprint('main_urls', __name__)
 
@@ -55,12 +54,21 @@ def ContractPrice(contract) -> float:
     return check_price
 
 
+@main_urls.after_request
+def redirect_to_signin(response):
+    if response.status_code == 401:
+        return redirect('/login')
+    else:
+        return response
+
+
 @main_urls.route('/')
 def main_page():
     return render_template("main.html")
 
 
 @main_urls.route('/all_history')
+@login_required
 def all_history():
     all_htry = AllHistory.query.order_by(AllHistory.date.desc()).all()
     return render_template("AllHistory.html",
@@ -73,6 +81,7 @@ def all_history():
 
 
 @main_urls.route('/active_contract', methods=['GET', 'POST'])
+@login_required
 def active_contract():
     if len(ListsOfContracts.query.all()) > 0:
         last_contract = ListsOfContracts.query.filter(ListsOfContracts.active == 1).first()
@@ -121,7 +130,7 @@ def active_contract():
             action_h = "Создан"
             type_h = "договор"
             name_h = f"{name}"
-            user = "Добрынин И.А."
+            user = request.form['user']
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -152,6 +161,7 @@ def active_contract():
 
 
 @main_urls.route('/active_contract/<int:contract_id>/close_contract', methods=['GET', 'POST'])
+@login_required
 def close_contract(contract_id):
     contract = ListsOfContracts.query.get(contract_id)
     contract.active = False
@@ -160,7 +170,7 @@ def close_contract(contract_id):
         action_h = "Закрыт"
         type_h = "договор"
         name_h = f"{contract.name}"
-        user = "Добрынин И.А."
+        user = current_user.login
         ah = AllHistory(action=action_h,
                         type=type_h,
                         name=name_h,
@@ -184,6 +194,7 @@ def close_contract(contract_id):
 
 
 @main_urls.route('/active_contract/<int:contract_id>/new_check', methods=['GET', 'POST'])
+@login_required
 def new_check(contract_id):
     contract = ListsOfContracts.query.get(contract_id)
 
@@ -203,7 +214,7 @@ def new_check(contract_id):
             action_h = "Создан"
             type_h = "счёт"
             name_h = f"{date_check.date().strftime('%d.%m.%Y')}"
-            user = "Добрынин И.А."
+            user = request.form['user']
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -225,6 +236,7 @@ def new_check(contract_id):
 
 
 @main_urls.route('/active_contract/<int:check_id>/close_check')
+@login_required
 def close_check(check_id):
     check = CheckLists.query.get(check_id)
 
@@ -237,7 +249,7 @@ def close_check(check_id):
             action_h = "Закрыт"
             type_h = "счёт"
             name_h = f"{check.date_check.date().strftime('%d.%m.%Y')}"
-            user = "Добрынин И.А."
+            user = current_user.login
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -260,6 +272,7 @@ def close_check(check_id):
 
 
 @main_urls.route('/active_contract/<int:check_id>/reopen_check')
+@login_required
 def reopen_check(check_id):
     check = CheckLists.query.get(check_id)
     check.active = True
@@ -268,7 +281,7 @@ def reopen_check(check_id):
         action_h = "Переоткрыт"
         type_h = "счёт"
         name_h = f"{check.date_check.date().strftime('%d.%m.%Y')}"
-        user = "Добрынин И.А."
+        user = current_user.login
         ah = AllHistory(action=action_h,
                         type=type_h,
                         name=name_h,
@@ -287,6 +300,7 @@ def reopen_check(check_id):
 
 
 @main_urls.route('/active_contract/<int:check_id>/more', methods=['GET', 'POST'])
+@login_required
 def check_more(check_id):
     if len(ListsOfContracts.query.all()) > 0:
         last_contract = ListsOfContracts.query.filter(ListsOfContracts.active == 1).first()
@@ -306,6 +320,10 @@ def check_more(check_id):
     for el in wl:
         wd_prices.append(WorkDonePrice(el))
 
+    wl_prices = []
+    for el in wl_add:
+        wl_prices.append(WorkDonePrice(el))
+
     if request.method == "POST":
         works = request.form.getlist('works')
 
@@ -317,7 +335,7 @@ def check_more(check_id):
             action_h = "Пополнен"
             type_h = "счёт"
             name_h = f"{check.date_check.date().strftime('%d.%m.%Y')}"
-            user = "Добрынин И.А."
+            user = request.form['user']
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -348,10 +366,12 @@ def check_more(check_id):
                                all_wc=all_wc,
                                all_wp=all_wp,
                                len_wl=len_wl,
-                               wd_prices=wd_prices)
+                               wd_prices=wd_prices,
+                               wl_prices=wl_prices)
 
 
 @main_urls.route('/list_of_completed_works', methods=['GET', 'POST'])
+@login_required
 def list_of_completed_works():
     wl = WorkList.query.filter(WorkList.check_lists_id == None).all()
     len_wl = len(wl)
@@ -367,7 +387,7 @@ def list_of_completed_works():
     if request.method == "POST":
         date_work_list = request.form['date_work']
         date_work_list = datetime.fromisoformat(f'{date_work_list}')
-        user = request.form.getlist('user')[0]
+        user = request.form['user']
 
         work_list = WorkList(date_work=date_work_list)
 
@@ -429,7 +449,6 @@ def list_of_completed_works():
             action_h = "Создан"
             type_h = "список работ"
             name_h = f"{work_list.date_work.date().strftime('%d.%m.%Y')}"
-            user = "Добрынин И.А."
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -461,6 +480,7 @@ def list_of_completed_works():
 
 
 @main_urls.route('/list_of_completed_works/<int:work_id>/update', methods=['GET', 'POST'])
+@login_required
 def update_work(work_id):
     work = WorkList.query.get(work_id)
     wlp = WorkListsPrinters.query.all()
@@ -489,7 +509,7 @@ def update_work(work_id):
             action_h = "Изменён"
             type_h = "список работ"
             name_h = f"{work.date_work.date().strftime('%d.%m.%Y')}"
-            user = "Добрынин И.А."
+            user = request.form['user']
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -516,6 +536,7 @@ def update_work(work_id):
 
 
 @main_urls.route('/progress_report')
+@login_required
 def progress_report():
     all_contracts = ListsOfContracts.query.filter(ListsOfContracts.active == 0).all()
     wdc = WorkListsCartridges.query.all()
@@ -531,6 +552,7 @@ def progress_report():
 
 
 @main_urls.route('/progress_report/<int:check_id><int:contract_id>/more')
+@login_required
 def progress_report_more(check_id, contract_id):
     contract = ListsOfContracts.query.get(contract_id)
     check = CheckLists.query.get(check_id)

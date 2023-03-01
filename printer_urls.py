@@ -3,6 +3,8 @@ from flask import redirect
 from flask import request
 from flask import Blueprint
 from flask import flash
+from flask_login import current_user, login_required
+
 from models import *
 from tabs_that_appear import *
 from ScanFunctions import TypeVar
@@ -10,7 +12,16 @@ from ScanFunctions import TypeVar
 printer_urls = Blueprint('printer_urls', __name__)
 
 
+@printer_urls.after_request
+def redirect_to_signin(response):
+    if response.status_code == 401:
+        return redirect('/login')
+    else:
+        return response
+
+
 @printer_urls.route('/add_works_printers', methods=['GET', 'POST'])
+@login_required
 def add_works_printers():
     all_works_printers = AllWorksPrinters.query.all()
     counter_works = len(all_works_printers)
@@ -56,6 +67,7 @@ def add_works_printers():
 
 
 @printer_urls.route('/printer/<int:id>/update', methods=['GET', 'POST'])
+@login_required
 def update_printer(id):
     printer = Printer.query.get(id)
 
@@ -85,7 +97,7 @@ def update_printer(id):
             action_h = "Изменён"
             type_h = "принтер"
             name_h = f"{printer.num_inventory}"
-            user = "Добрынин И.А."
+            user = request.form['user']
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -108,6 +120,7 @@ def update_printer(id):
 
 
 @printer_urls.route('/printers', methods=['GET', 'POST'])
+@login_required
 def printers():
     printers = Printer.query.order_by(Printer.date_added.desc()).all()
 
@@ -169,6 +182,7 @@ def printers():
 
 
 @printer_urls.route('/printer/<int:id>/statuses')
+@login_required
 def printers_status(id):
     statuses = AllHistory.query.filer(AllHistory.printer_id == id).order_by(AllHistory.date.desc()).all()
     printer = Printer.query.get(id)
@@ -179,6 +193,7 @@ def printers_status(id):
 
 
 @printer_urls.route('/printer/<int:id>/delete')
+@login_required
 def delete_printer(id):
     printer = Printer.query.get_or_404(id)
     try:
@@ -186,7 +201,7 @@ def delete_printer(id):
             action_h = "Удалён"
             type_h = "принтер"
             name_h = f"{printer.num_inventory}"
-            user = "Добрынин И.А."
+            user = current_user.login
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -208,6 +223,7 @@ def delete_printer(id):
 
 
 @printer_urls.route('/printer/<int:id>/resume')
+@login_required
 def resume_printer(id):
     printer = Printer.query.get_or_404(id)
     try:
@@ -215,7 +231,7 @@ def resume_printer(id):
             action_h = "Восстановлен"
             type_h = "принтер"
             name_h = f"{printer.num_inventory}"
-            user = "Добрынин И.А."
+            user = current_user.login
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -237,6 +253,7 @@ def resume_printer(id):
 
 
 @printer_urls.route('/deleted_printers')
+@login_required
 def deleted_printers():
     printers = Printer.query.all()
 
@@ -245,6 +262,7 @@ def deleted_printers():
 
 
 @printer_urls.route('/brought_a_printer', methods=['GET', 'POST'])
+@login_required
 def brought_a_printer():
     printers = Printer.query.all()
 
@@ -261,7 +279,7 @@ def brought_a_printer():
                 location = request.form[f'location{number}']
                 learning_campus = request.form[f'learning_campus{number}']
                 cabinet = request.form[f'cabinet{number}']
-                user = request.form[f'user{number}']
+                user = request.form['user']
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
 
                 brought_a_printer = BroughtAPrinter(location=location,
@@ -275,7 +293,6 @@ def brought_a_printer():
                     action_h = "Принят в ремонт"
                     type_h = "принтер"
                     name_h = f"{printer.num_inventory}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -322,7 +339,6 @@ def brought_a_printer():
                     action_h = "Принят в ремонт"
                     type_h = "принтер"
                     name_h = f"{printer.num_inventory}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -351,6 +367,7 @@ def brought_a_printer():
 
 
 @printer_urls.route('/repairing', methods=['GET', 'POST'])
+@login_required
 def repairing():
     printers = Printer.query.all()
 
@@ -364,7 +381,7 @@ def repairing():
 
         if id_form == '2':
             for number in printer_num:
-                user = request.form[f'user{number}']
+                user = request.form['user']
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
                 repair = Repair(user=user)
 
@@ -374,7 +391,6 @@ def repairing():
                     action_h = "В ремонте"
                     type_h = "принтер"
                     name_h = f"{printer.num_inventory}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -400,7 +416,6 @@ def repairing():
                     action_h = "В ремонте"
                     type_h = "принтер"
                     name_h = f"{printer.num_inventory}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -427,6 +442,7 @@ def repairing():
 
 
 @printer_urls.route('/reception_from_a_repairing', methods=['GET', 'POST'])
+@login_required
 def receptionFromARepairing():
     printers = Printer.query.all()
 
@@ -440,7 +456,7 @@ def receptionFromARepairing():
 
         if id_form == '2':
             for number in printer_num:
-                user = request.form[f'user{number}']
+                user = request.form[f'user']
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
                 reception_from_a_repairing = ReceptionFromARepairing(user=user)
 
@@ -450,7 +466,6 @@ def receptionFromARepairing():
                     action_h = "Получен из ремонта"
                     type_h = "принтер"
                     name_h = f"{printer.num_inventory}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -468,7 +483,7 @@ def receptionFromARepairing():
                 db.session.add(reception_from_a_repairing)
         else:
             for number in printer_num:
-                user = request.form[f'user']
+                user = request.form['user']
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
                 reception_from_a_repairing = ReceptionFromARepairing(user=user)
 
@@ -478,7 +493,6 @@ def receptionFromARepairing():
                     action_h = "Получен из ремонта"
                     type_h = "принтер"
                     name_h = f"{printer.num_inventory}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -507,6 +521,7 @@ def receptionFromARepairing():
 
 
 @printer_urls.route('/issuance_printers', methods=['GET', 'POST'])
+@login_required
 def issuance_printers():
     printers = Printer.query.all()
 
@@ -520,7 +535,7 @@ def issuance_printers():
 
         if id_form == "2":
             for number in printer_num:
-                user = request.form[f'user{number}']
+                user = request.form['user']
                 location = request.form[f'location{number}']
                 learning_campus = request.form[f'learning_campus{number}']
                 cabinet = request.form[f'cabinet{number}']
@@ -541,7 +556,6 @@ def issuance_printers():
                     action_h = "В подразделении"
                     type_h = "принтер"
                     name_h = f"{printer.num_inventory}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
@@ -556,7 +570,7 @@ def issuance_printers():
 
                 db.session.add(issuance)
         else:
-            user = request.form[f'user']
+            user = request.form['user']
             location = request.form[f'location']
             learning_campus = request.form[f'learning_campus']
             cabinet = request.form[f'cabinet']
@@ -592,7 +606,6 @@ def issuance_printers():
                     action_h = "В подразделении"
                     type_h = "принтер"
                     name_h = f"{printer.num_inventory}"
-                    user = "Добрынин И.А."
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
