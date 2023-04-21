@@ -4,7 +4,7 @@ from flask import request
 from flask import flash
 from flask import Blueprint
 from flask_login import current_user, login_required
-
+from datetime import datetime
 from models import *
 from tabs_that_appear import *
 from ScanFunctions import TypeVar
@@ -166,7 +166,8 @@ def update_cartridge(id):
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             cartridge.all_history_id.append(ah)
             db.session.add(ah)
         except:
@@ -242,7 +243,8 @@ def cartridges():
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             cartridge.all_history_id.append(ah)
             db.session.add(ah)
         except:
@@ -275,7 +277,8 @@ def delete_cartridge(id):
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             cartridge.all_history_id.append(ah)
             db.session.add(ah)
         except:
@@ -305,7 +308,8 @@ def resume_cartridge(id):
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             cartridge.all_history_id.append(ah)
             db.session.add(ah)
         except:
@@ -411,7 +415,8 @@ def brought_a_cartridge():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     cartridge.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -462,7 +467,8 @@ def refueling():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     cartridge.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -487,7 +493,8 @@ def refueling():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     cartridge.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -537,7 +544,8 @@ def receptionFromARefuelling():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     cartridge.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -564,7 +572,8 @@ def receptionFromARefuelling():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     cartridge.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -622,7 +631,8 @@ def issuance_cartridges():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     cartridge.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -668,7 +678,8 @@ def issuance_cartridges():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     cartridge.all_history_id.append(ah)
                     db.session.add(ah)
                 except:

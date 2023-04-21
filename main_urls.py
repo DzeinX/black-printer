@@ -134,7 +134,8 @@ def active_contract():
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -174,7 +175,8 @@ def close_contract(contract_id):
         ah = AllHistory(action=action_h,
                         type=type_h,
                         name=name_h,
-                        user=user)
+                        user=user,
+                        date=datetime.now())
         db.session.add(ah)
     except:
         flash('При создании статуса произошла ошибка')
@@ -218,7 +220,8 @@ def new_check(contract_id):
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -253,7 +256,8 @@ def close_check(check_id):
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -285,7 +289,8 @@ def reopen_check(check_id):
         ah = AllHistory(action=action_h,
                         type=type_h,
                         name=name_h,
-                        user=user)
+                        user=user,
+                        date=datetime.now())
         db.session.add(ah)
     except:
         flash('При создании статуса произошла ошибка')
@@ -339,7 +344,8 @@ def check_more(check_id):
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -452,7 +458,8 @@ def list_of_completed_works():
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
@@ -513,7 +520,8 @@ def update_work(work_id):
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')

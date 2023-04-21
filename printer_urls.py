@@ -101,7 +101,8 @@ def update_printer(id):
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             printer.all_history_id.append(ah)
             db.session.add(ah)
         except:
@@ -162,7 +163,8 @@ def printers():
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             printer.all_history_id.append(ah)
             db.session.add(ah)
         except:
@@ -205,7 +207,8 @@ def delete_printer(id):
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             printer.all_history_id.append(ah)
             db.session.add(ah)
         except:
@@ -235,7 +238,8 @@ def resume_printer(id):
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
-                            user=user)
+                            user=user,
+                            date=datetime.now())
             printer.all_history_id.append(ah)
             db.session.add(ah)
         except:
@@ -296,7 +300,8 @@ def brought_a_printer():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     printer.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -342,7 +347,8 @@ def brought_a_printer():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     printer.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -394,7 +400,8 @@ def repairing():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     printer.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -419,7 +426,8 @@ def repairing():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     printer.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -469,7 +477,8 @@ def receptionFromARepairing():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     printer.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -496,7 +505,8 @@ def receptionFromARepairing():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     printer.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -559,7 +569,8 @@ def issuance_printers():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     printer.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -609,7 +620,8 @@ def issuance_printers():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     printer.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
