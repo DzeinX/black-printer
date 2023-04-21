@@ -29,7 +29,7 @@ body {
     height: 60px;
     background: var(--main_color);
     padding: 0 50px;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--text-light-color);
     z-index: 100;

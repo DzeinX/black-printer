@@ -23,47 +23,50 @@ def redirect_to_signin(response):
 @printer_urls.route('/add_works_printers', methods=['GET', 'POST'])
 @login_required
 def add_works_printers():
-    all_works_printers = AllWorksPrinters.query.all()
-    counter_works = len(all_works_printers)
+    if current_user.is_boss:
+        all_works_printers = AllWorksPrinters.query.all()
+        counter_works = len(all_works_printers)
 
-    if request.method == "POST":
-        all_works_printers = request.form.getlist('works')
+        if request.method == "POST":
+            all_works_printers = request.form.getlist('works')
 
-        var_check = TypeVar(all_works_printers, var_type='str')
-        if var_check[1]:
-            all_works_printers = var_check[0][0]
-        else:
-            if isinstance(var_check[0], str):
-                flash(var_check[0])
-                return redirect(request.referrer)
+            var_check = TypeVar(all_works_printers, var_type='str')
+            if var_check[1]:
+                all_works_printers = var_check[0][0]
             else:
-                flash('Incorrect value')
+                if isinstance(var_check[0], str):
+                    flash(var_check[0])
+                    return redirect(request.referrer)
+                else:
+                    flash('Incorrect value')
+                    return redirect(request.referrer)
+
+            if len(all_works_printers) == 0:
+                flash('Нельзя удалить все модели')
                 return redirect(request.referrer)
 
-        if len(all_works_printers) == 0:
-            flash('Нельзя удалить все модели')
-            return redirect(request.referrer)
+            AllWorksPrinters.query.delete()
+            try:
+                for work in all_works_printers:
 
-        AllWorksPrinters.query.delete()
-        try:
-            for work in all_works_printers:
+                    if work != '' and not work.isspace():
+                        model = AllWorksPrinters(work=work)
+                        db.session.add(model)
+            except:
+                return f"Не удалось сохранить изменения"
 
-                if work != '' and not work.isspace():
-                    model = AllWorksPrinters(work=work)
-                    db.session.add(model)
-        except:
-            return f"Не удалось сохранить изменения"
-
-        try:
-            db.session.commit()
-            return redirect("/add_works_printers")
-        except:
-            flash('Не удалось добавить тип работ')
-            return render_template("main.html")
+            try:
+                db.session.commit()
+                return redirect("/add_works_printers")
+            except:
+                flash('Не удалось добавить тип работ')
+                return render_template("main.html")
+        else:
+            return render_template("AddWorksPrinters.html",
+                                   all_works_printers=all_works_printers,
+                                   counter_works=counter_works)
     else:
-        return render_template("AddWorksPrinters.html",
-                               all_works_printers=all_works_printers,
-                               counter_works=counter_works)
+        return redirect('/')
 
 
 @printer_urls.route('/printer/<int:id>/update', methods=['GET', 'POST'])

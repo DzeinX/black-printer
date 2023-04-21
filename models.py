@@ -33,7 +33,7 @@ class AllHistory(db.Model):
 class Buildings(db.Model):
     __tablename__ = "Buildings"
     id = db.Column(db.Integer, primary_key=True)
-    building = db.Column(db.String(50), nullable=False)
+    building = db.Column(db.String(50), nullable=False, unique=True)
 
     def __repr__(self):
         return '<Buildings %r>' % self.id
@@ -42,7 +42,7 @@ class Buildings(db.Model):
 class Division(db.Model):
     __tablename__ = "Division"
     id = db.Column(db.Integer, primary_key=True)
-    division = db.Column(db.String(50), nullable=False)
+    division = db.Column(db.String(50), nullable=False, unique=True)
 
     def __repr__(self):
         return '<Division %r>' % self.id
@@ -98,7 +98,7 @@ class Cartridges(db.Model):
 class ListModels(db.Model):
     __tablename__ = "ListModels"
     id = db.Column(db.Integer, primary_key=True)
-    model = db.Column(db.String(15))
+    model = db.Column(db.String(15), unique=True)
 
     def __repr__(self):
         return '<ListModels %r>' % self.id

@@ -5,6 +5,7 @@ from flask import redirect
 from flask import flash
 from flask_login import current_user, login_required
 
+from ScanFunctions import TypeVar
 from models import *
 from tabs_that_appear import *
 
@@ -65,6 +66,98 @@ def redirect_to_signin(response):
 @main_urls.route('/')
 def main_page():
     return render_template("main.html")
+
+
+@main_urls.route('/divisions', methods=['GET', 'POST'])
+@login_required
+def add_divisions():
+    division_list = Division.query.all()
+    counter_division = len(division_list)
+
+    if request.method == "POST":
+        list_division = request.form.getlist('division')
+
+        var_check = TypeVar(list_division, var_type='str')
+        if var_check[1]:
+            list_division = var_check[0][0]
+        else:
+            if isinstance(var_check[0], str):
+                flash(var_check[0])
+                return redirect(request.referrer)
+            else:
+                flash('Неправильное значение у поля формы')
+                return redirect(request.referrer)
+
+        if len(list_division) == 0:
+            flash('Нельзя удалить все подразделения')
+            return redirect(request.referrer)
+
+        Division.query.delete()
+        try:
+            for division in list_division:
+                is_not_available = Division.query.filter(Division.division == division).first() is None
+                if division != '' and not division.isspace() and is_not_available:
+                    division = Division(division=division)
+                    db.session.add(division)
+        except:
+            return f"Не удалось сохранить изменения"
+
+        try:
+            db.session.commit()
+            return redirect("/divisions")
+        except:
+            flash('Не удалось добавить подразделение')
+            return render_template("main.html")
+    else:
+        return render_template("Divisions.html",
+                               division_list=division_list,
+                               counter_division=counter_division)
+
+
+@main_urls.route('/buildings', methods=['GET', 'POST'])
+@login_required
+def add_buildings():
+    building_list = Buildings.query.all()
+    counter_building = len(building_list)
+
+    if request.method == "POST":
+        list_buildings = request.form.getlist('building')
+
+        var_check = TypeVar(list_buildings, var_type='str')
+        if var_check[1]:
+            list_buildings = var_check[0][0]
+        else:
+            if isinstance(var_check[0], str):
+                flash(var_check[0])
+                return redirect(request.referrer)
+            else:
+                flash('Неправильное значение у поля формы')
+                return redirect(request.referrer)
+
+        if len(list_buildings) == 0:
+            flash('Нельзя удалить все корпусы')
+            return redirect(request.referrer)
+
+        Buildings.query.delete()
+        try:
+            for building in list_buildings:
+                is_not_available = Buildings.query.filter(Buildings.building == building).first() is None
+                if building != '' and not building.isspace() and is_not_available:
+                    building = Buildings(building=building)
+                    db.session.add(building)
+        except:
+            return f"Не удалось сохранить изменения"
+
+        try:
+            db.session.commit()
+            return redirect("/buildings")
+        except:
+            flash('Не удалось добавить корпус')
+            return render_template("main.html")
+    else:
+        return render_template("Buildings.html",
+                               building_list=building_list,
+                               counter_building=counter_building)
 
 
 @main_urls.route('/all_history')

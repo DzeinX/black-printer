@@ -93,18 +93,20 @@
                             <li class="nav-item">
                                 <a href="/add_models" class="nav-link">Модели</a>
                             </li>
-                            <li class="nav-item">
-                                <a href="/add_works_cartridges" class="nav-link">Тип работ картриждей</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/add_works_printers" class="nav-link">Тип работ принтеров</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/buildings" class="nav-link">Корпуса</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/divisions" class="nav-link">Подразделения</a>
-                            </li>
+                            {% if current_user.is_boss %}
+                                <li class="nav-item">
+                                    <a href="/add_works_cartridges" class="nav-link">Тип работ картриждей</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/add_works_printers" class="nav-link">Тип работ принтеров</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/buildings" class="nav-link">Корпуса</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/divisions" class="nav-link">Подразделения</a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </li>
                     <li class="nav-item">

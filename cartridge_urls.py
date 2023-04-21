@@ -23,47 +23,50 @@ def redirect_to_signin(response):
 @cartridge_urls.route('/add_works_cartridges', methods=['GET', 'POST'])
 @login_required
 def add_works_cartridges():
-    all_works_cartridges = AllWorksCartridges.query.all()
-    counter_works = len(all_works_cartridges)
+    if current_user.is_boss:
+        all_works_cartridges = AllWorksCartridges.query.all()
+        counter_works = len(all_works_cartridges)
 
-    if request.method == "POST":
-        all_works_cartridges = request.form.getlist('works')
+        if request.method == "POST":
+            all_works_cartridges = request.form.getlist('works')
 
-        var_check = TypeVar(all_works_cartridges, var_type='str')
-        if var_check[1]:
-            all_works_cartridges = var_check[0][0]
-        else:
-            if isinstance(var_check[0], str):
-                flash(var_check[0])
-                return redirect(request.referrer)
+            var_check = TypeVar(all_works_cartridges, var_type='str')
+            if var_check[1]:
+                all_works_cartridges = var_check[0][0]
             else:
-                flash('Incorrect value')
+                if isinstance(var_check[0], str):
+                    flash(var_check[0])
+                    return redirect(request.referrer)
+                else:
+                    flash('Incorrect value')
+                    return redirect(request.referrer)
+
+            if len(all_works_cartridges) == 0:
+                flash('Нельзя удалить все модели')
                 return redirect(request.referrer)
 
-        if len(all_works_cartridges) == 0:
-            flash('Нельзя удалить все модели')
-            return redirect(request.referrer)
+            AllWorksCartridges.query.delete()
+            try:
+                for work in all_works_cartridges:
 
-        AllWorksCartridges.query.delete()
-        try:
-            for work in all_works_cartridges:
+                    if work != '' and not work.isspace():
+                        model = AllWorksCartridges(work=work)
+                        db.session.add(model)
+            except:
+                return f"Не удалось сохранить изменения"
 
-                if work != '' and not work.isspace():
-                    model = AllWorksCartridges(work=work)
-                    db.session.add(model)
-        except:
-            return f"Не удалось сохранить изменения"
-
-        try:
-            db.session.commit()
-            return redirect("/add_works_cartridges")
-        except:
-            flash('Не удалось добавить тип работ')
-            return render_template("main.html")
+            try:
+                db.session.commit()
+                return redirect("/add_works_cartridges")
+            except:
+                flash('Не удалось добавить тип работ')
+                return render_template("main.html")
+        else:
+            return render_template("AddWorksCartridges.html",
+                                   all_works_cartridges=all_works_cartridges,
+                                   counter_works=counter_works)
     else:
-        return render_template("AddWorksCartridges.html",
-                               all_works_cartridges=all_works_cartridges,
-                               counter_works=counter_works)
+        return redirect('/')
 
 
 @cartridge_urls.route('/add_models', methods=['GET', 'POST'])
