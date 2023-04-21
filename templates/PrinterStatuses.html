@@ -3,7 +3,6 @@
 {% block title %}Printer statuses{% endblock %}
 
 {% block script %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
 {% endblock %}
 
@@ -12,21 +11,49 @@
     <a href={{ request.referrer }}>Назад</a><br>
     {% if statuses|length > 0 %}
         <div class="sch_bar">
-            <div class="ctr">
-                <label for="search"><strong>Поиск по таблице:</strong></label><br>
-                <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-            </div>
-            <div class="line"></div>
-            <div class="ctr">
-                <strong>Поиск по статусу:</strong><br>
-                <input type="radio" name="status" value="в подразделении">В подразделении
-                <input type="radio" name="status" value="принят в ремонт">Принят в ремонт
-                <input type="radio" name="status" value="в ремонте">В ремонте
-                <input type="radio" name="status" value="получен из ремонта">Получен из ремонта
-                <input type="radio" name="status" value="восстановлен">Восстановлен
-                <input type="radio" name="status" value="добавлен">Добавлен
-            </div>
-            <div class="line"></div>
+            <table style="border: none">
+                <colgroup>
+                    <col span="1" style="width: 40%;">
+                    <col span="1" style="width: 60%;">
+                </colgroup>
+                <tbody>
+                <tr>
+                    <td class="ctr" style="border: none">
+                        <strong>Поиск по таблице:</strong>
+                    </td>
+                    <td class="ctr" style="border: none">
+                        <strong>Поиск по статусу:</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="ctr" style="border: none">
+                        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+                    </td>
+                    <td class="ctr" style="border: none">
+                        <div class="radios">
+                            <span>
+                                <input type="radio" name="status" value="в подразделении"><label>В подразделении</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="принят в ремонт"><label>Принят в ремонт</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="в ремонте">В ремонте</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="получен из ремонта"><label>Получен из ремонта</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="восстановлен"><label>Восстановлен</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="добавлен"><label>Добавлен</label>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
             <input type="button" id="btn_off" value="Снять выделение" class="btn_clr">
         </div>
         <table id="mytable">

@@ -3,7 +3,6 @@
 {% block title %}New check{% endblock %}
 
 {% block script %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script>
@@ -50,7 +49,6 @@
                             <td>
                                 {{ counter.value }}
                             </td>
-
                             <td>
                                 Картридж
                             </td>

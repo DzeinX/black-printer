@@ -4,45 +4,70 @@
 
 {% block body %}
     <h1>Принтер:</h1>
-    <a href={{ request.referrer }}>Назад</a>
     <div class="align-center" style="background-color: gray">
         <form method="POST">
             <input type="hidden" name="user" value="{{ current_user.login }}">
             <div class="form">
-                <label for="name">Имя принтера: </label><input type="text"
-                                                               name="name"
-                                                               id="name"
-                                                               class="enter"
-                                                               value="{{ printer.name }}"
-                                                               placeholder="Введите имя" required><br>
-
-                <label for="num_inventory">Номер инвентаря: </label><input type="text"
-                                                                           name="num_inventory"
-                                                                           id="num_inventory"
-                                                                           class="enter"
-                                                                           value="{{ printer.num_inventory }}"
-                                                                           placeholder="Введите номер" required><br>
-
-                <label for="location">Подразделение: </label><input type="text"
-                                                                    name="location"
-                                                                    id="location"
-                                                                    class="enter"
-                                                                    value="{{ printer.location_now }}"
-                                                                    placeholder="Введите подразделение" required><br>
-
-                <label for="learning_campus">Учебный корпус: </label><input type="text"
-                                                                            name="learning_campus"
-                                                                            id="learning_campus"
-                                                                            class="enter"
-                                                                            value="{{ printer.learning_campus_now }}"
-                                                                            placeholder="Введите корпус" required><br>
-
-                <label for="cabinet">Кабинет: </label><input type="text"
-                                                             name="cabinet"
-                                                             id="cabinet"
-                                                             class="enter"
-                                                             value="{{ printer.cabinet_now }}"
-                                                             placeholder="Введите кабинет" required><br>
+                <table style="border: none">
+                    <colgroup>
+                        <col span="1" style="width: 50%;">
+                        <col span="1" style="width: 30%;">
+                        <col span="1" style="width: 20%;">
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td style="border: none">
+                            <label for="name">Имя принтера: </label>
+                            <input type="text"
+                                   name="name"
+                                   id="name"
+                                   class="enter"
+                                   value="{{ printer.name }}"
+                                   placeholder="Введите имя" required><br>
+                        </td>
+                        <td style="border: none">
+                            <label for="learning_campus">Учебный корпус: </label>
+                            <input type="text"
+                                   name="learning_campus"
+                                   id="learning_campus"
+                                   class="enter"
+                                   value="{{ printer.learning_campus_now }}"
+                                   placeholder="Введите корпус" required><br>
+                        </td>
+                        <td style="border: none">
+                            <label for="cabinet">Кабинет: </label>
+                            <input type="text"
+                                   name="cabinet"
+                                   id="cabinet"
+                                   class="enter"
+                                   value="{{ printer.cabinet_now }}"
+                                   placeholder="Введите кабинет" required><br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: none">
+                            <label for="num_inventory">Номер инвентаря: </label>
+                            <input type="text"
+                                   name="num_inventory"
+                                   id="num_inventory"
+                                   class="enter"
+                                   value="{{ printer.num_inventory }}"
+                                   placeholder="Введите номер" required><br>
+                        </td>
+                        <td style="border: none">
+                            <label for="location">Подразделение: </label>
+                            <input type="text"
+                                   name="location"
+                                   id="location"
+                                   class="enter"
+                                   value="{{ printer.location_now }}"
+                                   placeholder="Введите подразделение" required><br>
+                        </td>
+                        <td style="border: none">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
                 <br>
                 <input type="submit" value="Обновить" class="add_btn">
             </div>

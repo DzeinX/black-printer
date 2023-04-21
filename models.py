@@ -1,10 +1,13 @@
 from datetime import datetime
 
-from flask_login import UserMixin, LoginManager
+from flask_ldap3_login import LDAP3LoginManager
+from flask_login import LoginManager, login_user, UserMixin, current_user
 from flask_sqlalchemy import SQLAlchemy
 
+
 db = SQLAlchemy()
-manager = LoginManager()
+login_manager = LoginManager()
+ldap_manager = LDAP3LoginManager()
 
 association_table_1 = db.Table('association', db.Model.metadata,
                                db.Column('cartridges_id', db.Integer, db.ForeignKey('cartridges.id')),
@@ -27,6 +30,24 @@ class AllHistory(db.Model):
         return '<AllHistory %r>' % self.id
 
 
+class Buildings(db.Model):
+    __tablename__ = "Buildings"
+    id = db.Column(db.Integer, primary_key=True)
+    building = db.Column(db.String(50), nullable=False)
+
+    def __repr__(self):
+        return '<Buildings %r>' % self.id
+
+
+class Division(db.Model):
+    __tablename__ = "Division"
+    id = db.Column(db.Integer, primary_key=True)
+    division = db.Column(db.String(50), nullable=False)
+
+    def __repr__(self):
+        return '<Division %r>' % self.id
+
+
 class Printer(db.Model):
     __tablename__ = "printer"
     id = db.Column(db.Integer, primary_key=True)
@@ -46,6 +67,8 @@ class Printer(db.Model):
     reception_from_a_repair_id = db.relationship("ReceptionFromARepairing")
     issuance_id = db.relationship("PrinterIssuance")
     work_done_printers_id = db.relationship("WorkListsPrinters")
+    cartridge_issuance_id = db.relationship("CartridgeIssuance")
+    cartridge_brought_id = db.relationship("BroughtACartridge")
 
     def __repr__(self):
         return '<Printer %r>' % self.id
@@ -91,6 +114,7 @@ class BroughtACartridge(db.Model):
     user = db.Column(db.String(40), nullable=False)
 
     cartridge_number_id = db.Column(db.Integer, db.ForeignKey("cartridges.id"))
+    printer_id = db.Column(db.Integer, db.ForeignKey("printer.id"))
 
     def __repr__(self):
         return '<BroughtACartridge %r>' % self.id
@@ -169,6 +193,7 @@ class CartridgeIssuance(db.Model):
     user = db.Column(db.String(40), nullable=True)
 
     cartridge_number_id = db.Column(db.Integer, db.ForeignKey("cartridges.id"))
+    printer_id = db.Column(db.Integer, db.ForeignKey("printer.id"))
 
     def __repr__(self):
         return '<CartridgeIssuance %r>' % self.id
@@ -311,13 +336,33 @@ class ListsOfContracts(db.Model):
         return '<ListOfContracts %r>' % self.id
 
 
-class User(db.Model, UserMixin):
+class User(UserMixin, db.Model):
     __tablename__ = "User"
     id = db.Column(db.Integer, primary_key=True)
-    login = db.Column(db.String(64), nullable=False, unique=True)
-    password = db.Column(db.String(32), nullable=False)
+    dn = db.Column(db.String(50), nullable=False)
+    username = db.Column(db.String(35), nullable=False)
+    is_boss = db.Column(db.Boolean, nullable=False)
+
+    def __init__(self, dn, username, is_boss):
+        self.dn = dn
+        self.username = username
+        self.is_boss = is_boss
+
+    def __repr__(self):
+        return self.dn
+
+    def get_id(self):
+        return self.dn
 
 
-@manager.user_loader
-def load_user(user_id):
-    return User.query.get(user_id)
+@login_manager.user_loader
+def load_user(dn):
+    return User.query.filter(User.dn == dn).first()
+
+
+@ldap_manager.save_user
+def save_user(dn, username, is_boss):
+    user = User(dn=dn, username=username, is_boss=is_boss)
+    db.session.add(user)
+    db.session.commit()
+    return user

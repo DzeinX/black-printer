@@ -93,8 +93,8 @@ def add_models():
         ListModels.query.delete()
         try:
             for model in list_models:
-
-                if model != '' and not model.isspace():
+                is_not_available = ListModels.query.filter(ListModels.model == model).first() is None
+                if model != '' and not model.isspace() and is_not_available:
                     model = ListModels(model=model)
                     db.session.add(model)
         except:
@@ -338,6 +338,9 @@ def deleted_cartridges():
 @login_required
 def brought_a_cartridge():
     cartridges = Cartridges.query.all()
+    printers = Printer.query.all()
+    buildings = Buildings.query.all()
+    divisions = Division.query.all()
 
     if request.method == "POST":
         cartridge_number = request.form.getlist('cartridge_number')
@@ -384,6 +387,8 @@ def brought_a_cartridge():
             learning_campus = request.form['learning_campus']
             cabinet = request.form['cabinet']
             user = request.form['user']
+            printer = request.form['printer_id']
+            printer = Printer.query.get(int(printer))
 
             var_check = TypeVar(location, learning_campus, cabinet, var_type='str')
             if var_check[1]:
@@ -424,6 +429,7 @@ def brought_a_cartridge():
                     return render_template("main.html")
 
                 cartridge.brought_a_cartridge_id.append(brought_a_cartridge)
+                printer.cartridge_brought_id.append(brought_a_cartridge)
 
                 db.session.add(brought_a_cartridge)
 
@@ -436,7 +442,10 @@ def brought_a_cartridge():
     else:
         return render_template('BroughtACartridge.html',
                                cartridges=cartridges,
-                               CartridgeIssuance=CartridgeIssuance)
+                               printers=printers,
+                               CartridgeIssuance=CartridgeIssuance,
+                               buildings=buildings,
+                               divisions=divisions)
 
 
 @cartridge_urls.route('/refueling', methods=['GET', 'POST'])
@@ -601,6 +610,9 @@ def receptionFromARefuelling():
 @login_required
 def issuance_cartridges():
     cartridges = Cartridges.query.all()
+    printers = Printer.query.all()
+    buildings = Buildings.query.all()
+    divisions = Division.query.all()
 
     if request.method == "POST":
         cartridge_number = request.form.getlist('cartridge_number')
@@ -616,6 +628,7 @@ def issuance_cartridges():
                 location = request.form[f'location{number}']
                 learning_campus = request.form[f'learning_campus{number}']
                 cabinet = request.form[f'cabinet{number}']
+                printer = request.form[f'printer{number}']
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
                 issuance = CartridgeIssuance(user=user,
                                              location=location,
@@ -647,6 +660,8 @@ def issuance_cartridges():
             location = request.form['location']
             learning_campus = request.form['learning_campus']
             cabinet = request.form['cabinet']
+            printer = request.form['printer_id']
+            printer = Printer.query.filter(Printer.id == int(printer)).first()
 
             var_check = TypeVar(location, learning_campus, cabinet, var_type='str')
             if var_check[1]:
@@ -687,6 +702,7 @@ def issuance_cartridges():
                     return render_template("main.html")
 
                 cartridge.issuance_id.append(issuance)
+                printer.cartridge_issuance_id.append(issuance)
 
                 db.session.add(issuance)
 
@@ -699,4 +715,8 @@ def issuance_cartridges():
     else:
         return render_template('IssuanceCartridges.html',
                                cartridges=cartridges,
-                               BroughtACartridge=BroughtACartridge)
+                               BroughtACartridge=BroughtACartridge,
+                               Printer=Printer,
+                               printers=printers,
+                               buildings=buildings,
+                               divisions=divisions)

@@ -12,13 +12,30 @@
                         {{ msg }}
                     </div>
                 {% endfor %}
-
-                <label for="login">Логин</label>
-                <input id="login" type="text" name="login" class="enter">
-
-                <label for="password1">Пароль</label>
-                <input id="password1" type="password" name="password" class="enter">
-
+                <table style="border: none">
+                    <colgroup>
+                        <col span="1" style="width: 50%;">
+                        <col span="1" style="width: 50%;">
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td style="border: none">
+                            <label for="login">Логин</label>
+                        </td>
+                        <td style="border: none">
+                            <label for="password1">Пароль</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: none">
+                            <input id="login" type="text" name="login" class="enter">
+                        </td>
+                        <td style="border: none">
+                            <input id="password1" type="password" name="password" class="enter">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
                 <input type="submit" value="Вход" class="add_btn">
             </div>
         </form>

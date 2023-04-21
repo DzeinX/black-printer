@@ -3,8 +3,8 @@
 {% block title %}Printers{% endblock %}
 
 {% block script %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -14,63 +14,122 @@
             {{ msg }}
         </div>
     {% endfor %}
-    <div class="align-center" style="background-color: gray">
+    <div class="align-center">
         <form method="POST">
             <div class="form">
-
-                <label for="name">Имя принтера: </label><input type="text"
-                                                               name="name"
-                                                               id="name"
-                                                               class="enter"
-                                                               placeholder="Введите имя" required><br>
-
-                <label for="num_inventory">Номер инвентаря: </label><input type="text"
-                                                                           name="num_inventory"
-                                                                           id="num_inventory"
-                                                                           class="enter"
-                                                                           placeholder="Введите номер" required><br>
-
-                <label for="location">Подразделение: </label><input type="text"
-                                                                    name="location"
-                                                                    id="location"
-                                                                    class="enter"
-                                                                    placeholder="Введите подразделение" required><br>
-
-                <label for="learning_campus">Учебный корпус: </label><input type="text"
-                                                                            name="learning_campus"
-                                                                            id="learning_campus"
-                                                                            class="enter"
-                                                                            placeholder="Введите корпус" required><br>
-
-                <label for="cabinet">Кабинет: </label><input type="text"
-                                                             name="cabinet"
-                                                             id="cabinet"
-                                                             class="enter"
-                                                             placeholder="Введите кабинет" required><br>
-
+                <table style="border: none">
+                    <colgroup>
+                        <col span="1" style="width: 50%;">
+                        <col span="1" style="width: 30%;">
+                        <col span="1" style="width: 20%;">
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td style="border: none">
+                            <label for="name">Имя принтера: </label>
+                            <input type="text"
+                                   name="name"
+                                   id="name"
+                                   class="enter"
+                                   placeholder="Введите имя" required>
+                        </td>
+                        <td style="border: none">
+                            <label for="learning_campus">Учебный корпус: </label>
+                            <select name="learning_campus"
+                                    id="learning_campus"
+                                    class="select" required>
+                                {% for b in buildings %}
+                                    <option>{{ b.building }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td style="border: none">
+                            <label for="cabinet">Кабинет: </label>
+                            <input type="text"
+                                   name="cabinet"
+                                   id="cabinet"
+                                   class="enter"
+                                   placeholder="Введите кабинет" required>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: none">
+                            <label for="num_inventory">Номер инвентаря: </label>
+                            <input type="text"
+                                   name="num_inventory"
+                                   id="num_inventory"
+                                   class="enter"
+                                   placeholder="Введите номер" required>
+                        </td>
+                        <td style="border: none">
+                            <label for="location">Подразделение: </label>
+                            <select name="location"
+                                    id="location"
+                                    class="select" required>
+                                {% for d in divisions %}
+                                    <option>{{ d.division }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td style="border: none">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
                 <input type="hidden" name="user" value="{{ current_user.login }}">
-                <input type="submit" value="Добавить" class="add_btn">
+                <div class="btns">
+                    <input type="submit" value="Добавить" class="add_btn">
+                </div>
             </div>
         </form>
     </div>
 
     {% if printers|length > 0 %}
         <div class="sch_bar">
-            <div class="ctr">
-                <label for="search"><strong>Поиск по таблице:</strong></label><br>
-                <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-            </div>
-            <div class="line"></div>
-            <div class="ctr">
-                <strong>Поиск по статусу:></strong><br>
-                <input type="radio" name="status" value="в подразделении">В подразделении
-                <input type="radio" name="status" value="принят в ремонт">Принят в ремонт
-                <input type="radio" name="status" value="в ремонте">В ремонте
-                <input type="radio" name="status" value="получен из ремонта">Получен из ремонта
-                <input type="radio" name="status" value="восстановлен">Восстановлен
-                <input type="radio" name="status" value="добавлен">Добавлен<br>
-            </div>
-            <div class="line"></div>
+            <table style="border: none">
+                <colgroup>
+                    <col span="1" style="width: 40%;">
+                    <col span="1" style="width: 60%;">
+                </colgroup>
+                <tbody>
+                <tr>
+                    <td class="ctr" style="border: none">
+                        <strong>Поиск по таблице:</strong>
+                    </td>
+                    <td class="ctr" style="border: none">
+                        <strong>Поиск по статусу:</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="ctr" style="border: none">
+                        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+                    </td>
+                    <td class="ctr" style="border: none">
+                        <div class="radios">
+                            <span>
+                                <input type="radio" name="status" value="в подразделении"><label>В подразделении</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="принят в ремонт"><label>Принят в ремонт</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="в ремонте">В ремонте</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status"
+                                       value="получен из ремонта"><label>Получен из ремонта</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="восстановлен"><label>Восстановлен</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="добавлен"><label>Добавлен</label>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
             <input type="button" id="btn_off" value="Снять выделение" class="btn_clr">
         </div>
         <table style="width: 100%" id="mytable">
@@ -85,11 +144,18 @@
             <thead>
             <tr>
                 <th>№</th>
-                <th>Имя принтера<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"><br></th>
-                <th>Номер инвентаря<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"><br>
-                </th>
+                <th>Имя принтера</th>
+                <th>Номер инвентаря</th>
                 <th>Статус</th>
                 <th>Локация</th>
+                <th>Действие</th>
+            </tr>
+            <tr style="background: lightblue">
+                <th><i class="fa-solid fa-magnifying-glass"></i></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th></th>
+                <th></th>
                 <th></th>
             </tr>
             </thead>

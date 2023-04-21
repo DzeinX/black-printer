@@ -3,16 +3,16 @@
 {% block title %}List of completed works{% endblock %}
 
 {% block script %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
     <script>
         let items = 1;
         let counter = {{ len_wl }} +1;
+        let isFirst = false;
 
         function AddCheck() {
+            isFirst = true;
             const div = document.getElementById("items");
             const button = document.getElementById("add_work_done");
             items++;
@@ -20,7 +20,6 @@
             let id = "new";
             newitem.setAttribute("id", id);
             newitem.innerHTML = `
-                <h4>Проделанные работы:</h4>
                 <form method="POST">
                 <input type="hidden" name="user" value="{{ current_user.login }}">
                 {% set cartridges = namespace(value=Cartridges.query.all()) %}
@@ -39,8 +38,7 @@
                             <div id=dc${items}>
                                 <select id="s"
                                         name="work{{ ctg.number }}"
-                                        placeholder="Выберите тип работы"
-                                        style="width: 240px; height: 30px; border-radius: 4px">
+                                        class="select">
                                              <option value="NAN">--Не выбрано--</option>
                                         {% for el in all_wc %}
                                              <option>{{ el.work }}</option>
@@ -83,8 +81,7 @@
                                 <div id=dp${items}>
                                     <select id="s"
                                             name="work{{ prtr.num_inventory }}"
-                                            placeholder="Выберите тип работы"
-                                            style="width: 240px; height: 30px; border-radius: 4px">
+                                            class="select">
                                                 <option value="NAN">--Не выбрано--</option>
                                             {% for el in all_wp %}
                                                 <option>{{ el.work }}</option>
@@ -131,8 +128,14 @@
 
             div.insertBefore(newitem, button);
             button.remove();
-        }
 
+            $('select').select2({
+                placeholder: "Выберите",
+                allowClear: true
+            });
+        }
+    </script>
+    <script>
         function AddItemP(printer_num) {
             const div = document.getElementById("main" + printer_num);
             const button = document.getElementById("ap" + printer_num);
@@ -164,6 +167,11 @@
                                 <br>`;
 
             div.insertBefore(newitem, button);
+
+            $('select').select2({
+                placeholder: "Выберите",
+                allowClear: true
+            });
         }
 
         function AddItemC(cartridge_num) {
@@ -177,7 +185,7 @@
             newitem.innerHTML = `<select id="s"
                                         name="work${cartridge_num}"
                                         placeholder="Выберите тип работы"
-                                        style="width: 240px; height: 30px; border-radius: 4px">
+                                        class="select">
                                             <option value="NAN">--Не выбрано--</option>
                                         {% for el in all_wc %}
                                             <option>{{ el.work }}</option>
@@ -215,9 +223,9 @@
         </div>
     </div>
     <div id="items">
-    <input type="button" value="Добавить" class="add_field" id="add_work_done" onclick="AddCheck();">
+        <input type="button" id="add_work_done" value="Добавить" class="add_btn" onclick="AddCheck()">
         {% for work in wl %}
-            <div id="d{{ loop.index }}" style="background: lightblue; margin: 5px; padding: 5px" class="dtls">
+            <div id="d{{ loop.index }}" style="margin: 15px; padding: 5px" class="dtls">
                 <h4>Проделанные работы {{ work.number }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
                 Общая сумма:{{ wd_prices[loop.index - 1] }}<br>
                 <table>

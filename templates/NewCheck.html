@@ -3,7 +3,6 @@
 {% block title %}New check{% endblock %}
 
 {% block script %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script>
@@ -21,7 +20,7 @@
     <div class="align-center">
         <form method="POST">
             <input type="hidden" name="user" value="{{ current_user.login }}">
-            <div class="form" id="items" style="width: 270px !important;">
+            <div class="form" id="items">
                 <label for="sum_check">Сумма счёта:</label><br>
                 <input type="number" name="sum" id="sum_check" class="enter"><br>
                 <label for="date_check">Дата счёта</label>

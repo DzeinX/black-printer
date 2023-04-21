@@ -124,6 +124,8 @@ def update_printer(id):
 @login_required
 def printers():
     printers = Printer.query.order_by(Printer.date_added.desc()).all()
+    buildings = Buildings.query.all()
+    divisions = Division.query.all()
 
     if request.method == 'POST':
         name = request.form['name']
@@ -180,13 +182,15 @@ def printers():
             return render_template("main.html")
 
     return render_template("Printers.html",
-                           printers=printers)
+                           printers=printers,
+                           buildings=buildings,
+                           divisions=divisions)
 
 
 @printer_urls.route('/printer/<int:id>/statuses')
 @login_required
 def printers_status(id):
-    statuses = AllHistory.query.filer(AllHistory.printer_id == id).order_by(AllHistory.date.desc()).all()
+    statuses = AllHistory.query.filter(AllHistory.printer_id == id).order_by(AllHistory.date.desc()).all()
     printer = Printer.query.get(id)
     return render_template("PrinterStatuses.html",
                            statuses=statuses,
@@ -269,6 +273,8 @@ def deleted_printers():
 @login_required
 def brought_a_printer():
     printers = Printer.query.all()
+    buildings = Buildings.query.all()
+    divisions = Division.query.all()
 
     if request.method == "POST":
         printer_num = request.form.getlist('num_inventory')
@@ -369,7 +375,9 @@ def brought_a_printer():
     else:
         return render_template('BroughtAPrinter.html',
                                printers=printers,
-                               PrinterIssuance=PrinterIssuance)
+                               PrinterIssuance=PrinterIssuance,
+                               buildings=buildings,
+                               divisions=divisions)
 
 
 @printer_urls.route('/repairing', methods=['GET', 'POST'])
@@ -534,6 +542,8 @@ def receptionFromARepairing():
 @login_required
 def issuance_printers():
     printers = Printer.query.all()
+    buildings = Buildings.query.all()
+    divisions = Division.query.all()
 
     if request.method == "POST":
         printer_num = request.form.getlist('num_inventory')
@@ -641,4 +651,6 @@ def issuance_printers():
     else:
         return render_template('IssuancePrinters.html',
                                printers=printers,
-                               BroughtAPrinter=BroughtAPrinter)
+                               BroughtAPrinter=BroughtAPrinter,
+                               buildings=buildings,
+                               divisions=divisions)

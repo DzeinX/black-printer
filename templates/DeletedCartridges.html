@@ -3,7 +3,6 @@
 {% block title %}Deleted Cartridges{% endblock %}
 
 {% block script %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
 {% endblock %}
 
@@ -24,8 +23,14 @@
             <thead>
             <tr>
                 <th>№</th>
-                <th>Номер<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"><br></th>
-                <th>Модели<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"><br></th>
+                <th>Номер</th>
+                <th>Модели</th>
+                <th></th>
+            </tr>
+            <tr style="background: lightblue">
+                <th><i class="fa-solid fa-magnifying-glass"></i></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
                 <th></th>
             </tr>
             </thead>

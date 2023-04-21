@@ -1,13 +1,10 @@
 {% extends 'base.html' %}
 
 
-{% block CSS %}../static/css/select2.min.css{% endblock %}
 {% block title %}Issuance printers{% endblock %}
 
 
 {% block script %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
@@ -15,14 +12,15 @@
         let items = 1;
 
         function AddItem() {
-            const div = document.getElementById("items");
-            const button = document.getElementById("add");
+            const table = document.getElementById("table").getElementsByTagName('tbody')[0];
             items++;
-            let newitem = document.createElement("div");
-            let id = "d" + items;
-            newitem.setAttribute("id", id);
-            newitem.innerHTML = `
-            <select type="number"
+            let id = "d" + items
+            let newRow = table.insertRow()
+            newRow.setAttribute('id', id)
+            let td = document.createElement("td")
+            td.setAttribute('style', 'border: none; vertical-align: top')
+            td.innerHTML = `
+                <select type="number"
                     name="num_inventory"
                     id="${items}"
                     class="select"
@@ -37,11 +35,11 @@
                     {% endif %}
                 {% endfor %}
                 </select><input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}"><br>`;
+            newRow.appendChild(td)
 
-            div.insertBefore(newitem, button);
 
             $('select').select2({
-                placeholder: "Select Model",
+                placeholder: "Выберите",
                 allowClear: true
             });
         }
@@ -57,50 +55,67 @@
                 {% for msg in get_flashed_messages() %}
                     <p class="msg"><strong>{{ msg }}</strong></p>
                 {% endfor %}
-                <label for="location">Подразделение: </label><br>
-                <input type="text"
-                       name="location"
-                       id="location"
-                       class="enter"
-                       required><br>
+                <table style="border: none" id="table">
+                    <colgroup>
+                        <col span="1" style="width: 50%;">
+                        <col span="1" style="width: 50%;">
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td style="border: none; vertical-align: top" id="d1">
+                            <label for="1">Номер инвентаря<strong>||</strong>Имя: </label><br>
+                            <select type="number"
+                                    name="num_inventory"
+                                    id="1"
+                                    class="select"
+                                    required>
+                                {% for printer in printers %}
+                                    {% if printer.status == "Получен из ремонта" or printer.status == "Восстановлен" %}
+                                        <option value="{{ printer.num_inventory }}">
+                                            {{ printer.num_inventory }}
+                                            <strong>||</strong>
+                                            {{ printer.name }}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td style="border: none" rowspan="3">
+                            <label for="location">Подразделение: </label><br>
+                            <select name="location"
+                                    id="location"
+                                    class="select" required>
+                                {% for d in divisions %}
+                                    <option>{{ d.division }}</option>
+                                {% endfor %}
+                            </select><br>
 
-                <label for="learning_campus">Учебный корпус: </label><br>
-                <input type="text"
-                       name="learning_campus"
-                       id="learning_campus"
-                       class="enter"
-                       required><br>
+                            <label for="learning_campus">Учебный корпус: </label><br>
+                            <select name="learning_campus"
+                                    id="learning_campus"
+                                    class="select" required>
+                                {% for b in buildings %}
+                                    <option>{{ b.building }}</option>
+                                {% endfor %}
+                            </select><br>
 
-                <label for="cabinet">Кабинет: </label><br>
-                <input type="text"
-                       name="cabinet"
-                       id="cabinet"
-                       class="enter"
-                       required><br>
-
+                            <label for="cabinet">Кабинет: </label><br>
+                            <input type="text"
+                                   name="cabinet"
+                                   id="cabinet"
+                                   class="enter"
+                                   placeholder="Введите кабинет"
+                                   required>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
                 <input type="hidden" name="user" value="{{ current_user.login }}">
-                <input type="hidden" name="id_form" value="1">
-
-                <div id="d1">
-                    <label for="1">Номер инвентаря<strong>||</strong>Имя: </label><br>
-                    <select type="number"
-                            name="num_inventory"
-                            id="1"
-                            class="select"
-                            required>
-                        {% for printer in printers %}
-                            {% if printer.status == "Получен из ремонта" or printer.status == "Восстановлен" %}
-                                <option value="{{ printer.num_inventory }}">
-                                    {{ printer.num_inventory }}
-                                    <strong>||</strong>
-                                    {{ printer.name }}
-                                </option>
-                            {% endif %}
-                        {% endfor %}
-                    </select><input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d1');" id="r1"><br>
+                <div class="btns">
+                    <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
+                    <input type="submit" value="Добавить" class="add_btn">
                 </div>
-                <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
-                <input type="submit" value="Выдать" class="add_btn">
+                <input type="hidden" name="id_form" value="1">
             </div>
         </form>
     </div>
@@ -120,10 +135,15 @@
             <thead>
             <tr>
                 <th>№</th>
-                <th>Имя принтера<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"><br></th>
-                <th>Номер инвентаря<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"><br>
-                </th>
-                <th>Принесён из...<br><input type="text" placeholder="Начните вводить" id="sch4" class="enter"><br></th>
+                <th>Имя принтера</th>
+                <th>Номер инвентаря</th>
+                <th>Принесён из...</th>
+            </tr>
+            <tr style="background: lightblue">
+                <th><i class="fa-solid fa-magnifying-glass"></i></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch4" class="enter"></th>
             </tr>
             </thead>
             <tbody>
