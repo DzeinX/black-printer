@@ -207,6 +207,11 @@ def cartridges():
     list_models = ListModels.query.all()
     cartridges = Cartridges.query.order_by(Cartridges.date_added.desc()).all()
 
+    cartridges_and_location = []
+    for cartridge in cartridges:
+        cartridges_and_location.append(
+            [cartridge, CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()])
+
     if request.method == 'POST':
         action = "Создан"
         number = request.form['number']
@@ -263,8 +268,10 @@ def cartridges():
             return render_template("main.html")
     else:
         return render_template("Cartridges.html",
-                               cartridges=cartridges,
-                               list_models=list_models)
+                               cartridges_and_location=cartridges_and_location,
+                               list_models=list_models,
+                               CartridgeIssuance=CartridgeIssuance,
+                               Printer=Printer)
 
 
 @cartridge_urls.route('/cartridge/<int:id>/delete')

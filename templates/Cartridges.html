@@ -95,7 +95,7 @@
             </div>
         </form>
     </div>
-    {% if cartridges|length > 0 %}
+    {% if cartridges_and_location|length > 0 %}
         <div class="sch_bar">
             <table style="border: none">
                 <colgroup>
@@ -146,10 +146,11 @@
         <table style="width: 100%" id="mytable">
             <colgroup>
                 <col span="1" style="width: 5%;">
+                <col span="1" style="width: 25%;">
                 <col span="1" style="width: 15%;">
-                <col span="1" style="width: 30%;">
-                <col span="1" style="width: 25%;">
-                <col span="1" style="width: 25%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 15%;">
             </colgroup>
             <thead>
             <tr>
@@ -157,6 +158,7 @@
                 <th>Номер</th>
                 <th>Модели</th>
                 <th>Статус</th>
+                <th>Локация</th>
                 <th>Действия</th>
             </tr>
             <tr style="background: lightblue">
@@ -165,11 +167,12 @@
                 <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
                 <th></th>
                 <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
             {% set counter = namespace(value=1) %}
-            {% for cartridge in cartridges %}
+            {% for cartridge, location in cartridges_and_location %}
                 {% if (cartridge.efficiency != 0) %}
                     <tr>
                         <td class="1">
@@ -187,8 +190,20 @@
                             {{ cartridge.status }}
                         </td>
                         <td class="5">
+                            {% if location|length != 0 %}
+                                {% set cartridge_issuance = location[-1] %}
+                                {% set printer = Printer.query.filter(Printer.id == cartridge_issuance.printer_id).first() %}
+                                Подразделение: {{ cartridge_issuance.location }}<br>
+                                Корпус: {{ cartridge_issuance.learning_campus }}<br>
+                                Кабинет: {{ cartridge_issuance.cabinet }}<br>
+                                Номер принтера: {{ printer.num_inventory }}<br>
+                            {% else %}
+                                Ещё не был в подразделении
+                            {% endif %}
+                        </td>
+                        <td class="6">
                             <a href="/cartridge/{{ cartridge.id }}/update">Изменить</a>
-                            <a href="/cartridge/{{ cartridge.id }}/delete">Удалить</a>
+                            <a href="/cartridge/{{ cartridge.id }}/delete">Утилизировать</a>
                             <a href="/cartridge/{{ cartridge.id }}/statuses">Статусы</a>
                         </td>
                     </tr>
