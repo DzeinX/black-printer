@@ -160,8 +160,8 @@
                                        name="cabinet{{ printer.num_inventory }}"
                                        value="{{ brought_a_printer.cabinet }}">
                                 <input type="hidden"
-                                       name="user{{ printer.num_inventory }}"
-                                       value="Добрынин И.А.">
+                                       name="user"
+                                       value="{{ current_user.login }}">
                             </td>
                         </tr>
                         {% set counter.value = counter.value + 1 %}
