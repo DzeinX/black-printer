@@ -8,6 +8,7 @@ from flask_login import current_user, login_required
 from ScanFunctions import TypeVar
 from models import *
 from tabs_that_appear import *
+from StatusSettings import StatusSettings
 
 main_urls = Blueprint('main_urls', __name__)
 
@@ -170,7 +171,8 @@ def all_history():
                            Printer=Printer,
                            WorkList=WorkList,
                            CheckLists=CheckLists,
-                           ListsOfContracts=ListsOfContracts)
+                           ListsOfContracts=ListsOfContracts,
+                           StatusSettings=StatusSettings)
 
 
 @main_urls.route('/active_contract', methods=['GET', 'POST'])
@@ -220,8 +222,8 @@ def active_contract():
         db.session.add(contract)
 
         try:
-            action_h = "Создан"
-            type_h = "договор"
+            action_h = StatusSettings.CONTRACT['Создан']
+            type_h = StatusSettings.TYPE['CONTRACT']
             name_h = f"{name}"
             user = request.form['user']
             ah = AllHistory(action=action_h,
@@ -261,10 +263,10 @@ def close_contract(contract_id):
     contract.active = False
 
     try:
-        action_h = "Закрыт"
-        type_h = "договор"
+        action_h = StatusSettings.CONTRACT['Закрыт']
+        type_h = StatusSettings.TYPE['CONTRACT']
         name_h = f"{contract.name}"
-        user = current_user.login
+        user = current_user.username
         ah = AllHistory(action=action_h,
                         type=type_h,
                         name=name_h,
@@ -306,8 +308,8 @@ def new_check(contract_id):
         db.session.add(check)
 
         try:
-            action_h = "Создан"
-            type_h = "счёт"
+            action_h = StatusSettings.CHECK["Создан"]
+            type_h = StatusSettings.TYPE['CHECK']
             name_h = f"{date_check.date().strftime('%d.%m.%Y')}"
             user = request.form['user']
             ah = AllHistory(action=action_h,
@@ -342,10 +344,10 @@ def close_check(check_id):
         check.active = False
 
         try:
-            action_h = "Закрыт"
-            type_h = "счёт"
+            action_h = StatusSettings.CHECK["Закрыт"]
+            type_h = StatusSettings.TYPE['CHECK']
             name_h = f"{check.date_check.date().strftime('%d.%m.%Y')}"
-            user = current_user.login
+            user = current_user.username
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -375,10 +377,10 @@ def reopen_check(check_id):
     check.active = True
 
     try:
-        action_h = "Переоткрыт"
-        type_h = "счёт"
+        action_h = StatusSettings.CHECK["Переоткрыт"]
+        type_h = StatusSettings.TYPE['CHECK']
         name_h = f"{check.date_check.date().strftime('%d.%m.%Y')}"
-        user = current_user.login
+        user = current_user.username
         ah = AllHistory(action=action_h,
                         type=type_h,
                         name=name_h,
@@ -430,8 +432,8 @@ def check_more(check_id):
             check.work_lists_id.append(work)
 
         try:
-            action_h = "Пополнен"
-            type_h = "счёт"
+            action_h = StatusSettings.CHECK["Пополнен"]
+            type_h = StatusSettings.TYPE['CHECK']
             name_h = f"{check.date_check.date().strftime('%d.%m.%Y')}"
             user = request.form['user']
             ah = AllHistory(action=action_h,
@@ -545,8 +547,8 @@ def list_of_completed_works():
                 pr_0.work_done = True
 
         try:
-            action_h = "Создан"
-            type_h = "список работ"
+            action_h = StatusSettings.WORK_LIST["Создан"]
+            type_h = StatusSettings.TYPE['WORK_LIST']
             name_h = f"{work_list.date_work.date().strftime('%d.%m.%Y')}"
             ah = AllHistory(action=action_h,
                             type=type_h,
@@ -606,8 +608,8 @@ def update_work(work_id):
                         wpp.price = prices_p[i]
 
         try:
-            action_h = "Изменён"
-            type_h = "список работ"
+            action_h = StatusSettings.WORK_LIST["Изменён"]
+            type_h = StatusSettings.TYPE['WORK_LIST']
             name_h = f"{work.date_work.date().strftime('%d.%m.%Y')}"
             user = request.form['user']
             ah = AllHistory(action=action_h,

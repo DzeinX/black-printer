@@ -118,23 +118,28 @@
                     <td class="ctr" style="border: none">
                         <div class="radios">
                             <span>
-                                <input type="radio" name="status" value="в резерве"><label>В резерве</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В резерве'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['В резерве'] }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status"
-                                       value="принят в заправку"><label>Принят в заправку</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Принят в заправку'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['Принят в заправку'] }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="в заправке"><label>В заправке</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В заправке'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['В заправке'] }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="выдан"><label>Выдан</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В подразделении'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['В подразделении'] }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="восстановлен"><label>Восстановлен</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Восстановлен'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['Восстановлен'] }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="создан"><label>Создан</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Создан'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['Создан'] }}</label>
                             </span>
                         </div>
                     </td>
