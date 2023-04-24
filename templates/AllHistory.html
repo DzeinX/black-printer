@@ -40,11 +40,9 @@
             <th>Дата</th>
             <th>Пользователь</th>
         </tr>
-        </thead>
-        <tbody>
         <tr style="background: lightblue">
-            <td><i class="fa-solid fa-magnifying-glass"></i></td>
-            <td>
+            <th><i class="fa-solid fa-magnifying-glass"></i></th>
+            <th>
                 <select type="text" id="sch2_s" class="select">
                     <option></option>
                     <option>Создан</option>
@@ -57,26 +55,28 @@
                     <option>Принят в заправку</option>
                     <option>В заправке</option>
                     <option>В резерве</option>
-                    <option>Выдан</option>
+                    <option>В подразделении</option>
                     <option>Принят в ремонт</option>
                     <option>В ремонте</option>
                     <option>Получен из ремонта</option>
                 </select>
-            </td>
-            <td>
+            </th>
+            <th>
                 <select type="text" id="sch3_s" class="select">
                     <option></option>
-                    <option>Список работ</option>
-                    <option>Счёт</option>
-                    <option>Договор</option>
-                    <option>Картридж</option>
-                    <option>Принтер</option>
+                    <option>{{ StatusSettings.TYPE['WORK_LIST'] }}</option>
+                    <option>{{ StatusSettings.TYPE['CHECK'] }}</option>
+                    <option>{{ StatusSettings.TYPE['CONTRACT'] }}</option>
+                    <option>{{ StatusSettings.TYPE['CARTRIDGE'] }}</option>
+                    <option>{{ StatusSettings.TYPE['PRINTER'] }}</option>
                 </select>
-            </td>
-            <td><input type="text" placeholder="Начните вводить" id="sch4" class="enter"></td>
-            <td><input type="text" placeholder="Начните вводить" id="sch5" class="enter"></td>
-            <td><input type="text" placeholder="Начните вводить" id="sch6" class="enter"></td>
+            </th>
+            <th><input type="text" placeholder="Начните вводить" id="sch4" class="enter"></th>
+            <th><input type="text" placeholder="Начните вводить" id="sch5" class="enter"></th>
+            <th><input type="text" placeholder="Начните вводить" id="sch6" class="enter"></th>
         </tr>
+        </thead>
+        <tbody>
         {% for htry in all_htry %}
             <tr>
                 <td class="1">{{ loop.index }}</td>

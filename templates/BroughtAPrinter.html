@@ -110,7 +110,7 @@
                     </tr>
                     </tbody>
                 </table>
-                <input type="hidden" name="user" value="{{ current_user.login }}">
+                <input type="hidden" name="user" value="{{ current_user.username }}">
                 <div class="btns">
                     <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
                     <input type="submit" value="Добавить" class="add_btn">
@@ -180,7 +180,7 @@
                                 <input type="hidden"
                                        name="cabinet{{ printer.num_inventory }}"
                                        value="{{ printer.cabinet_now }}">
-                                <input type="hidden" name="user" value="{{ current_user.login }}">
+                                <input type="hidden" name="user" value="{{ current_user.username }}">
                             </td>
                         </tr>
                         {% set counter.value = counter.value + 1 %}

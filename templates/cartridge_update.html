@@ -45,7 +45,7 @@
         <p class="msg"><strong>{{ msg }}</strong></p>
     {% endfor %}
     <form method="POST" id="form">
-        <input type="hidden" name="user" value="{{ current_user.login }}">
+        <input type="hidden" name="user" value="{{ current_user.username }}">
         <div class=form id="items">
             <table style="border: none" id="table">
                 <colgroup>
@@ -97,17 +97,16 @@
                                        id="number"
                                        class="enter"
                                        placeholder="Введите номер"
-                                       value="{{ cartridge.name }}">
+                                       value="{{ cartridge.number }}">
                             </td>
                         {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
-            <input type="hidden" name="user" value="{{ current_user.login }}">
+            <input type="hidden" name="user" value="{{ current_user.username }}">
             <div class="btns">
                 <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
-                <input type="submit" value="Добавить" class="add_btn">
             </div>
             <input type="submit" value="Обновить" class="add_btn">
         </div>

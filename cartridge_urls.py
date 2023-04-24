@@ -8,6 +8,7 @@ from datetime import datetime
 from models import *
 from tabs_that_appear import *
 from ScanFunctions import TypeVar
+from StatusSettings import StatusSettings
 
 cartridge_urls = Blueprint('cartridge_urls', __name__)
 
@@ -162,8 +163,8 @@ def update_cartridge(id):
                 cartridge.cartridge_models.append(model)
 
         try:
-            action_h = "Изменён"
-            type_h = "картридж"
+            action_h = StatusSettings.CARTRIDGE["Изменён"]
+            type_h = StatusSettings.TYPE['CARTRIDGE']
             name_h = f"{cartridge.number}"
             user = request.form['user']
             ah = AllHistory(action=action_h,
@@ -198,7 +199,8 @@ def cartridge_status(id):
     return render_template("CartridgeStatuses.html",
                            statuses=statuses,
                            id=id,
-                           cartridge=cartridge)
+                           cartridge=cartridge,
+                           StatusSettings=StatusSettings)
 
 
 @cartridge_urls.route('/cartridges', methods=['GET', 'POST'])
@@ -244,8 +246,8 @@ def cartridges():
             cartridge.cartridge_models.append(model)
 
         try:
-            action_h = "Создан"
-            type_h = "картридж"
+            action_h = StatusSettings.CARTRIDGE["Создан"]
+            type_h = StatusSettings.TYPE['CARTRIDGE']
             name_h = f"{number}"
             user = request.form['user']
             ah = AllHistory(action=action_h,
@@ -271,7 +273,8 @@ def cartridges():
                                cartridges_and_location=cartridges_and_location,
                                list_models=list_models,
                                CartridgeIssuance=CartridgeIssuance,
-                               Printer=Printer)
+                               Printer=Printer,
+                               StatusSettings=StatusSettings)
 
 
 @cartridge_urls.route('/cartridge/<int:id>/delete')
@@ -280,10 +283,10 @@ def delete_cartridge(id):
     cartridge = Cartridges.query.get_or_404(id)
     try:
         try:
-            action_h = "Удалён"
-            type_h = "картридж"
+            action_h = StatusSettings.CARTRIDGE["Удалён"]
+            type_h = StatusSettings.TYPE['CARTRIDGE']
             name_h = f"{cartridge.number}"
-            user = current_user.login
+            user = current_user.username
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -311,10 +314,10 @@ def resume_cartridge(id):
     cartridge = Cartridges.query.get_or_404(id)
     try:
         try:
-            action_h = "Восстановлен"
-            type_h = "картридж"
+            action_h = StatusSettings.CARTRIDGE["Восстановлен"]
+            type_h = StatusSettings.TYPE['CARTRIDGE']
             name_h = f"{cartridge.number}"
-            user = current_user.login
+            user = current_user.username
             ah = AllHistory(action=action_h,
                             type=type_h,
                             name=name_h,
@@ -376,8 +379,8 @@ def brought_a_cartridge():
                 cartridge.status = "Принят в заправку"
 
                 try:
-                    action_h = "Принят в заправку"
-                    type_h = "картридж"
+                    action_h = StatusSettings.CARTRIDGE["Принят в заправку"]
+                    type_h = StatusSettings.TYPE['CARTRIDGE']
                     name_h = f"{cartridge.number}"
                     ah = AllHistory(action=action_h,
                                     type=type_h,
@@ -424,8 +427,8 @@ def brought_a_cartridge():
                 cartridge.status = "Принят в заправку"
 
                 try:
-                    action_h = "Принят в заправку"
-                    type_h = "картридж"
+                    action_h = StatusSettings.CARTRIDGE["Принят в заправку"]
+                    type_h = StatusSettings.TYPE['CARTRIDGE']
                     name_h = f"{cartridge.number}"
                     ah = AllHistory(action=action_h,
                                     type=type_h,
@@ -480,8 +483,8 @@ def refueling():
                 cartridge.status = "В заправке"
 
                 try:
-                    action_h = "В заправке"
-                    type_h = "картридж"
+                    action_h = StatusSettings.CARTRIDGE["В заправке"]
+                    type_h = StatusSettings.TYPE['CARTRIDGE']
                     name_h = f"{cartridge.number}"
                     ah = AllHistory(action=action_h,
                                     type=type_h,
@@ -506,8 +509,8 @@ def refueling():
                 cartridge.status = "В заправке"
 
                 try:
-                    action_h = "В заправке"
-                    type_h = "картридж"
+                    action_h = StatusSettings.CARTRIDGE["В заправке"]
+                    type_h = StatusSettings.TYPE['CARTRIDGE']
                     name_h = f"{cartridge.number}"
                     ah = AllHistory(action=action_h,
                                     type=type_h,
@@ -557,8 +560,8 @@ def receptionFromARefuelling():
                 cartridge.status = "В резерве"
 
                 try:
-                    action_h = "В резерве"
-                    type_h = "картридж"
+                    action_h = StatusSettings.CARTRIDGE["В резерве"]
+                    type_h = StatusSettings.TYPE['CARTRIDGE']
                     name_h = f"{cartridge.number}"
                     ah = AllHistory(action=action_h,
                                     type=type_h,
@@ -585,8 +588,8 @@ def receptionFromARefuelling():
                 cartridge.status = "В резерве"
 
                 try:
-                    action_h = "В резерве"
-                    type_h = "картридж"
+                    action_h = StatusSettings.CARTRIDGE["В резерве"]
+                    type_h = StatusSettings.TYPE['CARTRIDGE']
                     name_h = f"{cartridge.number}"
                     ah = AllHistory(action=action_h,
                                     type=type_h,
@@ -648,8 +651,8 @@ def issuance_cartridges():
                 cartridge.status = "В подразделении"
 
                 try:
-                    action_h = "В подразделении"
-                    type_h = "картридж"
+                    action_h = StatusSettings.CARTRIDGE["В подразделении"]
+                    type_h = StatusSettings.TYPE['CARTRIDGE']
                     name_h = f"{cartridge.number}"
                     ah = AllHistory(action=action_h,
                                     type=type_h,
@@ -697,8 +700,8 @@ def issuance_cartridges():
                 cartridge.status = "В подразделении"
 
                 try:
-                    action_h = "В подразделении"
-                    type_h = "картридж"
+                    action_h = StatusSettings.CARTRIDGE["В подразделении"]
+                    type_h = StatusSettings.TYPE['CARTRIDGE']
                     name_h = f"{cartridge.number}"
                     ah = AllHistory(action=action_h,
                                     type=type_h,
