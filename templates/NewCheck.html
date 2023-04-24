@@ -19,7 +19,7 @@
     {% endfor %}
     <div class="align-center">
         <form method="POST">
-            <input type="hidden" name="user" value="{{ current_user.login }}">
+            <input type="hidden" name="user" value="{{ current_user.username }}">
             <div class="form" id="items">
                 <label for="sum_check">Сумма счёта:</label><br>
                 <input type="number" name="sum" id="sum_check" class="enter"><br>

@@ -299,7 +299,7 @@
     {% endfor %}
     {% if check.active == 1 %}
         <form method="POST">
-            <input type="hidden" name="user" value="{{ current_user.login }}">
+            <input type="hidden" name="user" value="{{ current_user.username }}">
             <div id="items">
                 <input type="hidden" value="" name="">
                 {% for work in wl_add %}

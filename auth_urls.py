@@ -23,7 +23,7 @@ def login_page():
         if new_user.status != AuthenticationResponseStatus.fail:
             user = User.query.filter(User.username == username).first()
             if user is None:
-                if username == IsBoss.BOSS_LOGIN:
+                if username in IsBoss.BOSS_LOGIN:
                     user = save_user(new_user.user_dn, username, True)
                 else:
                     user = save_user(new_user.user_dn, username, False)

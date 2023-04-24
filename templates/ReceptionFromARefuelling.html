@@ -101,7 +101,7 @@
                     </tr>
                     </tbody>
                 </table>
-                <input type="hidden" name="user" value="{{ current_user.login }}">
+                <input type="hidden" name="user" value="{{ current_user.username }}">
                 <div class="btns">
                     <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
                     <input type="submit" value="Добавить" class="add_btn">
@@ -144,7 +144,7 @@
                                 <label>
                                     <input type="checkbox" name="cartridge_number" value="{{ cartridge.number }}">
                                 </label>
-                                <input type="hidden" name="user" value="{{ current_user.login }}">
+                                <input type="hidden" name="user" value="{{ current_user.username }}">
                             </td>
                             <td class="2">
                                 {{ cartridge.number }}

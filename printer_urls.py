@@ -73,6 +73,8 @@ def add_works_printers():
 @login_required
 def update_printer(id):
     printer = Printer.query.get(id)
+    divisions = Division.query.all()
+    buildings = Buildings.query.all()
 
     if request.method == "POST":
         name = request.form['name']
@@ -120,7 +122,9 @@ def update_printer(id):
             return render_template("main.html")
     else:
         return render_template("printer_update.html",
-                               printer=printer)
+                               printer=printer,
+                               divisions=divisions,
+                               buildings=buildings)
 
 
 @printer_urls.route('/printers', methods=['GET', 'POST'])
