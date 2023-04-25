@@ -3,7 +3,6 @@
 {% block title %}Cartridge statuses{% endblock %}
 
 {% block script %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
 {% endblock %}
 
@@ -13,18 +12,59 @@
             {{ model.model }} <br>
         {% endfor %}
         статусы:</h1><br>
-    <a href={{ request.referrer }}>Назад</a><br>
     {% if statuses|length > 0 %}
-        <label for="search">Поиск по таблице:</label><br>
-        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-        Поиск по статусу:<br>
-        <input type="radio" name="status" value="в резерве">В резерве
-        <input type="radio" name="status" value="принят в заправку">Принят в заправку
-        <input type="radio" name="status" value="в заправке">В заправке
-        <input type="radio" name="status" value="выдан">Выдан
-        <input type="radio" name="status" value="восстановлен">Восстановлен
-        <input type="radio" name="status" value="добавлен">Добавлен
-        <input type="button" id="btn_off" value="Снять выделение">
+        <div class="sch_bar">
+            <table style="border: none">
+                <colgroup>
+                    <col span="1" style="width: 40%;">
+                    <col span="1" style="width: 60%;">
+                </colgroup>
+                <tbody>
+                <tr>
+                    <td class="ctr" style="border: none">
+                        <strong>Поиск по таблице:</strong>
+                    </td>
+                    <td class="ctr" style="border: none">
+                        <strong>Поиск по статусу:</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="ctr" style="border: none">
+                        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+                    </td>
+                    <td class="ctr" style="border: none">
+                        <div class="radios">
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В резерве'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['В резерве'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Принят в заправку'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['Принят в заправку'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В заправке'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['В заправке'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В подразделении'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['В подразделении'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Восстановлен'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['Восстановлен'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Создан'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['Создан'] }}</label>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <input type="button" id="btn_off" value="Снять выделение" class="btn_clr">
+        </div>
         <table id="mytable">
             <colgroup>
                 <col span="1" style="width: 5%;">
@@ -43,24 +83,21 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for status in statuses %}
-                {% if status.cartridge_id == id %}
-                    <tr>
-                        <td class="1">
-                            {{ counter.value }}
-                        </td>
-                        <td class="2">
-                            Дата: {{ status.date.date() }}
-                            Время: {{ status.date.time() }}
-                        </td>
-                        <td class="3">
-                            {{ status.user }}
-                        </td>
-                        <td class="4">
-                            {{ status.status }}
-                        </td>
-                    </tr>
-                    {% set counter.value = counter.value + 1 %}
-                {% endif %}
+                <tr>
+                    <td class="1">
+                        {{ counter.value }}
+                    </td>
+                    <td class="2">
+                        {{ status.date.date().strftime("%d.%m.%Y") }} {{ status.date.time().strftime("%H:%M") }}
+                    </td>
+                    <td class="3">
+                        {{ status.user }}
+                    </td>
+                    <td class="4">
+                        {{ status.action }}
+                    </td>
+                </tr>
+                {% set counter.value = counter.value + 1 %}
             {% endfor %}
             </tbody>
         </table>

@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}Add Models{% endblock %}
+{% block title %}Корпуса{% endblock %}
 
 {% block script %}
     <script>
-        let items = {{ counter_models }};
+        let items = {{ counter_building }};
 
         function AddItem() {
             const table = document.getElementById("table").getElementsByTagName('tbody')[0];
@@ -27,7 +27,7 @@
                     <input id="${items}"
                            type="text"
                            class="enter"
-                           name="model">
+                           name="building">
                 </td>`;
             tdThird.innerHTML = `
                 <td>
@@ -48,7 +48,7 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Модели:</h1>
+    <h1>Корпусы:</h1>
     <div class="align-center">
         <form method="POST">
             <div class="form" id="items">
@@ -63,7 +63,7 @@
                         <col span="1" style="width: 5%;">
                     </colgroup>
                     <tbody>
-                    {% for model in list_models %}
+                    {% for b in building_list %}
                         <tr id="d{{ loop.index }}">
                             <td style="border: none">
                                 <label for="{{ loop.index }}">{{ counter.value }} </label>
@@ -71,8 +71,8 @@
                             <td style="border: none">
                                 <input id="{{ loop.index }}"
                                        type="text"
-                                       value="{{ model.model }}"
-                                       name="model"
+                                       value="{{ b.building }}"
+                                       name="building"
                                        class="enter">
                             </td>
                             <td style="border: none">
@@ -83,7 +83,7 @@
                     {% endfor %}
                     </tbody>
                 </table>
-                <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
+                <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add">
                 <input type="submit" value="Обновить" class="add_btn">
             </div>
         </form>

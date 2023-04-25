@@ -4,7 +4,7 @@
 
 {% block script %}
     <script>
-        let items = {{ counter_models }};
+        let items = {{ counter_works }};
 
         function AddItem() {
             const table = document.getElementById("table").getElementsByTagName('tbody')[0];
@@ -12,27 +12,23 @@
             let id = "d" + items
             let newRow = table.insertRow()
             newRow.setAttribute('id', id)
-            let tdFirst = document.createElement("td")
+             let tdFirst = document.createElement("td")
             tdFirst.setAttribute('style', 'border: none;')
             let tdSecond = document.createElement("td")
             tdSecond.setAttribute('style', 'border: none;')
             let tdThird = document.createElement("td")
             tdThird.setAttribute('style', 'border: none;')
             tdFirst.innerHTML = `
-                <td style="border: none">
-                    <label for="${items}">${items} </label>
-                </td>`;
+                <label for="${items}">${items} </label>`;
             tdSecond.innerHTML = `
-                <td style="border: none">
-                    <input id="${items}"
-                           type="text"
-                           class="enter"
-                           name="model">
-                </td>`;
+                <input id="${items}"
+                       type="text"
+                       value=""
+                       class="enter"
+                       name="works">`;
             tdThird.innerHTML = `
-                <td>
-                    <input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}">
-                </td>`;
+                <input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}">`;
+
             newRow.appendChild(tdFirst)
             newRow.appendChild(tdSecond)
             newRow.appendChild(tdThird)
@@ -48,13 +44,14 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Модели:</h1>
+    <h1>Типы работ:</h1>
     <div class="align-center">
         <form method="POST">
             <div class="form" id="items">
                 {% for message in get_flashed_messages() %}
                     <p style="color: darkred"><strong>{{ message }}</strong></p>
                 {% endfor %}
+
                 {% set counter = namespace(value=1) %}
                 <table style="border: none" id="table">
                     <colgroup>
@@ -63,7 +60,7 @@
                         <col span="1" style="width: 5%;">
                     </colgroup>
                     <tbody>
-                    {% for model in list_models %}
+                    {% for work in all_works_cartridges %}
                         <tr id="d{{ loop.index }}">
                             <td style="border: none">
                                 <label for="{{ loop.index }}">{{ counter.value }} </label>
@@ -71,7 +68,7 @@
                             <td style="border: none">
                                 <input id="{{ loop.index }}"
                                        type="text"
-                                       value="{{ model.model }}"
+                                       value="{{ work.work }}"
                                        name="model"
                                        class="enter">
                             </td>

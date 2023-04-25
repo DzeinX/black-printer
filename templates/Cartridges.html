@@ -1,40 +1,40 @@
 {% extends 'base.html' %}
 
-{% block CSS %}../static/css/select2.min.css{% endblock %}
 {% block title %}Cartridges{% endblock %}
 
 {% block script %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+
     <script>
         let items = 1;
 
         function AddItem() {
-            const div = document.getElementById("items");
-            const button = document.getElementById("add");
+            const table = document.getElementById("table").getElementsByTagName('tbody')[0];
             items++;
-            let newitem = document.createElement("div");
-            let id = "d" + items;
-            newitem.setAttribute("id", id);
-            newitem.innerHTML = `
-            <select name="model"
-                    class="select"
-                    id="${items}"
-                    placeholder="Выберите модель" required>
-                {% for el in list_models %}
-                    {% if not (el.model in list_models) %}
-                        <option>{{ el.model }}</option>
-                    {% endif %}
-                {% endfor %}
-            </select><input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}"><br>`;
+            let id = "d" + items
+            let newRow = table.insertRow()
+            newRow.setAttribute('id', id)
+            let td = document.createElement("td")
+            td.setAttribute('style', 'border: none;')
+            td.innerHTML = `
+                <select name="model"
+                        class="select"
+                        id="${items}"
+                        placeholder="Выберите модель" required>
+                    {% for el in list_models %}
+                        {% if not (el.model in list_models) %}
+                            <option>{{ el.model }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}">`;
+            newRow.appendChild(td)
 
-            div.insertBefore(newitem, button);
 
             $('select').select2({
-                placeholder: "Select Model",
+                placeholder: "Выберите",
                 allowClear: true
             });
         }
@@ -42,8 +42,8 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Картриджы: </h1>
-    <div class="align-center" style="background-color: gray">
+    <h1>Картриджы:</h1>
+    <div class="align-center">
         <form method="POST">
             <div class="form" id="items">
                 {% for msg in get_flashed_messages() %}
@@ -51,68 +51,133 @@
                         {{ msg }}
                     </div>
                 {% endfor %}
-                <label for="1">Модели: </label><br>
-                <div id="d1">
-                    <select name="model"
-                            class="select"
-                            id="1" required>
-                        {% for el in list_models %}
-                            {% if not (el.model in list_models) %}
-                                <option>{{ el.model }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select><input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d1');" id="r1"><br>
+                <table style="border: none" id="table">
+                    <colgroup>
+                        <col span="1" style="width: 50%;">
+                        <col span="1" style="width: 50%;">
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td style="border: none">
+                            <label for="1">Модели: </label>
+                        </td>
+                        <td style="border: none">
+                            <label for="number">Номер: </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: none" id="d1">
+                            <select name="model"
+                                    class="select"
+                                    id="1" required>
+                                {% for el in list_models %}
+                                    {% if not (el.model in list_models) %}
+                                        <option>{{ el.model }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td style="border: none;  vertical-align: top">
+                            <input type="number"
+                                   name="number"
+                                   id="number"
+                                   class="enter"
+                                   placeholder="Введите номер"><br>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <input type="hidden" name="user" value="{{ current_user.username }}">
+                <div class="btns">
+                    <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
+                    <input type="submit" value="Добавить" class="add_btn">
                 </div>
-
-                <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
-
-                <label for="number">Номер: </label><br>
-                <input type="number"
-                       name="number"
-                       id="number"
-                       class="enter"
-                       placeholder="Введите номер"><br>
-
-                <label for="user">Пользователь: </label><br>
-                <input type="text"
-                       name="user"
-                       id="user"
-                       class="enter" required><br>
-                <input type="submit" value="Добавить" class="add_btn">
             </div>
         </form>
     </div>
-    {% if cartridges|length > 0 %}
-        Поиск по таблице:<br>
-        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-        Поиск по статусу:<br>
-        <input type="radio" name="status" value="в резерве">В резерве
-        <input type="radio" name="status" value="принят в заправку">Принят в заправку
-        <input type="radio" name="status" value="в заправке">В заправке
-        <input type="radio" name="status" value="выдан">Выдан
-        <input type="radio" name="status" value="восстановлен">Восстановлен
-        <input type="radio" name="status" value="добавлен">Добавлен
-        <input type="button" id="btn_off" value="Снять выделение">
+    {% if cartridges_and_location|length > 0 %}
+        <div class="sch_bar">
+            <table style="border: none">
+                <colgroup>
+                    <col span="1" style="width: 40%;">
+                    <col span="1" style="width: 60%;">
+                </colgroup>
+                <tbody>
+                <tr>
+                    <td class="ctr" style="border: none">
+                        <strong>Поиск по таблице:</strong>
+                    </td>
+                    <td class="ctr" style="border: none">
+                        <strong>Поиск по статусу:</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="ctr" style="border: none">
+                        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+                    </td>
+                    <td class="ctr" style="border: none">
+                        <div class="radios">
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В резерве'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['В резерве'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Принят в заправку'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['Принят в заправку'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В заправке'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['В заправке'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В подразделении'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['В подразделении'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Восстановлен'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['Восстановлен'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Создан'] }}">
+                                <label>{{ StatusSettings.CARTRIDGE['Создан'] }}</label>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <input type="button" id="btn_off" value="Снять выделение" class="btn_clr">
+        </div>
         <table style="width: 100%" id="mytable">
             <colgroup>
                 <col span="1" style="width: 5%;">
-                <col span="1" style="width: 10%;">
-                <col span="1" style="width: 30%;">
                 <col span="1" style="width: 25%;">
-                <col span="1" style="width: 30%;">
+                <col span="1" style="width: 15%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 15%;">
             </colgroup>
             <thead>
             <tr>
                 <th>№</th>
-                <th>Номер<br><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
-                <th>Модели<br><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th>Номер</th>
+                <th>Модели</th>
                 <th>Статус</th>
+                <th>Локация</th>
                 <th>Действия</th>
+            </tr>
+            <tr style="background: lightblue">
+                <th><i class="fa-solid fa-magnifying-glass"></i></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th></th>
+                <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
             {% set counter = namespace(value=1) %}
-            {% for cartridge in cartridges %}
+            {% for cartridge, location in cartridges_and_location %}
                 {% if (cartridge.efficiency != 0) %}
                     <tr>
                         <td class="1">
@@ -129,9 +194,21 @@
                         <td class="4">
                             {{ cartridge.status }}
                         </td>
-                        <td  class="5">
+                        <td class="5">
+                            {% if location|length != 0 %}
+                                {% set cartridge_issuance = location[-1] %}
+                                {% set printer = Printer.query.filter(Printer.id == cartridge_issuance.printer_id).first() %}
+                                Подразделение: {{ cartridge_issuance.location }}<br>
+                                Корпус: {{ cartridge_issuance.learning_campus }}<br>
+                                Кабинет: {{ cartridge_issuance.cabinet }}<br>
+                                Номер принтера: {{ printer.num_inventory }}<br>
+                            {% else %}
+                                Ещё не был в подразделении
+                            {% endif %}
+                        </td>
+                        <td class="6">
                             <a href="/cartridge/{{ cartridge.id }}/update">Изменить</a>
-                            <a href="/cartridge/{{ cartridge.id }}/delete">Удалить</a>
+                            <a href="/cartridge/{{ cartridge.id }}/delete">Утилизировать</a>
                             <a href="/cartridge/{{ cartridge.id }}/statuses">Статусы</a>
                         </td>
                     </tr>
@@ -141,6 +218,6 @@
             </tbody>
         </table>
     {% else %}
-        <h1>NAN</h1>
+        <h1>Картриджей пока что нету</h1>
     {% endif %}
 {% endblock %}

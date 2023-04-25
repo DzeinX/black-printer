@@ -3,7 +3,6 @@
 {% block title %}Printer statuses{% endblock %}
 
 {% block script %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
 {% endblock %}
 
@@ -11,16 +10,58 @@
     <h1>{{ printer.name }} статусы: </h1><br>
     <a href={{ request.referrer }}>Назад</a><br>
     {% if statuses|length > 0 %}
-        <label for="search">Поиск по таблице:</label><br>
-        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-        Поиск по статусу:<br>
-        <input type="radio" name="status" value="в подразделении">В подразделении
-        <input type="radio" name="status" value="принят в ремонт">Принят в ремонт
-        <input type="radio" name="status" value="в ремонте">В ремонте
-        <input type="radio" name="status" value="получен из ремонта">Получен из ремонта
-        <input type="radio" name="status" value="восстановлен">Восстановлен
-        <input type="radio" name="status" value="добавлен">Добавлен
-        <input type="button" id="btn_off" value="Снять выделение">
+        <div class="sch_bar">
+            <table style="border: none">
+                <colgroup>
+                    <col span="1" style="width: 40%;">
+                    <col span="1" style="width: 60%;">
+                </colgroup>
+                <tbody>
+                <tr>
+                    <td class="ctr" style="border: none">
+                        <strong>Поиск по таблице:</strong>
+                    </td>
+                    <td class="ctr" style="border: none">
+                        <strong>Поиск по статусу:</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="ctr" style="border: none">
+                        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+                    </td>
+                    <td class="ctr" style="border: none">
+                        <div class="radios">
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Получен из ремонта'] }}">
+                                <label>{{ StatusSettings.PRINTER['Получен из ремонта'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Принят в ремонт'] }}">
+                                <label>{{ StatusSettings.PRINTER['Принят в ремонт'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['В ремонте'] }}">
+                                <label>{{ StatusSettings.PRINTER['В ремонте'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['В подразделении'] }}">
+                                <label>{{ StatusSettings.PRINTER['В подразделении'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Восстановлен'] }}">
+                                <label>{{ StatusSettings.PRINTER['Восстановлен'] }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Создан'] }}">
+                                <label>{{ StatusSettings.PRINTER['Создан'] }}</label>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <input type="button" id="btn_off" value="Снять выделение" class="btn_clr">
+        </div>
         <table id="mytable">
             <colgroup>
                 <col span="1" style="width: 5%;">
@@ -39,23 +80,21 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for status in statuses %}
-                {% if status.printer_id == id %}
-                    <tr>
-                        <td class="1">
-                            {{ counter.value }}
-                        </td>
-                        <td class="2">
-                            {{ status.date.date() }}
-                        </td>
-                        <td class="3">
-                            {{ status.user }}
-                        </td>
-                        <td class="4">
-                            {{ status.status }}
-                        </td>
-                    </tr>
-                    {% set counter.value = counter.value + 1 %}
-                {% endif %}
+                <tr>
+                    <td class="1">
+                        {{ counter.value }}
+                    </td>
+                    <td class="2">
+                        {{ status.date.date().strftime("%d.%m.%Y") }} {{ status.date.time().strftime("%H:%M") }}
+                    </td>
+                    <td class="3">
+                        {{ status.user }}
+                    </td>
+                    <td class="4">
+                        {{ status.action }}
+                    </td>
+                </tr>
+                {% set counter.value = counter.value + 1 %}
             {% endfor %}
             </tbody>
         </table>

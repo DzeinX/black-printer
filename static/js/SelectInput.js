@@ -1,4 +1,4 @@
 $('select').select2({
-    placeholder: "Select Model",
+    placeholder: "Выберите",
     allowClear: true
 });

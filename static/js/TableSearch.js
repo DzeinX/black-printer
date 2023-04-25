@@ -29,13 +29,16 @@ $(document).ready(function () {
     $('#btn_off').click(function () {
         $('input[name="status"]').prop('checked', false)
         $('input[name="naming"]').prop('checked', false)
-        console.log($('#search').val(''))
-        console.log($('#sch1').val(''))
-        console.log($('#sch2').val(''))
-        console.log($('#sch3').val(''))
-        console.log($('#sch4').val(''))
-        console.log($('#sch5').val(''))
+        $('input[name="naming_wd"]').prop('checked', false)
+        $('#search').val('')
+        $('#search_work_done').val('')
+        $('#sch1').val('')
+        $('#sch2').val('')
+        $('#sch3').val('')
+        $('#sch4').val('')
+        $('#sch5').val('')
         $("#mytable tbody tr").show()
+        $(".dtls").show()
     });
 
     $("#sch1").keyup(function () {
@@ -45,10 +48,22 @@ $(document).ready(function () {
 
     $("#sch2").keyup(function () {
         _this = this;
+        console.log(this);
+        $.each($("#mytable tbody tr td[class='2']"), function_coll);
+    });
+
+    $("#sch2_s").change(function () {
+        _this = this;
+        console.log('111')
         $.each($("#mytable tbody tr td[class='2']"), function_coll);
     });
 
     $("#sch3").keyup(function () {
+        _this = this;
+        $.each($("#mytable tbody tr td[class='3']"), function_coll);
+    });
+
+    $("#sch3_s").change(function () {
         _this = this;
         $.each($("#mytable tbody tr td[class='3']"), function_coll);
     });
@@ -68,5 +83,24 @@ $(document).ready(function () {
         $.each($("#mytable tbody tr td[class='6']"), function_coll);
     });
 
+    $('#search_progress_report').keyup(function() {
+        _this = this;
+        $.each($('.dtls'), function () {
+            if ($(this).text().toLowerCase().substring(79, 100).indexOf($(_this).val().toLowerCase()) === -1)
+                $(this).hide();
+            else
+                $(this).show();
+        });
+    });
+
+    $('#search_locw').keyup(function() {
+        _this = this;
+        $.each($('.dtls'), function () {
+            if ($(this).text().toLowerCase().substring(38, 48).indexOf($(_this).val().toLowerCase()) === -1)
+                $(this).hide();
+            else
+                $(this).show();
+        });
+    });
 });
 
