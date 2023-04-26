@@ -6,6 +6,34 @@ class StatusSettings(object):
         'CHECK': 'Счёт',
         'CONTRACT': 'Договор',
     }
+
+    class Types(object):
+        printer = "Принтер"
+        cartridge = "Картридж"
+        work_list = "Список работ"
+        check = "Счёт"
+        contract = "Договор"
+
+    class Printer(object):
+        created = "Создан"
+        updated = "Изменён"
+        restored = "Восстановлен"
+        deleted = "Удалён"
+        in_division = "В подразделении"
+        accepted_for_repair = "Принят в ремонт"
+        in_repair = "В ремонте"
+        reception_from_a_repair = "Получен из ремонта"
+
+    class Cartridge(object):
+        created = "Создан"
+        updated = "Изменён"
+        restored = "Восстановлен"
+        deleted = "Удалён"
+        in_division = "В подразделении"
+        in_reserve = "В резерве"
+        in_refueling = "В заправке"
+        reception_from_a_refueling = "Получен из заправки"
+
     PRINTER = {
         'Создан': 'Создан',
         'Изменён': 'Изменён',

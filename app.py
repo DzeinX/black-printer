@@ -42,7 +42,7 @@ login_manager.init_app(app)
 with app.app_context():
     if reset_key_db:
         db.drop_all()
-    db.create_all()
+        db.create_all()
 
 app.register_blueprint(cartridge_urls)
 app.register_blueprint(printer_urls)
