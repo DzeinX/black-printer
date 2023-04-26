@@ -32,22 +32,28 @@
                     <td class="ctr" style="border: none">
                         <div class="radios">
                             <span>
-                                <input type="radio" name="status" value="в подразделении"><label>В подразделении</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Получен из ремонта'] }}">
+                                <label>{{ StatusSettings.PRINTER['Получен из ремонта'] }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="принят в ремонт"><label>Принят в ремонт</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Принят в ремонт'] }}">
+                                <label>{{ StatusSettings.PRINTER['Принят в ремонт'] }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="в ремонте">В ремонте</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['В ремонте'] }}">
+                                <label>{{ StatusSettings.PRINTER['В ремонте'] }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="получен из ремонта"><label>Получен из ремонта</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['В подразделении'] }}">
+                                <label>{{ StatusSettings.PRINTER['В подразделении'] }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="восстановлен"><label>Восстановлен</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Восстановлен'] }}">
+                                <label>{{ StatusSettings.PRINTER['Восстановлен'] }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="добавлен"><label>Добавлен</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Создан'] }}">
+                                <label>{{ StatusSettings.PRINTER['Создан'] }}</label>
                             </span>
                         </div>
                     </td>

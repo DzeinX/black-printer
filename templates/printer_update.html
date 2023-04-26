@@ -2,11 +2,15 @@
 
 {% block title %}Update printer{% endblock %}
 
+{% block script %}
+    <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
+{% endblock %}
+
 {% block body %}
     <h1>Принтер:</h1>
     <div class="align-center" style="background-color: gray">
         <form method="POST">
-            <input type="hidden" name="user" value="{{ current_user.login }}">
+            <input type="hidden" name="user" value="{{ current_user.username }}">
             <div class="form">
                 <table style="border: none">
                     <colgroup>
@@ -27,12 +31,17 @@
                         </td>
                         <td style="border: none">
                             <label for="learning_campus">Учебный корпус: </label>
-                            <input type="text"
-                                   name="learning_campus"
-                                   id="learning_campus"
-                                   class="enter"
-                                   value="{{ printer.learning_campus_now }}"
-                                   placeholder="Введите корпус" required><br>
+                            <select name="learning_campus"
+                                    id="learning_campus"
+                                    class="select" required>
+                                {% for b in buildings %}
+                                    {% if b.buildings == printer.learning_campus_now %}
+                                        <option selected>{{ b.building }}</option>
+                                    {% else %}
+                                        <option>{{ b.building }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
                         </td>
                         <td style="border: none">
                             <label for="cabinet">Кабинет: </label>
@@ -41,7 +50,7 @@
                                    id="cabinet"
                                    class="enter"
                                    value="{{ printer.cabinet_now }}"
-                                   placeholder="Введите кабинет" required><br>
+                                   placeholder="Введите кабинет" required>
                         </td>
                     </tr>
                     <tr>
@@ -56,12 +65,17 @@
                         </td>
                         <td style="border: none">
                             <label for="location">Подразделение: </label>
-                            <input type="text"
-                                   name="location"
-                                   id="location"
-                                   class="enter"
-                                   value="{{ printer.location_now }}"
-                                   placeholder="Введите подразделение" required><br>
+                            <select name="location"
+                                    id="location"
+                                    class="select" required>
+                                {% for d in divisions %}
+                                    {% if d.buildings == printer.location_now %}
+                                        <option selected>{{ d.building }}</option>
+                                    {% else %}
+                                        <option>{{ d.division }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
                         </td>
                         <td style="border: none">
                         </td>

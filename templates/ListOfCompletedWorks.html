@@ -21,7 +21,7 @@
             newitem.setAttribute("id", id);
             newitem.innerHTML = `
                 <form method="POST">
-                <input type="hidden" name="user" value="{{ current_user.login }}">
+                <input type="hidden" name="user" value="{{ current_user.username }}">
                 {% set cartridges = namespace(value=Cartridges.query.all()) %}
                 {% for ctg in cartridges.value %}
                 {% if ctg.work_done == 0 %}
