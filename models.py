@@ -339,30 +339,28 @@ class ListsOfContracts(db.Model):
 class User(UserMixin, db.Model):
     __tablename__ = "User"
     id = db.Column(db.Integer, primary_key=True)
-    dn = db.Column(db.String(50), nullable=False)
     username = db.Column(db.String(35), nullable=False)
     is_boss = db.Column(db.Boolean, nullable=False)
 
-    def __init__(self, dn, username, is_boss):
-        self.dn = dn
+    def __init__(self, username, is_boss):
         self.username = username
         self.is_boss = is_boss
 
     def __repr__(self):
-        return self.dn
+        return f'{self.id}'
 
     def get_id(self):
-        return self.dn
+        return self.id
 
 
 @login_manager.user_loader
-def load_user(dn):
-    return User.query.filter(User.dn == dn).first()
+def load_user(id):
+    return User.query.filter(User.id == id).first()
 
 
 @ldap_manager.save_user
-def save_user(dn, username, is_boss):
-    user = User(dn=dn, username=username, is_boss=is_boss)
+def save_user(username, is_boss):
+    user = User(username=username, is_boss=is_boss)
     db.session.add(user)
     db.session.commit()
     return user

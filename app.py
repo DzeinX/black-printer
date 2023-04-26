@@ -14,7 +14,7 @@ reset_key_db = False  # Ключ на случай перезагрузки ба
 
 app = Flask(__name__)
 db.init_app(app)
-migration = Migrate(app, db)
+migration = Migrate(app, db, render_as_batch=True)
 
 BASE_DIR = __file__[:-6]
 is_config = os.path.exists(str(BASE_DIR) + "Config.py")
