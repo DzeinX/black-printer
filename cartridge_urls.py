@@ -163,13 +163,13 @@ def update_cartridge(id):
                 cartridge.cartridge_models.append(model)
 
         try:
-            action_h = StatusSettings.CARTRIDGE["Изменён"]
-            type_h = StatusSettings.TYPE['CARTRIDGE']
-            name_h = f"{cartridge.number}"
+            action_history = StatusSettings.Cartridge.updated
+            type_history = StatusSettings.Types.cartridge
+            name_history = f"{cartridge.number}"
             user = request.form['user']
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
                             date=datetime.now())
             cartridge.all_history_id.append(ah)
@@ -215,7 +215,9 @@ def cartridges():
             [cartridge, CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()])
 
     if request.method == 'POST':
-        action = "Создан"
+        # TODO: Здесь нужно сделать, чтобы переменная action брала значение из формы из Cartridges.html (id карточки
+        #  kaiten: 10287681)
+        action = StatusSettings.Cartridge.in_reserve
         number = request.form['number']
         cartridge_models = request.form.getlist('model')
 
@@ -246,13 +248,13 @@ def cartridges():
             cartridge.cartridge_models.append(model)
 
         try:
-            action_h = StatusSettings.CARTRIDGE["Создан"]
-            type_h = StatusSettings.TYPE['CARTRIDGE']
-            name_h = f"{number}"
+            action_history = StatusSettings.Cartridge.created
+            type_history = StatusSettings.Types.cartridge
+            name_history = f"{number}"
             user = request.form['user']
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
                             date=datetime.now())
             cartridge.all_history_id.append(ah)
@@ -283,13 +285,13 @@ def delete_cartridge(id):
     cartridge = Cartridges.query.get_or_404(id)
     try:
         try:
-            action_h = StatusSettings.CARTRIDGE["Удалён"]
-            type_h = StatusSettings.TYPE['CARTRIDGE']
-            name_h = f"{cartridge.number}"
+            action_history = StatusSettings.Cartridge.deleted
+            type_history = StatusSettings.Types.cartridge
+            name_history = f"{cartridge.number}"
             user = current_user.username
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
                             date=datetime.now())
             cartridge.all_history_id.append(ah)
@@ -299,7 +301,7 @@ def delete_cartridge(id):
             return render_template("main.html")
 
         cartridge.efficiency = 0
-        cartridge.status = "Удалён"
+        cartridge.status = StatusSettings.Cartridge.deleted
         db.session.add(cartridge)
         db.session.commit()
         return redirect('/cartridges')
@@ -314,13 +316,13 @@ def resume_cartridge(id):
     cartridge = Cartridges.query.get_or_404(id)
     try:
         try:
-            action_h = StatusSettings.CARTRIDGE["Восстановлен"]
-            type_h = StatusSettings.TYPE['CARTRIDGE']
-            name_h = f"{cartridge.number}"
+            action_history = StatusSettings.Cartridge.restored
+            type_history = StatusSettings.Types.cartridge
+            name_history = f"{cartridge.number}"
             user = current_user.username
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
                             date=datetime.now())
             cartridge.all_history_id.append(ah)
@@ -330,7 +332,7 @@ def resume_cartridge(id):
             return render_template("main.html")
 
         cartridge.efficiency = 1
-        cartridge.status = "Восстановлен"
+        cartridge.status = StatusSettings.Cartridge.in_reserve
         db.session.add(cartridge)
         db.session.commit()
         return redirect(request.referrer)
@@ -376,15 +378,15 @@ def brought_a_cartridge():
                                                         cabinet=cabinet,
                                                         user=user)
 
-                cartridge.status = "Принят в заправку"
+                cartridge.status = StatusSettings.Cartridge.accepted_for_refuel
 
                 try:
-                    action_h = StatusSettings.CARTRIDGE["Принят в заправку"]
-                    type_h = StatusSettings.TYPE['CARTRIDGE']
-                    name_h = f"{cartridge.number}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Cartridge.accepted_for_refuel
+                    type_history = StatusSettings.Types.cartridge
+                    name_history = f"{cartridge.number}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user)
                     cartridge.all_history_id.append(ah)
                     db.session.add(ah)
@@ -424,15 +426,15 @@ def brought_a_cartridge():
                                                         cabinet=cabinet,
                                                         user=user)
 
-                cartridge.status = "Принят в заправку"
+                cartridge.status = StatusSettings.Cartridge.accepted_for_refuel
 
                 try:
-                    action_h = StatusSettings.CARTRIDGE["Принят в заправку"]
-                    type_h = StatusSettings.TYPE['CARTRIDGE']
-                    name_h = f"{cartridge.number}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Cartridge.accepted_for_refuel
+                    type_history = StatusSettings.Types.cartridge
+                    name_history = f"{cartridge.number}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     cartridge.all_history_id.append(ah)
@@ -455,10 +457,12 @@ def brought_a_cartridge():
     else:
         return render_template('BroughtACartridge.html',
                                cartridges=cartridges,
+                               Printer=Printer,
                                printers=printers,
                                CartridgeIssuance=CartridgeIssuance,
                                buildings=buildings,
-                               divisions=divisions)
+                               divisions=divisions,
+                               StatusSettings=StatusSettings)
 
 
 @cartridge_urls.route('/refueling', methods=['GET', 'POST'])
@@ -480,15 +484,15 @@ def refueling():
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
                 refueling = Refueling(user=user)
 
-                cartridge.status = "В заправке"
+                cartridge.status = StatusSettings.Cartridge.in_refueling
 
                 try:
-                    action_h = StatusSettings.CARTRIDGE["В заправке"]
-                    type_h = StatusSettings.TYPE['CARTRIDGE']
-                    name_h = f"{cartridge.number}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Cartridge.in_refueling
+                    type_history = StatusSettings.Types.cartridge
+                    name_history = f"{cartridge.number}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     cartridge.all_history_id.append(ah)
@@ -506,15 +510,15 @@ def refueling():
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
                 refueling = Refueling(user=user)
 
-                cartridge.status = "В заправке"
+                cartridge.status = StatusSettings.Cartridge.in_refueling
 
                 try:
-                    action_h = StatusSettings.CARTRIDGE["В заправке"]
-                    type_h = StatusSettings.TYPE['CARTRIDGE']
-                    name_h = f"{cartridge.number}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Cartridge.in_refueling
+                    type_history = StatusSettings.Types.cartridge
+                    name_history = f"{cartridge.number}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     cartridge.all_history_id.append(ah)
@@ -535,7 +539,8 @@ def refueling():
             return render_template("main.html")
     else:
         return render_template('Refueling.html',
-                               cartridges=cartridges)
+                               cartridges=cartridges,
+                               StatusSettings=StatusSettings)
 
 
 @cartridge_urls.route('/reception_from_a_refuelling', methods=['GET', 'POST'])
@@ -557,15 +562,15 @@ def receptionFromARefuelling():
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
                 reception_from_a_refueling = ReceptionFromARefueling(user=user)
 
-                cartridge.status = "В резерве"
+                cartridge.status = StatusSettings.Cartridge.in_reserve
 
                 try:
-                    action_h = StatusSettings.CARTRIDGE["В резерве"]
-                    type_h = StatusSettings.TYPE['CARTRIDGE']
-                    name_h = f"{cartridge.number}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Cartridge.in_reserve
+                    type_history = StatusSettings.Types.cartridge
+                    name_history = f"{cartridge.number}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     cartridge.all_history_id.append(ah)
@@ -585,15 +590,15 @@ def receptionFromARefuelling():
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
                 reception_from_a_refueling = ReceptionFromARefueling(user=user)
 
-                cartridge.status = "В резерве"
+                cartridge.status = StatusSettings.Cartridge.in_reserve
 
                 try:
-                    action_h = StatusSettings.CARTRIDGE["В резерве"]
-                    type_h = StatusSettings.TYPE['CARTRIDGE']
-                    name_h = f"{cartridge.number}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Cartridge.in_reserve
+                    type_history = StatusSettings.Types.cartridge
+                    name_history = f"{cartridge.number}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     cartridge.all_history_id.append(ah)
@@ -616,7 +621,8 @@ def receptionFromARefuelling():
             return render_template("main.html")
     else:
         return render_template('ReceptionFromARefuelling.html',
-                               cartridges=cartridges)
+                               cartridges=cartridges,
+                               StatusSettings=StatusSettings)
 
 
 @cartridge_urls.route('/issuance_cartridges', methods=['GET', 'POST'])
@@ -642,21 +648,22 @@ def issuance_cartridges():
                 learning_campus = request.form[f'learning_campus{number}']
                 cabinet = request.form[f'cabinet{number}']
                 printer = request.form[f'printer{number}']
+                printer = Printer.query.filter(Printer.id == int(printer)).first()
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
                 issuance = CartridgeIssuance(user=user,
                                              location=location,
                                              learning_campus=learning_campus,
                                              cabinet=cabinet)
 
-                cartridge.status = "В подразделении"
+                cartridge.status = StatusSettings.Cartridge.in_division
 
                 try:
-                    action_h = StatusSettings.CARTRIDGE["В подразделении"]
-                    type_h = StatusSettings.TYPE['CARTRIDGE']
-                    name_h = f"{cartridge.number}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Cartridge.in_division
+                    type_history = StatusSettings.Types.cartridge
+                    name_history = f"{cartridge.number}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     cartridge.all_history_id.append(ah)
@@ -667,6 +674,7 @@ def issuance_cartridges():
 
                 cartridge.issuance_id.append(issuance)
 
+                printer.cartridge_issuance_id.append(issuance)
                 db.session.add(issuance)
         else:
             user = request.form['user']
@@ -697,15 +705,15 @@ def issuance_cartridges():
                                              learning_campus=learning_campus,
                                              cabinet=cabinet)
 
-                cartridge.status = "В подразделении"
+                cartridge.status = StatusSettings.Cartridge.in_division
 
                 try:
-                    action_h = StatusSettings.CARTRIDGE["В подразделении"]
-                    type_h = StatusSettings.TYPE['CARTRIDGE']
-                    name_h = f"{cartridge.number}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Cartridge.in_division
+                    type_history = StatusSettings.Types.cartridge
+                    name_history = f"{cartridge.number}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     cartridge.all_history_id.append(ah)
@@ -732,4 +740,5 @@ def issuance_cartridges():
                                Printer=Printer,
                                printers=printers,
                                buildings=buildings,
-                               divisions=divisions)
+                               divisions=divisions,
+                               StatusSettings=StatusSettings)

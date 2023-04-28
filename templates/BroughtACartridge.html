@@ -26,7 +26,7 @@
                     required>
                 {% for cartridge in cartridges %}
 
-                {% if cartridge.status == "В подразделении" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
+                {% if cartridge.status == StatusSettings.Cartridge.in_division %}
                         <option value="{{ cartridge.number }}">
                             {{ cartridge.number }}
                             <strong>||</strong>
@@ -112,8 +112,7 @@
                                     class="select"
                                     required>
                                 {% for cartridge in cartridges %}
-                                    {% if cartridge.status == "В подразделении" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
-                                        <!-- 'В резерве' вынести в отдельную форму приёма в ремонт -->
+                                    {% if cartridge.status == StatusSettings.Cartridge.in_division %}
                                         <option value="{{ cartridge.number }}">
                                             {{ cartridge.number }}
                                             <strong>||</strong>
@@ -167,9 +166,12 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for cartridge in cartridges %}
-                {% if cartridge.status == "В подразделении" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
+                {% set cartridge_issuance = CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()[-1] %}
+                {% set printer = Printer.query.filter(Printer.id == cartridge_issuance.printer_id).first() %}
+                {% if cartridge.status == StatusSettings.Cartridge.in_division %}
                     {% if (cartridge.efficiency != 0) and
-                        CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()|length > 0 %}
+                        CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()|length > 0 and
+                            printer != None %}
                         <tr>
                             <td class="1">
                                 {{ counter.value }}
@@ -187,11 +189,10 @@
                                 {% endfor %}
                             </td>
                             <td class="4">
-                                {% set cartridge_issuance = CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()[-1] %}
                                 Подразделение: {{ cartridge_issuance.location }}<br>
                                 Корпус: {{ cartridge_issuance.learning_campus }}<br>
                                 Кабинет: {{ cartridge_issuance.cabinet }}<br>
-                                Номер принтера: {{ cartridge_issuance.printer_id }}<br>
+                                Номер принтера: {{ printer.num_inventory }}<br>
                                 <input type="hidden"
                                        name="location{{ cartridge.number }}"
                                        value="{{ cartridge_issuance.location }}">

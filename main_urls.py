@@ -3,7 +3,7 @@ from flask import render_template
 from flask import request
 from flask import redirect
 from flask import flash
-from flask_login import current_user, login_required
+from flask_login import login_required
 
 from ScanFunctions import TypeVar
 from models import *
@@ -54,14 +54,6 @@ def ContractPrice(contract) -> float:
                 for wp_p in wl_p.works_prices_printers_id:
                     check_price += wp_p.price
     return check_price
-
-
-@main_urls.after_request
-def redirect_to_signin(response):
-    if response.status_code == 401:
-        return redirect('/login')
-    else:
-        return response
 
 
 @main_urls.route('/')
@@ -222,13 +214,13 @@ def active_contract():
         db.session.add(contract)
 
         try:
-            action_h = StatusSettings.CONTRACT['Создан']
-            type_h = StatusSettings.TYPE['CONTRACT']
-            name_h = f"{name}"
+            action_history = StatusSettings.Contract.created
+            type_history = StatusSettings.Types.contract
+            name_history = f"{name}"
             user = request.form['user']
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
                             date=datetime.now())
             db.session.add(ah)
@@ -263,13 +255,13 @@ def close_contract(contract_id):
     contract.active = False
 
     try:
-        action_h = StatusSettings.CONTRACT['Закрыт']
-        type_h = StatusSettings.TYPE['CONTRACT']
-        name_h = f"{contract.name}"
+        action_history = StatusSettings.Contract.close
+        type_history = StatusSettings.Types.contract
+        name_history = f"{contract.name}"
         user = current_user.username
-        ah = AllHistory(action=action_h,
-                        type=type_h,
-                        name=name_h,
+        ah = AllHistory(action=action_history,
+                        type=type_history,
+                        name=name_history,
                         user=user,
                         date=datetime.now())
         db.session.add(ah)
@@ -308,13 +300,13 @@ def new_check(contract_id):
         db.session.add(check)
 
         try:
-            action_h = StatusSettings.CHECK["Создан"]
-            type_h = StatusSettings.TYPE['CHECK']
-            name_h = f"{date_check.date().strftime('%d.%m.%Y')}"
+            action_history = StatusSettings.Check.created
+            type_history = StatusSettings.Types.check
+            name_history = f"{date_check.date().strftime('%d.%m.%Y')}"
             user = request.form['user']
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
                             date=datetime.now())
             db.session.add(ah)
@@ -344,8 +336,8 @@ def close_check(check_id):
         check.active = False
 
         try:
-            action_h = StatusSettings.CHECK["Закрыт"]
-            type_h = StatusSettings.TYPE['CHECK']
+            action_h = StatusSettings.Check.close
+            type_h = StatusSettings.Types.check
             name_h = f"{check.date_check.date().strftime('%d.%m.%Y')}"
             user = current_user.username
             ah = AllHistory(action=action_h,
@@ -377,13 +369,13 @@ def reopen_check(check_id):
     check.active = True
 
     try:
-        action_h = StatusSettings.CHECK["Переоткрыт"]
-        type_h = StatusSettings.TYPE['CHECK']
-        name_h = f"{check.date_check.date().strftime('%d.%m.%Y')}"
+        action_history = StatusSettings.Check.reopen
+        type_history = StatusSettings.Types.check
+        name_history = f"{check.date_check.date().strftime('%d.%m.%Y')}"
         user = current_user.username
-        ah = AllHistory(action=action_h,
-                        type=type_h,
-                        name=name_h,
+        ah = AllHistory(action=action_history,
+                        type=type_history,
+                        name=name_history,
                         user=user,
                         date=datetime.now())
         db.session.add(ah)
@@ -432,13 +424,13 @@ def check_more(check_id):
             check.work_lists_id.append(work)
 
         try:
-            action_h = StatusSettings.CHECK["Пополнен"]
-            type_h = StatusSettings.TYPE['CHECK']
-            name_h = f"{check.date_check.date().strftime('%d.%m.%Y')}"
+            action_history = StatusSettings.Check.replenished
+            type_history = StatusSettings.Types.check
+            name_history = f"{check.date_check.date().strftime('%d.%m.%Y')}"
             user = request.form['user']
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
                             date=datetime.now())
             db.session.add(ah)
@@ -547,12 +539,12 @@ def list_of_completed_works():
                 pr_0.work_done = True
 
         try:
-            action_h = StatusSettings.WORK_LIST["Создан"]
-            type_h = StatusSettings.TYPE['WORK_LIST']
-            name_h = f"{work_list.date_work.date().strftime('%d.%m.%Y')}"
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            action_history = StatusSettings.WorkList.created
+            type_history = StatusSettings.Types.work_list
+            name_history = f"{work_list.date_work.date().strftime('%d.%m.%Y')}"
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
                             date=datetime.now())
             db.session.add(ah)
@@ -608,13 +600,13 @@ def update_work(work_id):
                         wpp.price = prices_p[i]
 
         try:
-            action_h = StatusSettings.WORK_LIST["Изменён"]
-            type_h = StatusSettings.TYPE['WORK_LIST']
-            name_h = f"{work.date_work.date().strftime('%d.%m.%Y')}"
+            action_history = StatusSettings.WorkList.updated
+            type_history = StatusSettings.Types.work_list
+            name_history = f"{work.date_work.date().strftime('%d.%m.%Y')}"
             user = request.form['user']
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
                             date=datetime.now())
             db.session.add(ah)

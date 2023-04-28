@@ -3,7 +3,7 @@ from flask import redirect
 from flask import request
 from flask import Blueprint
 from flask import flash
-from flask_login import current_user, login_required
+from flask_login import login_required
 
 from models import *
 from tabs_that_appear import *
@@ -11,14 +11,6 @@ from ScanFunctions import TypeVar
 from StatusSettings import StatusSettings
 
 printer_urls = Blueprint('printer_urls', __name__)
-
-
-@printer_urls.after_request
-def redirect_to_signin(response):
-    if response.status_code == 401:
-        return redirect('/login')
-    else:
-        return response
 
 
 @printer_urls.route('/add_works_printers', methods=['GET', 'POST'])
@@ -100,13 +92,13 @@ def update_printer(id):
                 return redirect(request.referrer)
 
         try:
-            action_h = StatusSettings.PRINTER["Изменён"]
-            type_h = StatusSettings.TYPE["PRINTER"]
-            name_h = f"{printer.num_inventory}"
+            action_history = StatusSettings.Printer.updated
+            type_history = StatusSettings.Types.printer
+            name_history = f"{printer.num_inventory}"
             user = request.form['user']
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
                             date=datetime.now())
             printer.all_history_id.append(ah)
@@ -157,7 +149,7 @@ def printers():
                 flash('Incorrect value')
                 return redirect(request.referrer)
 
-        action = StatusSettings.PRINTER['Создан']
+        action = StatusSettings.Printer.in_division
         printer = Printer(name=name,
                           num_inventory=num_inventory,
                           location_now=location_now,
@@ -166,13 +158,13 @@ def printers():
                           status=action)
 
         try:
-            action_h = StatusSettings.PRINTER["Создан"]
-            type_h = StatusSettings.TYPE["PRINTER"]
-            name_h = f"{printer.num_inventory}"
+            action_history = StatusSettings.Printer.created
+            type_history = StatusSettings.Types.printer
+            name_history = f"{printer.num_inventory}"
             user = request.form['user']
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
                             date=datetime.now())
             printer.all_history_id.append(ah)
@@ -214,13 +206,13 @@ def delete_printer(id):
     printer = Printer.query.get_or_404(id)
     try:
         try:
-            action_h = StatusSettings.PRINTER["Удалён"]
-            type_h = StatusSettings.TYPE["PRINTER"]
-            name_h = f"{printer.num_inventory}"
+            action_history = StatusSettings.Printer.deleted
+            type_history = StatusSettings.Types.printer
+            name_history = f"{printer.num_inventory}"
             user = current_user.username
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
                             date=datetime.now())
             printer.all_history_id.append(ah)
@@ -230,7 +222,7 @@ def delete_printer(id):
             return render_template("main.html")
 
         printer.efficiency = 0
-        printer.status = "Удалён"
+        printer.status = StatusSettings.Printer.deleted
         db.session.add(printer)
         db.session.commit()
         return redirect('/printers')
@@ -245,13 +237,13 @@ def resume_printer(id):
     printer = Printer.query.get_or_404(id)
     try:
         try:
-            action_h = StatusSettings.PRINTER["Восстановлен"]
-            type_h = StatusSettings.TYPE["PRINTER"]
-            name_h = f"{printer.num_inventory}"
+            action_history = StatusSettings.Printer.restored
+            type_history = StatusSettings.Types.printer
+            name_history = f"{printer.num_inventory}"
             user = current_user.username
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
                             date=datetime.now())
             printer.all_history_id.append(ah)
@@ -261,7 +253,7 @@ def resume_printer(id):
             return render_template("main.html")
 
         printer.efficiency = 1
-        printer.status = "Восстановлен"
+        printer.status = StatusSettings.Printer.in_reserve
         db.session.add(printer)
         db.session.commit()
         return redirect(request.referrer)
@@ -307,15 +299,15 @@ def brought_a_printer():
                                                     cabinet=cabinet,
                                                     user=user)
 
-                printer.status = "Принят в ремонт"
+                printer.status = StatusSettings.Printer.accepted_for_repair
 
                 try:
-                    action_h = StatusSettings.PRINTER["Принят в ремонт"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Printer.accepted_for_repair
+                    type_history = StatusSettings.Types.printer
+                    name_history = f"{printer.num_inventory}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     printer.all_history_id.append(ah)
@@ -354,15 +346,15 @@ def brought_a_printer():
                                                     cabinet=cabinet,
                                                     user=user)
 
-                printer.status = "Принят в ремонт"
+                printer.status = StatusSettings.Printer.accepted_for_repair
 
                 try:
-                    action_h = StatusSettings.PRINTER["Принят в ремонт"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Printer.accepted_for_repair
+                    type_history = StatusSettings.Types.printer
+                    name_history = f"{printer.num_inventory}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     printer.all_history_id.append(ah)
@@ -387,7 +379,8 @@ def brought_a_printer():
                                printers=printers,
                                PrinterIssuance=PrinterIssuance,
                                buildings=buildings,
-                               divisions=divisions)
+                               divisions=divisions,
+                               StatusSettings=StatusSettings)
 
 
 @printer_urls.route('/repairing', methods=['GET', 'POST'])
@@ -409,15 +402,15 @@ def repairing():
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
                 repair = Repair(user=user)
 
-                printer.status = "В ремонте"
+                printer.status = StatusSettings.Printer.in_repair
 
                 try:
-                    action_h = StatusSettings.PRINTER["В ремонте"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Printer.in_repair
+                    type_history = StatusSettings.Types.printer
+                    name_history = f"{printer.num_inventory}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     printer.all_history_id.append(ah)
@@ -435,15 +428,15 @@ def repairing():
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
                 repair = Repair(user=user)
 
-                printer.status = "В ремонте"
+                printer.status = StatusSettings.Printer.in_repair
 
                 try:
-                    action_h = StatusSettings.PRINTER["В ремонте"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Printer.in_repair
+                    type_history = StatusSettings.Types.printer
+                    name_history = f"{printer.num_inventory}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     printer.all_history_id.append(ah)
@@ -464,7 +457,8 @@ def repairing():
             return render_template("main.html")
     else:
         return render_template('Repairing.html',
-                               printers=printers)
+                               printers=printers,
+                               StatusSettings=StatusSettings)
 
 
 @printer_urls.route('/reception_from_a_repairing', methods=['GET', 'POST'])
@@ -486,15 +480,15 @@ def receptionFromARepairing():
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
                 reception_from_a_repairing = ReceptionFromARepairing(user=user)
 
-                printer.status = "Получен из ремонта"
+                printer.status = StatusSettings.Printer.in_reserve
 
                 try:
-                    action_h = StatusSettings.PRINTER["Получен из ремонта"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Printer.in_reserve
+                    type_history = StatusSettings.Types.printer
+                    name_history = f"{printer.num_inventory}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     printer.all_history_id.append(ah)
@@ -514,15 +508,15 @@ def receptionFromARepairing():
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
                 reception_from_a_repairing = ReceptionFromARepairing(user=user)
 
-                printer.status = "Получен из ремонта"
+                printer.status = StatusSettings.Printer.in_reserve
 
                 try:
-                    action_h = StatusSettings.PRINTER["Получен из ремонта"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Printer.in_reserve
+                    type_history = StatusSettings.Types.printer
+                    name_history = f"{printer.num_inventory}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     printer.all_history_id.append(ah)
@@ -545,7 +539,8 @@ def receptionFromARepairing():
             return render_template("main.html")
     else:
         return render_template('ReceptionFromARepair.html',
-                               printers=printers)
+                               printers=printers,
+                               StatusSettings=StatusSettings)
 
 
 @printer_urls.route('/issuance_printers', methods=['GET', 'POST'])
@@ -580,15 +575,15 @@ def issuance_printers():
                                            learning_campus=learning_campus,
                                            cabinet=cabinet)
 
-                printer.status = "В подразделении"
+                printer.status = StatusSettings.Printer.in_division
 
                 try:
-                    action_h = StatusSettings.PRINTER["В подразделении"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Printer.in_division
+                    type_history = StatusSettings.Types.printer
+                    name_history = f"{printer.num_inventory}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     printer.all_history_id.append(ah)
@@ -631,15 +626,15 @@ def issuance_printers():
                                            learning_campus=learning_campus,
                                            cabinet=cabinet)
 
-                printer.status = "В подразделении"
+                printer.status = StatusSettings.Printer.in_division
 
                 try:
-                    action_h = StatusSettings.PRINTER["В подразделении"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
+                    action_history = StatusSettings.Printer.in_division
+                    type_history = StatusSettings.Types.printer
+                    name_history = f"{printer.num_inventory}"
+                    ah = AllHistory(action=action_history,
+                                    type=type_history,
+                                    name=name_history,
                                     user=user,
                                     date=datetime.now())
                     printer.all_history_id.append(ah)
@@ -663,4 +658,5 @@ def issuance_printers():
                                printers=printers,
                                BroughtAPrinter=BroughtAPrinter,
                                buildings=buildings,
-                               divisions=divisions)
+                               divisions=divisions,
+                               StatusSettings=StatusSettings)

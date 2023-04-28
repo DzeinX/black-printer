@@ -28,7 +28,7 @@
                     class="select"
                     required>
                 {% for cartridge in cartridges %}
-                    {% if cartridge.status == "В заправке" or cartridge.status == "Восстановлен" %}
+                    {% if cartridge.status == StatusSettings.Cartridge.in_refueling %}
                         <option value="{{ cartridge.number }}">
                             {{ cartridge.number }}
                             <strong>||</strong>
@@ -83,7 +83,7 @@
                             class="select"
                             required>
                         {% for cartridge in cartridges %}
-                            {% if cartridge.status == "В заправке" or cartridge.status == "Восстановлен" %}
+                            {% if cartridge.status == StatusSettings.Cartridge.in_refueling %}
                                 <option value="{{ cartridge.number }}">
                                     {{ cartridge.number }}
                                     <strong>||</strong>
@@ -136,7 +136,7 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for cartridge in cartridges %}
-                {% if cartridge.status == "В заправке" or cartridge.status == "Восстановлен" %}
+                {% if cartridge.status == StatusSettings.Cartridge.in_refueling %}
                     {% if (cartridge.efficiency != 0) %}
                         <tr>
                             <td class="1">
