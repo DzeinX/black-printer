@@ -166,13 +166,23 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for cartridge in cartridges %}
+                {% set color = namespace(value='') %}
+                {% if cartridge.refills_left >= 3 %}
+                    {% set color.value = '#05c46b' %}
+                {% else %}
+                    {% if cartridge.refills_left <= 0 %}
+                        {% set color.value = '#ff7675' %}
+                    {% else %}
+                        {% set color.value = '#f6b93b' %}
+                    {% endif %}
+                {% endif %}
                 {% set cartridge_issuance = CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()[-1] %}
                 {% set printer = Printer.query.filter(Printer.id == cartridge_issuance.printer_id).first() %}
                 {% if cartridge.status == StatusSettings.Cartridge.in_division %}
                     {% if (cartridge.efficiency != 0) and
                         CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()|length > 0 and
                             printer != None %}
-                        <tr>
+                        <tr style="color: {{ color.value }}">
                             <td class="1">
                                 {{ counter.value }}
                                 <label>
@@ -205,6 +215,9 @@
                                 <input type="hidden"
                                        name="user"
                                        value="{{ current_user.username }}">
+                                <input type="hidden"
+                                       name="printer_id{{ cartridge.number }}"
+                                       value="{{ printer.id }}">
                             </td>
                         </tr>
                         {% set counter.value = counter.value + 1 %}

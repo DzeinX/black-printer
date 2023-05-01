@@ -167,14 +167,23 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for cartridge in cartridges %}
+                {% set color = namespace(value='') %}
+                {% if cartridge.refills_left >= 3 %}
+                    {% set color.value = '#05c46b' %}
+                {% else %}
+                    {% if cartridge.refills_left <= 0 %}
+                        {% set color.value = '#ff7675' %}
+                    {% else %}
+                        {% set color.value = '#f6b93b' %}
+                    {% endif %}
+                {% endif %}
                 {% if cartridge.status == StatusSettings.Cartridge.in_reserve %}
                     {% if BroughtACartridge.query.filter(BroughtACartridge.cartridge_number_id == cartridge.id).all()|length > 0 %}
                         {% set brought_a_cartridge = BroughtACartridge.query.filter(BroughtACartridge.cartridge_number_id == cartridge.id).all()[-1] %}
                         {% set printer = Printer.query.filter(Printer.id == brought_a_cartridge.printer_id).first() %}
                         {% if (cartridge.efficiency != 0) and
-                            BroughtACartridge.query.filter(BroughtACartridge.cartridge_number_id == cartridge.id).all()|length > 0 and
                                 printer != None%}
-                            <tr>
+                            <tr style="color: {{ color.value }}">
                                 <td class="1">
                                     {{ counter.value }}
                                     <label>
@@ -205,7 +214,7 @@
                                            name="cabinet{{ cartridge.number }}"
                                            value="{{ brought_a_cartridge.cabinet }}">
                                     <input type="hidden"
-                                           name="printer{{ brought_a_cartridge.printer_id }}"
+                                           name="printer{{ cartridge.number }}"
                                            value="{{ brought_a_cartridge.printer_id }}">
                                     <input type="hidden" name="user" value="{{ current_user.username }}">
                                 </td>

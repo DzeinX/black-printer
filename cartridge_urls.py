@@ -371,6 +371,8 @@ def brought_a_cartridge():
                 learning_campus = request.form[f'learning_campus{number}']
                 cabinet = request.form[f'cabinet{number}']
                 user = request.form['user']
+                printer = request.form[f'printer_id{number}']
+                printer = Printer.query.filter(Printer.id == printer).first()
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
 
                 brought_a_cartridge = BroughtACartridge(location=location,
@@ -379,6 +381,7 @@ def brought_a_cartridge():
                                                         user=user)
 
                 cartridge.status = StatusSettings.Cartridge.accepted_for_refuel
+                printer.cartridge_brought_id.append(brought_a_cartridge)
 
                 try:
                     action_history = StatusSettings.Cartridge.accepted_for_refuel
@@ -403,7 +406,7 @@ def brought_a_cartridge():
             cabinet = request.form['cabinet']
             user = request.form['user']
             printer = request.form['printer_id']
-            printer = Printer.query.get(int(printer))
+            printer = Printer.query.filter(Printer.id == printer).first()
 
             var_check = TypeVar(location, learning_campus, cabinet, var_type='str')
             if var_check[1]:
@@ -424,9 +427,11 @@ def brought_a_cartridge():
                 brought_a_cartridge = BroughtACartridge(location=location,
                                                         learning_campus=learning_campus,
                                                         cabinet=cabinet,
-                                                        user=user)
+                                                        user=user,
+                                                        printer_id=printer)
 
                 cartridge.status = StatusSettings.Cartridge.accepted_for_refuel
+                printer.cartridge_brought_id.append(brought_a_cartridge)
 
                 try:
                     action_history = StatusSettings.Cartridge.accepted_for_refuel
@@ -477,6 +482,12 @@ def refueling():
         if len(cartridge_number) == 0:
             flash('Не выбрана ни одна модель')
             return redirect(request.referrer)
+
+        for number in cartridge_number:
+            cartridge = Cartridges.query.filter(Cartridges.number == number).first()
+            if cartridge.refills_left <= 0:
+                flash(f"Картридж №{cartridge.number} был заправлен более 4 раз. Его следует утилизировать.")
+                return redirect(request.referrer)
 
         if id_form == '2':
             for number in cartridge_number:
@@ -580,6 +591,7 @@ def receptionFromARefuelling():
                     return render_template("main.html")
 
                 cartridge.reception_from_a_refueling_id.append(reception_from_a_refueling)
+                cartridge.refills_left -= 1
 
                 cartridge.work_done = False
 
@@ -608,6 +620,7 @@ def receptionFromARefuelling():
                     return render_template("main.html")
 
                 cartridge.reception_from_a_refueling_id.append(reception_from_a_refueling)
+                cartridge.refills_left -= 1
 
                 cartridge.work_done = False
 

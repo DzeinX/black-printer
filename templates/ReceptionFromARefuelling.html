@@ -137,8 +137,18 @@
             {% set counter = namespace(value=1) %}
             {% for cartridge in cartridges %}
                 {% if cartridge.status == StatusSettings.Cartridge.in_refueling %}
+                    {% set color = namespace(value='') %}
+                    {% if cartridge.refills_left >= 3 %}
+                        {% set color.value = '#05c46b' %}
+                    {% else %}
+                        {% if cartridge.refills_left <= 0 %}
+                            {% set color.value = '#ff7675' %}
+                        {% else %}
+                            {% set color.value = '#f6b93b' %}
+                        {% endif %}
+                    {% endif %}
                     {% if (cartridge.efficiency != 0) %}
-                        <tr>
+                        <tr style="color: {{ color.value }}">
                             <td class="1">
                                 {{ counter.value }}
                                 <label>
