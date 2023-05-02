@@ -270,7 +270,7 @@ def cartridges():
             flash('При создании картриджа произошла ошибка')
             return render_template("main.html")
     else:
-        number_cartridge = int(db.session.query(func.max(Cartridges.number)).first()[0] + 1)
+        number_cartridge = db.session.query(func.max(Cartridges.number))[0][0] + 1
         return render_template("Cartridges.html",
                                cartridges_and_location=cartridges_and_location,
                                list_models=list_models,
