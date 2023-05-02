@@ -163,7 +163,8 @@ def printers():
                           location_now=location_now,
                           learning_campus_now=learning_campus_now,
                           cabinet_now=cabinet_now,
-                          status=action)
+                          status=action,
+                          date_added=datetime.now())
 
         try:
             action_h = StatusSettings.PRINTER["Создан"]
@@ -305,7 +306,8 @@ def brought_a_printer():
                 brought_a_printer = BroughtAPrinter(location=location,
                                                     learning_campus=learning_campus,
                                                     cabinet=cabinet,
-                                                    user=user)
+                                                    user=user,
+                                                    date=datetime.now())
 
                 printer.status = "Принят в ремонт"
 
@@ -352,7 +354,8 @@ def brought_a_printer():
                 brought_a_printer = BroughtAPrinter(location=location,
                                                     learning_campus=learning_campus,
                                                     cabinet=cabinet,
-                                                    user=user)
+                                                    user=user,
+                                                    date=datetime.now())
 
                 printer.status = "Принят в ремонт"
 
@@ -407,7 +410,8 @@ def repairing():
             for number in printer_num:
                 user = request.form['user']
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
-                repair = Repair(user=user)
+                repair = Repair(user=user,
+                                date=datetime.now())
 
                 printer.status = "В ремонте"
 
@@ -433,7 +437,8 @@ def repairing():
             for number in printer_num:
                 user = request.form['user']
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
-                repair = Repair(user=user)
+                repair = Repair(user=user,
+                                date=datetime.now())
 
                 printer.status = "В ремонте"
 
@@ -484,7 +489,8 @@ def receptionFromARepairing():
             for number in printer_num:
                 user = request.form[f'user']
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
-                reception_from_a_repairing = ReceptionFromARepairing(user=user)
+                reception_from_a_repairing = ReceptionFromARepairing(user=user,
+                                                                     date=datetime.date())
 
                 printer.status = "Получен из ремонта"
 
@@ -512,7 +518,8 @@ def receptionFromARepairing():
             for number in printer_num:
                 user = request.form['user']
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
-                reception_from_a_repairing = ReceptionFromARepairing(user=user)
+                reception_from_a_repairing = ReceptionFromARepairing(user=user,
+                                                                     date=datetime.now())
 
                 printer.status = "Получен из ремонта"
 
@@ -578,7 +585,8 @@ def issuance_printers():
                 issuance = PrinterIssuance(user=user,
                                            location=location,
                                            learning_campus=learning_campus,
-                                           cabinet=cabinet)
+                                           cabinet=cabinet,
+                                           date=datetime.now())
 
                 printer.status = "В подразделении"
 
@@ -629,7 +637,8 @@ def issuance_printers():
                 issuance = PrinterIssuance(user=user,
                                            location=location,
                                            learning_campus=learning_campus,
-                                           cabinet=cabinet)
+                                           cabinet=cabinet,
+                                           date=datetime.now())
 
                 printer.status = "В подразделении"
 

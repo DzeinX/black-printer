@@ -239,7 +239,8 @@ def cartridges():
             return redirect(request.referrer)
 
         cartridge = Cartridges(status=action,
-                               number=number)
+                               number=number,
+                               date_added=datetime.now())
 
         for model in cartridge_models:
             model = ListModels.query.filter(ListModels.model == model).first()
@@ -374,7 +375,8 @@ def brought_a_cartridge():
                 brought_a_cartridge = BroughtACartridge(location=location,
                                                         learning_campus=learning_campus,
                                                         cabinet=cabinet,
-                                                        user=user)
+                                                        user=user,
+                                                        date=datetime.now())
 
                 cartridge.status = "Принят в заправку"
 
@@ -385,7 +387,8 @@ def brought_a_cartridge():
                     ah = AllHistory(action=action_h,
                                     type=type_h,
                                     name=name_h,
-                                    user=user)
+                                    user=user,
+                                    date=datetime.now())
                     cartridge.all_history_id.append(ah)
                     db.session.add(ah)
                 except:
@@ -422,7 +425,8 @@ def brought_a_cartridge():
                 brought_a_cartridge = BroughtACartridge(location=location,
                                                         learning_campus=learning_campus,
                                                         cabinet=cabinet,
-                                                        user=user)
+                                                        user=user,
+                                                        date=datetime.now())
 
                 cartridge.status = "Принят в заправку"
 
@@ -478,7 +482,8 @@ def refueling():
             for number in cartridge_number:
                 user = request.form[f'user']
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
-                refueling = Refueling(user=user)
+                refueling = Refueling(user=user,
+                                      date=datetime.now())
 
                 cartridge.status = "В заправке"
 
@@ -504,7 +509,8 @@ def refueling():
             for number in cartridge_number:
                 user = request.form['user']
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
-                refueling = Refueling(user=user)
+                refueling = Refueling(user=user,
+                                      date=datetime.now())
 
                 cartridge.status = "В заправке"
 
@@ -555,7 +561,8 @@ def receptionFromARefuelling():
             for number in cartridge_number:
                 user = request.form['user']
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
-                reception_from_a_refueling = ReceptionFromARefueling(user=user)
+                reception_from_a_refueling = ReceptionFromARefueling(user=user,
+                                                                     date=datetime.now())
 
                 cartridge.status = "В резерве"
 
@@ -583,7 +590,8 @@ def receptionFromARefuelling():
             for number in cartridge_number:
                 user = request.form['user']
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
-                reception_from_a_refueling = ReceptionFromARefueling(user=user)
+                reception_from_a_refueling = ReceptionFromARefueling(user=user,
+                                                                     date=datetime.now())
 
                 cartridge.status = "В резерве"
 
@@ -646,7 +654,8 @@ def issuance_cartridges():
                 issuance = CartridgeIssuance(user=user,
                                              location=location,
                                              learning_campus=learning_campus,
-                                             cabinet=cabinet)
+                                             cabinet=cabinet,
+                                             date=datetime.now())
 
                 cartridge.status = "В подразделении"
 
@@ -695,7 +704,8 @@ def issuance_cartridges():
                 issuance = CartridgeIssuance(user=user,
                                              location=location,
                                              learning_campus=learning_campus,
-                                             cabinet=cabinet)
+                                             cabinet=cabinet,
+                                             date=datetime.now())
 
                 cartridge.status = "В подразделении"
 
