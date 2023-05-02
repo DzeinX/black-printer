@@ -13,7 +13,7 @@ association_table_1 = db.Table('association', db.Model.metadata,
                                db.Column('cartridges_id', db.Integer, db.ForeignKey('cartridges.id')),
                                db.Column('ListModels_id', db.Integer, db.ForeignKey('ListModels.id')))
 
-
+# TODO: Надо комментировать
 class AllHistory(db.Model):
     __tablename__ = "AllHistory"
     id = db.Column(db.Integer, primary_key=True)
