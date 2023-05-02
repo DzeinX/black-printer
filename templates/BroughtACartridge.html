@@ -176,6 +176,7 @@
                         {% set color.value = '#f6b93b' %}
                     {% endif %}
                 {% endif %}
+                {% if CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()|length != 0 %}
                 {% set cartridge_issuance = CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()[-1] %}
                 {% set printer = Printer.query.filter(Printer.id == cartridge_issuance.printer_id).first() %}
                 {% if cartridge.status == StatusSettings.Cartridge.in_division %}
@@ -222,6 +223,7 @@
                         </tr>
                         {% set counter.value = counter.value + 1 %}
                     {% endif %}
+                {% endif %}
                 {% endif %}
             {% endfor %}
             </tbody>

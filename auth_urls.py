@@ -19,7 +19,7 @@ def login_page():
         password = request.form.get('password')
 
         new_user = ldap_manager.authenticate(username=username, password=password)
-
+        # TODO: Пользователю можно выдать права админа из конфига не только в первый его вход.
         if new_user.status != AuthenticationResponseStatus.fail:
             user = User.query.filter(User.username == username).first()
             print(str(user))
