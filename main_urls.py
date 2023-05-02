@@ -217,7 +217,8 @@ def active_contract():
         contract = ListsOfContracts(name=name,
                                     sum=sum_contract,
                                     date_contract=date_contract,
-                                    active=True)
+                                    active=True,
+                                    date_create=datetime.now())
 
         db.session.add(contract)
 
@@ -302,7 +303,8 @@ def new_check(contract_id):
 
         check = CheckLists(date_check=date_check,
                            sum=sum_check,
-                           active=1)
+                           active=1,
+                           date_create=datetime.now())
 
         contract.check_lists_id.append(check)
         db.session.add(check)
@@ -490,7 +492,8 @@ def list_of_completed_works():
         date_work_list = datetime.fromisoformat(f'{date_work_list}')
         user = request.form['user']
 
-        work_list = WorkList(date_work=date_work_list)
+        work_list = WorkList(date_work=date_work_list,
+                             date_create=datetime.now())
 
         cartridges_0 = Cartridges.query.filter(Cartridges.work_done == 0).all()
         for ctg_0 in cartridges_0:
@@ -501,7 +504,8 @@ def list_of_completed_works():
                 for i in range(0, len(works)):
                     if not works[i] == 'NAN':
                         if not prices[i] == 0:
-                            wl_c = WorkListsCartridges(user=user)
+                            wl_c = WorkListsCartridges(user=user,
+                                                       date=datetime.now())
                             work = AllWorksCartridges.query.filter(AllWorksCartridges.work == works[i]).first()
                             wpc = WorksPricesCartridges(price=prices[i])
                             work.works_prices_cartridges_id.append(wpc)
@@ -528,7 +532,8 @@ def list_of_completed_works():
                 for i in range(0, len(works)):
                     if not works[i] == 'NAN':
                         if not prices[i] == 0:
-                            wl_p = WorkListsPrinters(user=user)
+                            wl_p = WorkListsPrinters(user=user,
+                                                     date=datetime.now())
                             work = AllWorksPrinters.query.filter(AllWorksPrinters.work == works[i]).first()
                             wpp = WorksPricesPrinters(price=prices[i])
                             work.works_prices_printers_id.append(wpp)
