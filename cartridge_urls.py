@@ -9,6 +9,7 @@ from models import *
 from tabs_that_appear import *
 from ScanFunctions import TypeVar
 from StatusSettings import StatusSettings
+from sqlalchemy import func
 
 cartridge_urls = Blueprint('cartridge_urls', __name__)
 
@@ -269,12 +270,14 @@ def cartridges():
             flash('При создании картриджа произошла ошибка')
             return render_template("main.html")
     else:
+        number_cartridge = db.session.query(func.max(Cartridges.number))[0][0] + 1
         return render_template("Cartridges.html",
                                cartridges_and_location=cartridges_and_location,
                                list_models=list_models,
                                CartridgeIssuance=CartridgeIssuance,
                                Printer=Printer,
-                               StatusSettings=StatusSettings)
+                               StatusSettings=StatusSettings,
+                               number_cartridge=number_cartridge)
 
 
 @cartridge_urls.route('/cartridge/<int:id>/delete')
