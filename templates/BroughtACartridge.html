@@ -20,7 +20,7 @@
             td.setAttribute('style', 'border: none; vertical-align: top')
             td.innerHTML = `
                 <select type="number"
-                    name="num_inventory"
+                    name="cartridge_number"
                     id="${items}"
                     class="select"
                     required>
@@ -167,11 +167,11 @@
             {% set counter = namespace(value=1) %}
             {% for cartridge in cartridges %}
                 {% set color = namespace(value='') %}
-                {% if cartridge.refills_left >= 3 %}
-                    {% set color.value = '#05c46b' %}
+                {% if cartridge.refills >= 4 %}
+                    {% set color.value = '#ff7675' %}
                 {% else %}
-                    {% if cartridge.refills_left <= 0 %}
-                        {% set color.value = '#ff7675' %}
+                    {% if cartridge.refills <= 1 %}
+                        {% set color.value = '#05c46b' %}
                     {% else %}
                         {% set color.value = '#f6b93b' %}
                     {% endif %}

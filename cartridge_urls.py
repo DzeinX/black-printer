@@ -485,7 +485,7 @@ def refueling():
 
         for number in cartridge_number:
             cartridge = Cartridges.query.filter(Cartridges.number == number).first()
-            if cartridge.refills_left <= 0:
+            if cartridge.refills >= 4:
                 flash(f"Картридж №{cartridge.number} был заправлен более 4 раз. Его следует утилизировать.")
                 return redirect(request.referrer)
 
@@ -591,7 +591,7 @@ def receptionFromARefuelling():
                     return render_template("main.html")
 
                 cartridge.reception_from_a_refueling_id.append(reception_from_a_refueling)
-                cartridge.refills_left -= 1
+                cartridge.refills += 1
 
                 cartridge.work_done = False
 
@@ -620,7 +620,7 @@ def receptionFromARefuelling():
                     return render_template("main.html")
 
                 cartridge.reception_from_a_refueling_id.append(reception_from_a_refueling)
-                cartridge.refills_left -= 1
+                cartridge.refills += 1
 
                 cartridge.work_done = False
 

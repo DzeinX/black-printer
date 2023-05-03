@@ -138,11 +138,11 @@
             {% for cartridge in cartridges %}
                 {% if cartridge.status == StatusSettings.Cartridge.accepted_for_refuel %}
                     {% set color = namespace(value='') %}
-                    {% if cartridge.refills_left >= 3 %}
-                        {% set color.value = '#05c46b' %}
+                    {% if cartridge.refills >= 4 %}
+                        {% set color.value = '#ff7675' %}
                     {% else %}
-                        {% if cartridge.refills_left <= 0 %}
-                            {% set color.value = '#ff7675' %}
+                        {% if cartridge.refills <= 1 %}
+                            {% set color.value = '#05c46b' %}
                         {% else %}
                             {% set color.value = '#f6b93b' %}
                         {% endif %}
