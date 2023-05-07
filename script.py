@@ -114,8 +114,6 @@ def main_func():
     base = sq.connect('printersDB.db')
     cursor = base.cursor()
 
-    add_column_bd()
-
     # работа с broughtcartridge
     max_number = cursor.execute('SELECT max(id) FROM BroughtACartridge').fetchone()[0]
     new_str = 0

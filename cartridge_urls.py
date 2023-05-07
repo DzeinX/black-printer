@@ -213,7 +213,8 @@ def cartridges():
     cartridges_and_location = []
     for cartridge in cartridges:
         cartridges_and_location.append(
-            [cartridge, CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()])
+            [cartridge, AllHistory.query.filter(
+                AllHistory.cartridge_id == cartridge.id, AllHistory.action == StatusSettings.Cartridge.in_refueling).all()])
 
     if request.method == 'POST':
         action = "Создан"
@@ -275,7 +276,6 @@ def cartridges():
         return render_template("Cartridges.html",
                                cartridges_and_location=cartridges_and_location,
                                list_models=list_models,
-                               CartridgeIssuance=CartridgeIssuance,
                                Printer=Printer,
                                StatusSettings=StatusSettings,
                                number_cartridge=number_cartridge)

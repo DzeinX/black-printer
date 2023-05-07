@@ -13,6 +13,7 @@ association_table_1 = db.Table('association', db.Model.metadata,
                                db.Column('cartridges_id', db.Integer, db.ForeignKey('cartridges.id')),
                                db.Column('ListModels_id', db.Integer, db.ForeignKey('ListModels.id')))
 
+
 # TODO: Надо комментировать
 class AllHistory(db.Model):
     __tablename__ = "AllHistory"
@@ -22,6 +23,10 @@ class AllHistory(db.Model):
     name = db.Column(db.String(30), nullable=False)
     date = db.Column(db.DateTime)
     user = db.Column(db.String(20), nullable=False)
+    status = db.Column(db.String(20))
+    location = db.Column(db.String(30))
+    learning_campus = db.Column(db.String(30))
+    cabinet = db.Column(db.String(20))
 
     cartridge_id = db.Column(db.Integer, db.ForeignKey("cartridges.id"))
     printer_id = db.Column(db.Integer, db.ForeignKey("printer.id"))
@@ -104,6 +109,37 @@ class ListModels(db.Model):
         return '<ListModels %r>' % self.id
 
 
+class BroughtACartridge(db.Model):
+    __tablename__ = "BroughtACartridge"
+    id = db.Column(db.Integer, primary_key=True)
+    location = db.Column(db.String(15), nullable=False)
+    learning_campus = db.Column(db.String(35), nullable=False)
+    cabinet = db.Column(db.String(15), nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    user = db.Column(db.String(40), nullable=False)
+
+    cartridge_number_id = db.Column(db.Integer, db.ForeignKey("cartridges.id"))
+    printer_id = db.Column(db.Integer, db.ForeignKey("printer.id"))
+
+    def __repr__(self):
+        return '<BroughtACartridge %r>' % self.id
+
+
+class BroughtAPrinter(db.Model):
+    __tablename__ = "BroughtAPrinter"
+    id = db.Column(db.Integer, primary_key=True)
+    location = db.Column(db.String(15), nullable=False)
+    learning_campus = db.Column(db.String(35), nullable=False)
+    cabinet = db.Column(db.String(15), nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    user = db.Column(db.String(40), nullable=False)
+
+    printer_id = db.Column(db.Integer, db.ForeignKey("printer.id"))
+
+    def __repr__(self):
+        return '<BroughtAPrinter %r>' % self.id
+
+
 class Refueling(db.Model):
     __tablename__ = "Refueling"
     id = db.Column(db.Integer, primary_key=True)
@@ -150,6 +186,37 @@ class ReceptionFromARepairing(db.Model):
 
     def __repr__(self):
         return '<ReceptionFromARepairing %r>' % self.id
+
+
+class CartridgeIssuance(db.Model):
+    __tablename__ = "CartridgeIssuance"
+    id = db.Column(db.Integer, primary_key=True)
+    location = db.Column(db.String(15), nullable=True)
+    learning_campus = db.Column(db.String(35), nullable=True)
+    cabinet = db.Column(db.String(15), nullable=True)
+    date = db.Column(db.DateTime, nullable=False)
+    user = db.Column(db.String(40), nullable=True)
+
+    cartridge_number_id = db.Column(db.Integer, db.ForeignKey("cartridges.id"))
+    printer_id = db.Column(db.Integer, db.ForeignKey("printer.id"))
+
+    def __repr__(self):
+        return '<CartridgeIssuance %r>' % self.id
+
+
+class PrinterIssuance(db.Model):
+    __tablename__ = "PrinterIssuance"
+    id = db.Column(db.Integer, primary_key=True)
+    location = db.Column(db.String(15), nullable=True)
+    learning_campus = db.Column(db.String(35), nullable=True)
+    cabinet = db.Column(db.String(15), nullable=True)
+    date = db.Column(db.DateTime, nullable=False)
+    user = db.Column(db.String(40), nullable=True)
+
+    printer_id = db.Column(db.Integer, db.ForeignKey("printer.id"))
+
+    def __repr__(self):
+        return '<PrinterIssuance %r>' % self.id
 
 
 class WorksPricesCartridges(db.Model):
