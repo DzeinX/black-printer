@@ -138,6 +138,12 @@ def printers():
     if request.method == 'POST':
         name = request.form['name']
         num_inventory = request.form['num_inventory']
+        check_num_inv_printer = db.session.query(Printer).filter(Printer.num_inventory == f'{num_inventory}').all()
+        # запрос в таблицу printer выведет строки, в которых инвентарник совпадает с инвентарником введенным юзером
+        if len(check_num_inv_printer) != 0:
+            # если строка/и с введенным пользователем инвентарником будут найдены сообщаем об этом пользователю
+            flash('Принтер с таким инвентарным номером уже существует!')
+            return redirect(request.referrer)
         location = request.form['location']
         learning_campus = request.form['learning_campus']
         cabinet = request.form['cabinet']
