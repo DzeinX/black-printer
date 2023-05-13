@@ -28,7 +28,7 @@
                     class="select"
                     required>
                 {% for printer in printers %}
-                    {% if printer.status == "Принят в ремонт" or printer.status == "Восстановлен" %}
+                    {% if printer.status == StatusSettings.Printer.accepted_for_repair %}
                         <option value="{{ printer.num_inventory }}">
                             {{ printer.num_inventory }}
                             <strong>||</strong>
@@ -81,7 +81,7 @@
                                     class="select"
                                     required>
                                 {% for printer in printers %}
-                                    {% if printer.status == "Принят в ремонт" or printer.status == "Восстановлен" %}
+                                    {% if printer.status == StatusSettings.Printer.accepted_for_repair %}
                                         <option value="{{ printer.num_inventory }}">
                                             {{ printer.num_inventory }}
                                             <strong>||</strong>
@@ -132,7 +132,7 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for printer in printers %}
-                {% if printer.status == "Принят в ремонт" or printer.status == "Восстановлен" %}
+                {% if printer.status == StatusSettings.Printer.accepted_for_repair %}
                     {% if (printer.efficiency != 0) %}
                         <tr>
                             <td class="1">

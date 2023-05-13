@@ -28,7 +28,7 @@
                     class="select"
                     required>
                 {% for cartridge in cartridges %}
-                    {% if cartridge.status == "Принят в заправку" or cartridge.status == "Восстановлен" %}
+                    {% if cartridge.status == StatusSettings.Cartridge.accepted_for_refuel %}
                         <option value="{{ cartridge.number }}">
                             {{ cartridge.number }}
                             <strong>||</strong>
@@ -83,7 +83,7 @@
                             class="select"
                             required>
                         {% for cartridge in cartridges %}
-                            {% if cartridge.status == "Принят в заправку" or cartridge.status == "Восстановлен" %}
+                            {% if cartridge.status == StatusSettings.Cartridge.accepted_for_refuel %}
                                 <option value="{{ cartridge.number }}">
                                     {{ cartridge.number }}
                                     <strong>||</strong>
@@ -136,9 +136,19 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for cartridge in cartridges %}
-                {% if cartridge.status == "Принят в заправку" or cartridge.status == "Восстановлен" %}
+                {% if cartridge.status == StatusSettings.Cartridge.accepted_for_refuel %}
+                    {% set color = namespace(value='') %}
+                    {% if cartridge.refills >= 4 %}
+                        {% set color.value = '#ff7675' %}
+                    {% else %}
+                        {% if cartridge.refills <= 1 %}
+                            {% set color.value = '#05c46b' %}
+                        {% else %}
+                            {% set color.value = '#f6b93b' %}
+                        {% endif %}
+                    {% endif %}
                     {% if (cartridge.efficiency != 0) %}
-                        <tr>
+                        <tr style="color: {{ color.value }}">
                             <td class="1">
                                 {{ counter.value }}
                                 <label>

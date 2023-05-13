@@ -87,6 +87,7 @@ class Cartridges(db.Model):
     date_added = db.Column(db.DateTime, nullable=False)
     efficiency = db.Column(db.Boolean, nullable=False, default=True)
     work_done = db.Column(db.Boolean, nullable=False, default=True)
+    refills = db.Column(db.Integer, default=0)
 
     all_history_id = db.relationship("AllHistory")
     cartridge_models = db.relationship("ListModels", secondary=association_table_1)

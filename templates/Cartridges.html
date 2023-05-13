@@ -119,28 +119,24 @@
                     <td class="ctr" style="border: none">
                         <div class="radios">
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В резерве'] }}">
-                                <label>{{ StatusSettings.CARTRIDGE['В резерве'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.in_reserve }}">
+                                <label>{{ StatusSettings.Cartridge.in_reserve }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Принят в заправку'] }}">
-                                <label>{{ StatusSettings.CARTRIDGE['Принят в заправку'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.accepted_for_refuel }}">
+                                <label>{{ StatusSettings.Cartridge.accepted_for_refuel }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В заправке'] }}">
-                                <label>{{ StatusSettings.CARTRIDGE['В заправке'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.in_refueling }}">
+                                <label>{{ StatusSettings.Cartridge.in_refueling }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В подразделении'] }}">
-                                <label>{{ StatusSettings.CARTRIDGE['В подразделении'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.in_division }}">
+                                <label>{{ StatusSettings.Cartridge.in_division }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Восстановлен'] }}">
-                                <label>{{ StatusSettings.CARTRIDGE['Восстановлен'] }}</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Создан'] }}">
-                                <label>{{ StatusSettings.CARTRIDGE['Создан'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.restored }}">
+                                <label>{{ StatusSettings.Cartridge.restored }}</label>
                             </span>
                         </div>
                     </td>
@@ -179,8 +175,18 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for cartridge, location in cartridges_and_location %}
+                {% set color = namespace(value='') %}
+                {% if cartridge.refills >= 4 %}
+                    {% set color.value = '#ff7675' %}
+                {% else %}
+                    {% if cartridge.refills <= 1 %}
+                        {% set color.value = '#05c46b' %}
+                    {% else %}
+                        {% set color.value = '#f6b93b' %}
+                    {% endif %}
+                {% endif %}
                 {% if (cartridge.efficiency != 0) %}
-                    <tr>
+                    <tr style="color: {{ color.value }}">
                         <td class="1">
                             {{ counter.value }}
                         </td>
@@ -196,15 +202,23 @@
                             {{ cartridge.status }}
                         </td>
                         <td class="5">
-                            {% if location|length != 0 %}
-                                {% set cartridge_issuance = location[-1] %}
-                                {% set printer = Printer.query.filter(Printer.id == cartridge_issuance.printer_id).first() %}
-                                Подразделение: {{ cartridge_issuance.location }}<br>
-                                Корпус: {{ cartridge_issuance.learning_campus }}<br>
-                                Кабинет: {{ cartridge_issuance.cabinet }}<br>
-                                Номер принтера: {{ printer.num_inventory }}<br>
+                            {% if cartridge.status == StatusSettings.Cartridge.accepted_for_refuel  or cartridge.status == StatusSettings.Cartridge.in_reserve %}
+                                     У нас в подразделении
                             {% else %}
-                                Ещё не был в подразделении
+                                {% if cartridge.status == StatusSettings.Cartridge.in_refueling %}
+                                    В заправке
+                                {% else %}
+                                    {% if cartridge.status == StatusSettings.Cartridge.in_division %}
+                                        {% set cartridge_issuance = location[-1] %}
+                                        {% set printer = Printer.query.filter(Printer.id == cartridge_issuance.printer_id).first() %}
+                                        Подразделение: {{ cartridge_issuance.location }}<br>
+                                        Корпус: {{ cartridge_issuance.learning_campus }}<br>
+                                        Кабинет: {{ cartridge_issuance.cabinet }}<br>
+                                        Номер принтера: {{ printer.num_inventory }}<br>
+                                    {% else %}
+                                        Ещё не был в подразделении
+                                    {% endif %}
+                                {% endif %}
                             {% endif %}
                         </td>
                         <td class="6">

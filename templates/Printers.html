@@ -107,28 +107,24 @@
                     <td class="ctr" style="border: none">
                         <div class="radios">
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Получен из ремонта'] }}">
-                                <label>{{ StatusSettings.PRINTER['Получен из ремонта'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.in_reserve }}">
+                                <label>{{ StatusSettings.Printer.in_reserve }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Принят в ремонт'] }}">
-                                <label>{{ StatusSettings.PRINTER['Принят в ремонт'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.accepted_for_repair }}">
+                                <label>{{ StatusSettings.Printer.accepted_for_repair }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['В ремонте'] }}">
-                                <label>{{ StatusSettings.PRINTER['В ремонте'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.in_repair }}">
+                                <label>{{ StatusSettings.Printer.in_repair }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['В подразделении'] }}">
-                                <label>{{ StatusSettings.PRINTER['В подразделении'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.in_division }}">
+                                <label>{{ StatusSettings.Printer.in_division }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Восстановлен'] }}">
-                                <label>{{ StatusSettings.PRINTER['Восстановлен'] }}</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Создан'] }}">
-                                <label>{{ StatusSettings.PRINTER['Создан'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.restored }}">
+                                <label>{{ StatusSettings.Printer.restored }}</label>
                             </span>
                         </div>
                     </td>
@@ -181,9 +177,21 @@
                             {{ printer.status }}
                         </td>
                         <td class="5">
-                            Подразделение: {{ printer.location_now }}<br>
-                            Корпус: {{ printer.learning_campus_now }}<br>
-                            Кабинет: {{ printer.cabinet_now }}<br>
+                            {% if printer.status == StatusSettings.Printer.accepted_for_repair  or printer.status == StatusSettings.Printer.in_reserve %}
+                                У нас в подразделении
+                            {% else %}
+                                {% if printer.status == StatusSettings.Printer.in_repair %}
+                                    В ремонте
+                                {% else %}
+                                    {% if printer.status == StatusSettings.Printer.in_division %}
+                                        Подразделение: {{ printer.location_now }}<br>
+                                        Корпус: {{ printer.learning_campus_now }}<br>
+                                        Кабинет: {{ printer.cabinet_now }}<br>
+                                    {% else %}
+                                        Ещё не был в подразделении
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
                         </td>
                         <td class="6">
                             <a href="/printer/{{ printer.id }}/update">Изменить</a>

@@ -20,13 +20,13 @@
             td.setAttribute('style', 'border: none; vertical-align: top')
             td.innerHTML = `
                 <select type="number"
-                    name="num_inventory"
+                    name="cartridge_number"
                     id="${items}"
                     class="select"
                     required>
                 {% for cartridge in cartridges %}
 
-                {% if cartridge.status == "В подразделении" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
+                {% if cartridge.status == StatusSettings.Cartridge.in_division %}
                         <option value="{{ cartridge.number }}">
                             {{ cartridge.number }}
                             <strong>||</strong>
@@ -112,8 +112,7 @@
                                     class="select"
                                     required>
                                 {% for cartridge in cartridges %}
-                                    {% if cartridge.status == "В подразделении" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
-                                        <!-- 'В резерве' вынести в отдельную форму приёма в ремонт -->
+                                    {% if cartridge.status == StatusSettings.Cartridge.in_division %}
                                         <option value="{{ cartridge.number }}">
                                             {{ cartridge.number }}
                                             <strong>||</strong>
@@ -167,10 +166,24 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for cartridge in cartridges %}
-                {% if cartridge.status == "В подразделении" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
+                {% set color = namespace(value='') %}
+                {% if cartridge.refills >= 4 %}
+                    {% set color.value = '#ff7675' %}
+                {% else %}
+                    {% if cartridge.refills <= 1 %}
+                        {% set color.value = '#05c46b' %}
+                    {% else %}
+                        {% set color.value = '#f6b93b' %}
+                    {% endif %}
+                {% endif %}
+                {% if CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()|length != 0 %}
+                {% set cartridge_issuance = CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()[-1] %}
+                {% set printer = Printer.query.filter(Printer.id == cartridge_issuance.printer_id).first() %}
+                {% if cartridge.status == StatusSettings.Cartridge.in_division %}
                     {% if (cartridge.efficiency != 0) and
-                        CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()|length > 0 %}
-                        <tr>
+                        CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()|length > 0 and
+                            printer != None %}
+                        <tr style="color: {{ color.value }}">
                             <td class="1">
                                 {{ counter.value }}
                                 <label>
@@ -187,11 +200,10 @@
                                 {% endfor %}
                             </td>
                             <td class="4">
-                                {% set cartridge_issuance = CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()[-1] %}
                                 Подразделение: {{ cartridge_issuance.location }}<br>
                                 Корпус: {{ cartridge_issuance.learning_campus }}<br>
                                 Кабинет: {{ cartridge_issuance.cabinet }}<br>
-                                Номер принтера: {{ cartridge_issuance.printer_id }}<br>
+                                Номер принтера: {{ printer.num_inventory }}<br>
                                 <input type="hidden"
                                        name="location{{ cartridge.number }}"
                                        value="{{ cartridge_issuance.location }}">
@@ -204,10 +216,14 @@
                                 <input type="hidden"
                                        name="user"
                                        value="{{ current_user.username }}">
+                                <input type="hidden"
+                                       name="printer_id{{ cartridge.number }}"
+                                       value="{{ printer.id }}">
                             </td>
                         </tr>
                         {% set counter.value = counter.value + 1 %}
                     {% endif %}
+                {% endif %}
                 {% endif %}
             {% endfor %}
             </tbody>
