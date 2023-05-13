@@ -166,13 +166,14 @@ def update_cartridge(id):
         try:
             action_history = StatusSettings.Cartridge.updated
             type_history = StatusSettings.Types.cartridge
-            name_history = f"{cartridge.number}"
+            name_history = cartridge.number
             user = request.form['user']
             ah = AllHistory(action=action_history,
                             type=type_history,
                             name=name_history,
                             user=user,
-                            date=datetime.now())
+                            date=datetime.now(),
+                            cartridge_id=cartridge.id)
             cartridge.all_history_id.append(ah)
             db.session.add(ah)
         except:
@@ -213,13 +214,12 @@ def cartridges():
     cartridges_and_location = []
     for cartridge in cartridges:
         cartridges_and_location.append(
-            [cartridge, AllHistory.query.filter(
-                AllHistory.cartridge_id == cartridge.id, AllHistory.action == StatusSettings.Cartridge.in_refueling).all()])
+            [cartridge, AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).all()])
 
     if request.method == 'POST':
         # TODO: Здесь нужно сделать, чтобы переменная action брала значение из формы из Cartridges.html (id карточки
         #  kaiten: 10287681)
-        action = StatusSettings.Cartridge.in_reserve
+        status = StatusSettings.Cartridge.in_reserve
         number = request.form['number']
         cartridge_models = request.form.getlist('model')
 
@@ -241,8 +241,8 @@ def cartridges():
         if Cartridges.query.filter(Cartridges.number == number).first():
             flash('Такой номер уже есть')
             return redirect(request.referrer)
-
-        cartridge = Cartridges(status=action,
+        # TODO: status для картриджа не нужен, нужно подумать как его убрать без потери данных
+        cartridge = Cartridges(status=status,
                                number=number,
                                date_added=datetime.now())
 
@@ -255,13 +255,14 @@ def cartridges():
             type_history = StatusSettings.Types.cartridge
             name_history = f"{number}"
             user = request.form['user']
-            ah = AllHistory(action=action_history,
-                            type=type_history,
-                            name=name_history,
-                            user=user,
-                            date=datetime.now())
-            cartridge.all_history_id.append(ah)
-            db.session.add(ah)
+            all_history = AllHistory(action=action_history,
+                                     type=type_history,
+                                     name=name_history,
+                                     user=user,
+                                     date=datetime.now(),
+                                     status=status)
+            cartridge.all_history_id.append(all_history)
+            db.session.add(all_history)
         except:
             flash('При создании статуса произошла ошибка')
             return render_template("main.html")
@@ -278,7 +279,6 @@ def cartridges():
         return render_template("Cartridges.html",
                                cartridges_and_location=cartridges_and_location,
                                list_models=list_models,
-                               CartridgeIssuance=CartridgeIssuance,
                                Printer=Printer,
                                StatusSettings=StatusSettings,
                                number_cartridge=number_cartridge)
@@ -294,13 +294,14 @@ def delete_cartridge(id):
             type_history = StatusSettings.Types.cartridge
             name_history = f"{cartridge.number}"
             user = current_user.username
-            ah = AllHistory(action=action_history,
-                            type=type_history,
-                            name=name_history,
-                            user=user,
-                            date=datetime.now())
-            cartridge.all_history_id.append(ah)
-            db.session.add(ah)
+            all_history = AllHistory(action=action_history,
+                                     type=type_history,
+                                     name=name_history,
+                                     user=user,
+                                     date=datetime.now(),
+                                     status=StatusSettings.Cartridge.deleted)
+            cartridge.all_history_id.append(all_history)
+            db.session.add(all_history)
         except:
             flash('При создании статуса произошла ошибка')
             return render_template("main.html")
@@ -325,13 +326,14 @@ def resume_cartridge(id):
             type_history = StatusSettings.Types.cartridge
             name_history = f"{cartridge.number}"
             user = current_user.username
-            ah = AllHistory(action=action_history,
-                            type=type_history,
-                            name=name_history,
-                            user=user,
-                            date=datetime.now())
-            cartridge.all_history_id.append(ah)
-            db.session.add(ah)
+            all_history = AllHistory(action=action_history,
+                                     type=type_history,
+                                     name=name_history,
+                                     user=user,
+                                     date=datetime.now(),
+                                     status=StatusSettings.Cartridge.in_reserve)
+            cartridge.all_history_id.append(all_history)
+            db.session.add(all_history)
         except:
             flash('При создании статуса произошла ошибка')
             return render_template("main.html")
@@ -380,33 +382,28 @@ def brought_a_cartridge():
                 printer = Printer.query.filter(Printer.id == printer).first()
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
 
-                brought_a_cartridge = BroughtACartridge(location=location,
-                                                        learning_campus=learning_campus,
-                                                        cabinet=cabinet,
-                                                        user=user,
-                                                        date=datetime.now())
-
-                cartridge.status = StatusSettings.Cartridge.accepted_for_refuel
-                printer.cartridge_brought_id.append(brought_a_cartridge)
-
+                action_status_history = StatusSettings.Cartridge.accepted_for_refuel
+                type_history = StatusSettings.Types.cartridge
+                name_history = number
                 try:
-                    action_history = StatusSettings.Cartridge.accepted_for_refuel
-                    type_history = StatusSettings.Types.cartridge
-                    name_history = f"{cartridge.number}"
-                    ah = AllHistory(action=action_history,
-                                    type=type_history,
-                                    name=name_history,
-                                    user=user,
-                                    date=datetime.now())
-                    cartridge.all_history_id.append(ah)
-                    db.session.add(ah)
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             cartridge_id=cartridge.id,
+                                             printer_id=printer.id,
+                                             location=location,
+                                             learning_campus=learning_campus,
+                                             cabinet=cabinet)
+
+                    cartridge.status = StatusSettings.Cartridge.accepted_for_refuel
+
+                    db.session.add(all_history)
                 except:
-                    flash('При создании статуса произошла ошибка')
+                    flash(f'При создании статуса у {number} произошла ошибка')
                     return render_template("main.html")
-
-                cartridge.brought_a_cartridge_id.append(brought_a_cartridge)
-
-                db.session.add(brought_a_cartridge)
         else:
             location = request.form['location']
             learning_campus = request.form['learning_campus']
@@ -414,6 +411,8 @@ def brought_a_cartridge():
             user = request.form['user']
             printer = request.form['printer_id']
             printer = Printer.query.filter(Printer.id == printer).first()
+            action_status_history = StatusSettings.Cartridge.accepted_for_refuel
+            type_history = StatusSettings.Types.cartridge
 
             var_check = TypeVar(location, learning_campus, cabinet, var_type='str')
             if var_check[1]:
@@ -430,36 +429,28 @@ def brought_a_cartridge():
 
             for number in cartridge_number:
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
-
-                brought_a_cartridge = BroughtACartridge(location=location,
-                                                        learning_campus=learning_campus,
-                                                        cabinet=cabinet,
-                                                        user=user,
-                                                        printer_id=printer,
-                                                        date=datetime.now())
-
-                cartridge.status = StatusSettings.Cartridge.accepted_for_refuel
-                printer.cartridge_brought_id.append(brought_a_cartridge)
+                name_history = number
 
                 try:
-                    action_history = StatusSettings.Cartridge.accepted_for_refuel
-                    type_history = StatusSettings.Types.cartridge
-                    name_history = f"{cartridge.number}"
-                    ah = AllHistory(action=action_history,
-                                    type=type_history,
-                                    name=name_history,
-                                    user=user,
-                                    date=datetime.now())
-                    cartridge.all_history_id.append(ah)
-                    db.session.add(ah)
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             cartridge_id=cartridge.id,
+                                             printer_id=printer.id,
+                                             location=location,
+                                             learning_campus=learning_campus,
+                                             cabinet=cabinet)
+
+                    cartridge.status = StatusSettings.Cartridge.accepted_for_refuel
+                    printer.cartridge_brought_id.append(all_history)
+
+                    db.session.add(brought_a_cartridge)
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
-
-                cartridge.brought_a_cartridge_id.append(brought_a_cartridge)
-                printer.cartridge_brought_id.append(brought_a_cartridge)
-
-                db.session.add(brought_a_cartridge)
 
         try:
             db.session.commit()
@@ -472,7 +463,7 @@ def brought_a_cartridge():
                                cartridges=cartridges,
                                Printer=Printer,
                                printers=printers,
-                               CartridgeIssuance=CartridgeIssuance,
+                               AllHistory=AllHistory,
                                buildings=buildings,
                                divisions=divisions,
                                StatusSettings=StatusSettings)
@@ -507,16 +498,18 @@ def refueling():
                 cartridge.status = StatusSettings.Cartridge.in_refueling
 
                 try:
-                    action_history = StatusSettings.Cartridge.in_refueling
+                    action_status_history = StatusSettings.Cartridge.in_refueling
                     type_history = StatusSettings.Types.cartridge
-                    name_history = f"{cartridge.number}"
-                    ah = AllHistory(action=action_history,
-                                    type=type_history,
-                                    name=name_history,
-                                    user=user,
-                                    date=datetime.now())
-                    cartridge.all_history_id.append(ah)
-                    db.session.add(ah)
+                    name_history = cartridge.number
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             cartridge_id=cartridge.id)
+                    cartridge.all_history_id.append(all_history)
+                    db.session.add(all_history)
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
@@ -534,16 +527,18 @@ def refueling():
                 cartridge.status = StatusSettings.Cartridge.in_refueling
 
                 try:
-                    action_history = StatusSettings.Cartridge.in_refueling
+                    action_status_history = StatusSettings.Cartridge.in_refueling
                     type_history = StatusSettings.Types.cartridge
                     name_history = f"{cartridge.number}"
-                    ah = AllHistory(action=action_history,
-                                    type=type_history,
-                                    name=name_history,
-                                    user=user,
-                                    date=datetime.now())
-                    cartridge.all_history_id.append(ah)
-                    db.session.add(ah)
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             cartridge_id=cartridge.id)
+                    cartridge.all_history_id.append(all_history)
+                    db.session.add(all_history)
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
@@ -587,16 +582,18 @@ def receptionFromARefuelling():
                 cartridge.status = StatusSettings.Cartridge.in_reserve
 
                 try:
-                    action_history = StatusSettings.Cartridge.in_reserve
+                    action_status_history = StatusSettings.Cartridge.in_reserve
                     type_history = StatusSettings.Types.cartridge
                     name_history = f"{cartridge.number}"
-                    ah = AllHistory(action=action_history,
-                                    type=type_history,
-                                    name=name_history,
-                                    user=user,
-                                    date=datetime.now())
-                    cartridge.all_history_id.append(ah)
-                    db.session.add(ah)
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             cartridge_id=cartridge.id)
+                    cartridge.all_history_id.append(all_history)
+                    db.session.add(all_history)
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
@@ -617,16 +614,18 @@ def receptionFromARefuelling():
                 cartridge.status = StatusSettings.Cartridge.in_reserve
 
                 try:
-                    action_history = StatusSettings.Cartridge.in_reserve
+                    action_status_history = StatusSettings.Cartridge.in_reserve
                     type_history = StatusSettings.Types.cartridge
                     name_history = f"{cartridge.number}"
-                    ah = AllHistory(action=action_history,
-                                    type=type_history,
-                                    name=name_history,
-                                    user=user,
-                                    date=datetime.now())
-                    cartridge.all_history_id.append(ah)
-                    db.session.add(ah)
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             cartridge_id=cartridge.id)
+                    cartridge.all_history_id.append(all_history)
+                    db.session.add(all_history)
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
@@ -675,33 +674,31 @@ def issuance_cartridges():
                 printer = request.form[f'printer{number}']
                 printer = Printer.query.filter(Printer.id == int(printer)).first()
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
-                issuance = CartridgeIssuance(user=user,
-                                             location=location,
-                                             learning_campus=learning_campus,
-                                             cabinet=cabinet,
-                                             date=datetime.now())
 
-                cartridge.status = StatusSettings.Cartridge.in_division
+                action_status_history = StatusSettings.Cartridge.in_division
+                type_history = StatusSettings.Types.cartridge
+                name_history = number
 
                 try:
-                    action_history = StatusSettings.Cartridge.in_division
-                    type_history = StatusSettings.Types.cartridge
-                    name_history = f"{cartridge.number}"
-                    ah = AllHistory(action=action_history,
-                                    type=type_history,
-                                    name=name_history,
-                                    user=user,
-                                    date=datetime.now())
-                    cartridge.all_history_id.append(ah)
-                    db.session.add(ah)
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             cartridge_id=cartridge.id,
+                                             printer_id=printer.id,
+                                             location=location,
+                                             learning_campus=learning_campus,
+                                             cabinet=cabinet)
+
+                    cartridge.status = StatusSettings.Cartridge.in_division
+
+                    db.session.add(all_history)
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
 
-                cartridge.issuance_id.append(issuance)
-
-                printer.cartridge_issuance_id.append(issuance)
-                db.session.add(issuance)
         else:
             user = request.form['user']
             location = request.form['location']
@@ -709,6 +706,8 @@ def issuance_cartridges():
             cabinet = request.form['cabinet']
             printer = request.form['printer_id']
             printer = Printer.query.filter(Printer.id == int(printer)).first()
+            action_status_history = StatusSettings.Cartridge.in_division
+            type_history = StatusSettings.Types.cartridge
 
             var_check = TypeVar(location, learning_campus, cabinet, var_type='str')
             if var_check[1]:
@@ -725,34 +724,26 @@ def issuance_cartridges():
 
             for number in cartridge_number:
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
-
-                issuance = CartridgeIssuance(user=user,
+                name_history = number
+                try:
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             cartridge_id=cartridge.id,
+                                             printer_id=printer.id,
                                              location=location,
                                              learning_campus=learning_campus,
-                                             cabinet=cabinet,
-                                             date=datetime.now())
+                                             cabinet=cabinet)
 
-                cartridge.status = StatusSettings.Cartridge.in_division
+                    cartridge.status = StatusSettings.Cartridge.in_division
 
-                try:
-                    action_history = StatusSettings.Cartridge.in_division
-                    type_history = StatusSettings.Types.cartridge
-                    name_history = f"{cartridge.number}"
-                    ah = AllHistory(action=action_history,
-                                    type=type_history,
-                                    name=name_history,
-                                    user=user,
-                                    date=datetime.now())
-                    cartridge.all_history_id.append(ah)
-                    db.session.add(ah)
+                    db.session.add(all_history)
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
-
-                cartridge.issuance_id.append(issuance)
-                printer.cartridge_issuance_id.append(issuance)
-
-                db.session.add(issuance)
 
         try:
             db.session.commit()
@@ -763,9 +754,9 @@ def issuance_cartridges():
     else:
         return render_template('IssuanceCartridges.html',
                                cartridges=cartridges,
-                               BroughtACartridge=BroughtACartridge,
                                Printer=Printer,
                                printers=printers,
                                buildings=buildings,
+                               AllHistory=AllHistory,
                                divisions=divisions,
                                StatusSettings=StatusSettings)

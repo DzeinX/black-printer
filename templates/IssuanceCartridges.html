@@ -178,10 +178,13 @@
                     {% endif %}
                 {% endif %}
                 {% if cartridge.status == StatusSettings.Cartridge.in_reserve %}
-                    {% if BroughtACartridge.query.filter(BroughtACartridge.cartridge_number_id == cartridge.id).all()|length > 0 %}
-                        {% set brought_a_cartridge = BroughtACartridge.query.filter(BroughtACartridge.cartridge_number_id == cartridge.id).all()[-1] %}
-                        {% set printer = Printer.query.filter(Printer.id == brought_a_cartridge.printer_id).first() %}
+                    {% if AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).all()|length != 0 %}
+                        {% set all_history = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).all()[-1] %}
+                        {% set printer = Printer.query.filter(Printer.id == all_history.printer_id).first() %}
                         {% if (cartridge.efficiency != 0) and
+                                all_history.location != None and
+                                all_history.learning_campus != None and
+                                all_history.cabinet != None and
                                 printer != None%}
                             <tr style="color: {{ color.value }}">
                                 <td class="1">
