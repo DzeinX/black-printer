@@ -186,7 +186,7 @@ def printers():
             db.session.add(ah)
         except:
             flash('При создании статуса произошла ошибка')
-            return render_template("main.html")
+            return redirect(request.referrer)
 
         try:
             db.session.add(printer)
@@ -194,7 +194,7 @@ def printers():
             return redirect('/printers')
         except:
             flash('При добавлении принтера произошла ошибка')
-            return render_template("main.html")
+            return redirect(request.referrer)
 
     return render_template("Printers.html",
                            printers=printers,
