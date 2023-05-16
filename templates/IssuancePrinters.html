@@ -70,7 +70,8 @@
                                     class="select"
                                     required>
                                 {% for printer in printers %}
-                                    {% if printer.status == "Получен из ремонта" or printer.status == "Восстановлен" %}
+                                    {% if printer.status == "Получен из ремонта" or printer.status == "Восстановлен"
+                                            or printer.status == "Создан"%}
                                         <option value="{{ printer.num_inventory }}">
                                             {{ printer.num_inventory }}
                                             <strong>||</strong>
