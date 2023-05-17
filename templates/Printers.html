@@ -162,6 +162,7 @@
             </thead>
             <tbody>
             {% for printer in printers %}
+                {% set status = AllHistory.query.filter(AllHistory.printer_id == printer.id).order_by(AllHistory.id.desc()).all()[0].status %}
                 {% if (printer.efficiency != 0) %}
                     <tr>
                         <td class="1">
@@ -174,17 +175,17 @@
                             {{ printer.num_inventory }}
                         </td>
                         <td class="4">
-                            {{ printer.status }}
+                            {{ status }}
                         </td>
                         <td class="5">
-                            {% if printer.status == StatusSettings.Printer.accepted_for_repair or
-                                  printer.status == StatusSettings.Printer.in_reserve %}
+                            {% if status == StatusSettings.Printer.accepted_for_repair or
+                                  status == StatusSettings.Printer.in_reserve %}
                                 У нас в подразделении
                             {% else %}
-                                {% if printer.status == StatusSettings.Printer.in_repair %}
+                                {% if status == StatusSettings.Printer.in_repair %}
                                     В ремонте
                                 {% else %}
-                                    {% if printer.status == StatusSettings.Printer.in_division %}
+                                    {% if status == StatusSettings.Printer.in_division %}
                                         Подразделение: {{ printer.location_now }}<br>
                                         Корпус: {{ printer.learning_campus_now }}<br>
                                         Кабинет: {{ printer.cabinet_now }}<br>

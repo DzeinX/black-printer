@@ -26,7 +26,7 @@
                     required>
                 {% for cartridge in cartridges %}
 
-                {% if cartridge.status == StatusSettings.Cartridge.in_division %}
+                {% if AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[0].status == StatusSettings.Cartridge.in_division %}
                         <option value="{{ cartridge.number }}">
                             {{ cartridge.number }}
                             <strong>||</strong>
@@ -112,7 +112,8 @@
                                     class="select"
                                     required>
                                 {% for cartridge in cartridges %}
-                                    {% if cartridge.status == StatusSettings.Cartridge.in_division %}
+                                    {% set status = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[0].status %}
+                                    {% if status == StatusSettings.Cartridge.in_division %}
                                         <option value="{{ cartridge.number }}">
                                             {{ cartridge.number }}
                                             <strong>||</strong>
@@ -166,6 +167,7 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for cartridge in cartridges %}
+                {% set status = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[0].status %}
                 {% set color = namespace(value='') %}
                 {% if cartridge.refills >= 4 %}
                     {% set color.value = '#ff7675' %}
@@ -177,7 +179,7 @@
                     {% endif %}
                 {% endif %}
 
-                {% if cartridge.status == StatusSettings.Cartridge.in_division %}
+                {% if status == StatusSettings.Cartridge.in_division %}
                     {% if AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).all()|length != 0 %}
                         {% set all_history = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).all()[-1] %}
                         {% set printer = Printer.query.filter(Printer.id == all_history.printer_id).first() %}

@@ -59,7 +59,6 @@ class Printer(db.Model):
     name = db.Column(db.String(50), nullable=False)
     num_inventory = db.Column(db.String(50), nullable=False, unique=True)
     date_added = db.Column(db.DateTime, nullable=False)
-    status = db.Column(db.String(35), nullable=False)
     location_now = db.Column(db.String(50), nullable=False)
     learning_campus_now = db.Column(db.String(25), nullable=False)
     cabinet_now = db.Column(db.String(10), nullable=False)
@@ -79,7 +78,6 @@ class Cartridges(db.Model):
     __tablename__ = "cartridges"
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.Integer, unique=True)
-    status = db.Column(db.String(35), nullable=False)
     date_added = db.Column(db.DateTime, nullable=False)
     efficiency = db.Column(db.Boolean, nullable=False, default=True)
     work_done = db.Column(db.Boolean, nullable=False, default=True)

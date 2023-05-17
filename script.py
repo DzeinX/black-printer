@@ -1,14 +1,6 @@
 import sqlite3 as sq
 
 
-def add_column_bd():
-    # Создание столбцов в таблице AllHistory
-    # cursor.execute('ALTER TABLE AllHistory ADD COLUMN location VARCHAR(15)')
-    # cursor.execute('ALTER TABLE AllHistory ADD COLUMN learning_campus VARCHAR(35)')
-    # cursor.execute('ALTER TABLE AllHistory ADD COLUMN cabinet VARCHAR(15)')
-    pass
-
-
 def check_table_allhistory_for_broughtacartridge(i):
     # Ищем дату и ID для сравнения строк из таблицы allhistory (данные для BroughtACartridge)
 
@@ -164,7 +156,7 @@ def main_func():
     # Подключение к БД
     base = sq.connect('printersDB.db')
     cursor = base.cursor()
-    add_column_bd()
+
     # работа с broughtcartridge
     max_number = cursor.execute('SELECT max(id) FROM BroughtACartridge').fetchone()[0]
     new_str = 0
@@ -248,3 +240,69 @@ def main_func():
           f'Новые строки: {new_str}\n'
           f'Отредаченные строки {correct_str}\n'
           f'Всего: {new_str + correct_str}\n')
+
+    max_number = cursor.execute('SELECT max(id) FROM AllHistory').fetchone()[0]
+    for id_bd in range(1, max_number + 1):
+        user = cursor.execute('SELECT user FROM AllHistory WHERE id = ?', (id_bd, )).fetchone()[0]
+        if "@" in user:
+            print('Было - ', user)
+            user = user.split('@')[0]
+            cursor.execute(f"UPDATE AllHistory SET user = ? WHERE id = ?", (user, id_bd))
+            print(f'Стало {id_bd} - ', user, '\n')
+        type_machine = cursor.execute('SELECT type FROM AllHistory WHERE id = ?', (id_bd, )).fetchone()[0]
+        if type_machine == "принтер":
+            cursor.execute(f"UPDATE AllHistory SET type = ? WHERE id = ?", ("Принтер", id_bd))
+        if type_machine == "картридж":
+            cursor.execute(f"UPDATE AllHistory SET type = ? WHERE id = ?", ("Картридж", id_bd))
+
+    base.commit()
+
+    for id_db_allhistory in range(1, max_number + 1):
+        action = cursor.execute('SELECT action FROM AllHistory WHERE id = ?', (id_db_allhistory,)).fetchone()[0]
+        if action == "Создан" or action == "Восстановлен":
+            cursor.execute(f'UPDATE AllHistory SET status = ? WHERE id = ?', ('В резерве', id_db_allhistory))
+        elif action == "Изменён":
+            type_machine = cursor.execute('SELECT type FROM AllHistory WHERE id = ?', (id_db_allhistory,)).fetchone()[0]
+            if type_machine == "Картридж":
+                cartridge_id = cursor.execute('SELECT cartridge_id FROM AllHistory WHERE id = ?', (id_db_allhistory,)).fetchone()[0]
+                max_cartridge_id = cursor.execute('SELECT id  FROM AllHistory WHERE cartridge_id = ?', (cartridge_id,)).fetchall()
+                if id_db_allhistory == max_cartridge_id[-1][0]:
+                    if len(max_cartridge_id) == 2:
+                        action = cursor.execute('SELECT action  FROM AllHistory WHERE cartridge_id = ? AND id = ?', (cartridge_id, max_cartridge_id[0][0])).fetchone()[0]
+                        if action == "Создан" or action == "Восстановлен":
+                            cursor.execute(f'UPDATE AllHistory SET status = ? WHERE id = ?',
+                                           ('В резерве', max_cartridge_id[0][0]))
+                            cursor.execute(f'UPDATE AllHistory SET status = ? WHERE id = ?',
+                                           ('В резерве', max_cartridge_id[-1][0]))
+                        elif action == "Изменён":
+                            print(f"***\nНужно проверить\n"
+                                  f"id_db_allhistory = {id_db_allhistory}")
+                        else:
+                            cursor.execute(f'UPDATE AllHistory SET status = ? WHERE id = ?', (action, max_cartridge_id[0][0]))
+                    else:
+                        print(f"***\nНужно проверить\n"
+                              f"id_db_allhistory = {id_db_allhistory}")
+            elif type_machine == "Принтер":
+                printer_id = cursor.execute('SELECT printer_id FROM AllHistory WHERE id = ?', (id_db_allhistory,)).fetchone()[0]
+                max_printer_id = cursor.execute('SELECT id FROM AllHistory WHERE printer_id = ?', (printer_id,)).fetchall()
+                if id_db_allhistory == max_printer_id[-1][0]:
+                    if len(max_printer_id) == 2:
+                        action = cursor.execute('SELECT action  FROM AllHistory WHERE printer_id = ? AND id = ?', (printer_id, max_printer_id[0][0])).fetchone()[0]
+                        if action == "Создан" or action == "Восстановлен":
+                            cursor.execute(f'UPDATE AllHistory SET status = ? WHERE id = ?',
+                                           ('В резерве', max_printer_id[0][0]))
+                            cursor.execute(f'UPDATE AllHistory SET status = ? WHERE id = ?',
+                                           ('В резерве', max_printer_id[-1][0]))
+                        elif action == "Изменён":
+                            print(f"***\nНужно проверить\n"
+                                  f"id_db_allhistory = {id_db_allhistory}")
+                        else:
+                            cursor.execute(f'UPDATE AllHistory SET status = ? WHERE id = ?', (action, max_printer_id[0][0]))
+                    else:
+                        print(f"***\nНужно проверить\n"
+                              f"id_db_allhistory = {id_db_allhistory}")
+            else:
+                print(f'Статус не Принтер и не Картридж - id_allhistory{id_db_allhistory}')
+        else:
+            cursor.execute(f'UPDATE AllHistory SET status = ? WHERE id = ?', (action, id_db_allhistory))
+        base.commit()

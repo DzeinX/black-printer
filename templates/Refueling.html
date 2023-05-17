@@ -28,7 +28,8 @@
                     class="select"
                     required>
                 {% for cartridge in cartridges %}
-                    {% if cartridge.status == StatusSettings.Cartridge.accepted_for_refuel %}
+                {% set status = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[0].status %}
+                    {% if status == StatusSettings.Cartridge.accepted_for_refuel %}
                         <option value="{{ cartridge.number }}">
                             {{ cartridge.number }}
                             <strong>||</strong>
@@ -83,7 +84,8 @@
                             class="select"
                             required>
                         {% for cartridge in cartridges %}
-                            {% if cartridge.status == StatusSettings.Cartridge.accepted_for_refuel %}
+                            {% set status = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[0].status %}
+                            {% if status == StatusSettings.Cartridge.accepted_for_refuel %}
                                 <option value="{{ cartridge.number }}">
                                     {{ cartridge.number }}
                                     <strong>||</strong>
@@ -136,7 +138,8 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for cartridge in cartridges %}
-                {% if cartridge.status == StatusSettings.Cartridge.accepted_for_refuel %}
+                {% set status = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[0].status %}
+                {% if status == StatusSettings.Cartridge.accepted_for_refuel %}
                     {% set color = namespace(value='') %}
                     {% if cartridge.refills >= 4 %}
                         {% set color.value = '#ff7675' %}

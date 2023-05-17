@@ -217,9 +217,7 @@ def cartridges():
             [cartridge, AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).all()])
 
     if request.method == 'POST':
-        # TODO: Здесь нужно сделать, чтобы переменная action брала значение из формы из Cartridges.html (id карточки
-        #  kaiten: 10287681)
-        status = StatusSettings.Cartridge.in_reserve
+        status = request.form['status']
         number = request.form['number']
         cartridge_models = request.form.getlist('model')
 
@@ -241,9 +239,8 @@ def cartridges():
         if Cartridges.query.filter(Cartridges.number == number).first():
             flash('Такой номер уже есть')
             return redirect(request.referrer)
-        # TODO: status для картриджа не нужен, нужно подумать как его убрать без потери данных
-        cartridge = Cartridges(status=status,
-                               number=number,
+
+        cartridge = Cartridges(number=number,
                                date_added=datetime.now())
 
         for model in cartridge_models:
@@ -276,12 +273,23 @@ def cartridges():
             return render_template("main.html")
     else:
         number_cartridge = db.session.query(func.max(Cartridges.number))[0][0] + 1
+        # Выборка нужных статусов через метод __dict__
+        all_statuses = dict(StatusSettings.Cartridge.__dict__)
+        del all_statuses['__module__']
+        del all_statuses['__dict__']
+        del all_statuses['__weakref__']
+        del all_statuses['__doc__']
+        del all_statuses['restored']
+        del all_statuses['deleted']
+        del all_statuses['updated']
         return render_template("Cartridges.html",
                                cartridges_and_location=cartridges_and_location,
                                list_models=list_models,
                                Printer=Printer,
                                StatusSettings=StatusSettings,
-                               number_cartridge=number_cartridge)
+                               number_cartridge=number_cartridge,
+                               AllHistory=AllHistory,
+                               all_statuses=all_statuses)
 
 
 @cartridge_urls.route('/cartridge/<int:id>/delete')
@@ -307,7 +315,6 @@ def delete_cartridge(id):
             return render_template("main.html")
 
         cartridge.efficiency = 0
-        cartridge.status = StatusSettings.Cartridge.deleted
         db.session.add(cartridge)
         db.session.commit()
         return redirect('/cartridges')
@@ -322,6 +329,11 @@ def resume_cartridge(id):
     cartridge = Cartridges.query.get_or_404(id)
     try:
         try:
+            all_history = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[1]
+            status = all_history.status
+            location_history = all_history.location
+            learning_campus_history = all_history.learning_campus
+            cabinet_history = all_history.cabinet
             action_history = StatusSettings.Cartridge.restored
             type_history = StatusSettings.Types.cartridge
             name_history = f"{cartridge.number}"
@@ -331,7 +343,10 @@ def resume_cartridge(id):
                                      name=name_history,
                                      user=user,
                                      date=datetime.now(),
-                                     status=StatusSettings.Cartridge.in_reserve)
+                                     status=status,
+                                     location=location_history,
+                                     learning_campus=learning_campus_history,
+                                     cabinet=cabinet_history)
             cartridge.all_history_id.append(all_history)
             db.session.add(all_history)
         except:
@@ -339,7 +354,6 @@ def resume_cartridge(id):
             return render_template("main.html")
 
         cartridge.efficiency = 1
-        cartridge.status = StatusSettings.Cartridge.in_reserve
         db.session.add(cartridge)
         db.session.commit()
         return redirect(request.referrer)
@@ -398,8 +412,6 @@ def brought_a_cartridge():
                                              learning_campus=learning_campus,
                                              cabinet=cabinet)
 
-                    cartridge.status = StatusSettings.Cartridge.accepted_for_refuel
-
                     db.session.add(all_history)
                 except:
                     flash(f'При создании статуса у {number} произошла ошибка')
@@ -444,7 +456,6 @@ def brought_a_cartridge():
                                              learning_campus=learning_campus,
                                              cabinet=cabinet)
 
-                    cartridge.status = StatusSettings.Cartridge.accepted_for_refuel
                     printer.cartridge_brought_id.append(all_history)
 
                     db.session.add(brought_a_cartridge)
@@ -495,8 +506,6 @@ def refueling():
                 refueling = Refueling(user=user,
                                       date=datetime.now())
 
-                cartridge.status = StatusSettings.Cartridge.in_refueling
-
                 try:
                     action_status_history = StatusSettings.Cartridge.in_refueling
                     type_history = StatusSettings.Types.cartridge
@@ -523,8 +532,6 @@ def refueling():
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
                 refueling = Refueling(user=user,
                                       date=datetime.now())
-
-                cartridge.status = StatusSettings.Cartridge.in_refueling
 
                 try:
                     action_status_history = StatusSettings.Cartridge.in_refueling
@@ -556,7 +563,8 @@ def refueling():
     else:
         return render_template('Refueling.html',
                                cartridges=cartridges,
-                               StatusSettings=StatusSettings)
+                               StatusSettings=StatusSettings,
+                               AllHistory=AllHistory)
 
 
 @cartridge_urls.route('/reception_from_a_refuelling', methods=['GET', 'POST'])
@@ -578,8 +586,6 @@ def receptionFromARefuelling():
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
                 reception_from_a_refueling = ReceptionFromARefueling(user=user,
                                                                      date=datetime.now())
-
-                cartridge.status = StatusSettings.Cartridge.in_reserve
 
                 try:
                     action_status_history = StatusSettings.Cartridge.in_reserve
@@ -610,8 +616,6 @@ def receptionFromARefuelling():
                 cartridge = Cartridges.query.filter(Cartridges.number == number).first()
                 reception_from_a_refueling = ReceptionFromARefueling(user=user,
                                                                      date=datetime.now())
-
-                cartridge.status = StatusSettings.Cartridge.in_reserve
 
                 try:
                     action_status_history = StatusSettings.Cartridge.in_reserve
@@ -646,7 +650,8 @@ def receptionFromARefuelling():
     else:
         return render_template('ReceptionFromARefuelling.html',
                                cartridges=cartridges,
-                               StatusSettings=StatusSettings)
+                               StatusSettings=StatusSettings,
+                               AllHistory=AllHistory)
 
 
 @cartridge_urls.route('/issuance_cartridges', methods=['GET', 'POST'])
@@ -692,8 +697,6 @@ def issuance_cartridges():
                                              learning_campus=learning_campus,
                                              cabinet=cabinet)
 
-                    cartridge.status = StatusSettings.Cartridge.in_division
-
                     db.session.add(all_history)
                 except:
                     flash('При создании статуса произошла ошибка')
@@ -737,8 +740,6 @@ def issuance_cartridges():
                                              location=location,
                                              learning_campus=learning_campus,
                                              cabinet=cabinet)
-
-                    cartridge.status = StatusSettings.Cartridge.in_division
 
                     db.session.add(all_history)
                 except:

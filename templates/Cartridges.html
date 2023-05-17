@@ -54,7 +54,8 @@
                 <table style="border: none" id="table">
                     <colgroup>
                         <col span="1" style="width: 50%;">
-                        <col span="1" style="width: 50%;">
+                        <col span="1" style="width: 25%;">
+                        <col span="1" style="width: 25%;">
                     </colgroup>
                     <tbody>
                     <tr>
@@ -63,6 +64,9 @@
                         </td>
                         <td style="border: none">
                             <label for="number">Номер: </label>
+                        </td>
+                        <td style="border: none">
+                            <label for="number">Начальный статус: </label>
                         </td>
                     </tr>
                     <tr>
@@ -84,6 +88,13 @@
                                    class="enter"
                                    value="{{ number_cartridge }}"
                                    placeholder="Введите номер"><br>
+                        </td>
+                        <td style="border: none;  vertical-align: top">
+                            <select name="status">
+                                {% for _, status in all_statuses.items() %}
+                                    <option value="{{ status }}">{{ status }}</option>
+                                {% endfor %}
+                            </select>
                         </td>
                     </tr>
                     </tbody>
@@ -175,6 +186,7 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for cartridge, location in cartridges_and_location %}
+                {% set status = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[0].status %}
                 {% set color = namespace(value='') %}
                 {% if cartridge.refills >= 4 %}
                     {% set color.value = '#ff7675' %}
@@ -199,16 +211,16 @@
                             {% endfor %}
                         </td>
                         <td class="4">
-                            {{ cartridge.status }}
+                            {{ status }}
                         </td>
                         <td class="5">
-                            {% if cartridge.status == StatusSettings.Cartridge.accepted_for_refuel  or cartridge.status == StatusSettings.Cartridge.in_reserve %}
+                            {% if status == StatusSettings.Cartridge.accepted_for_refuel  or status == StatusSettings.Cartridge.in_reserve %}
                                      У нас в подразделении
                             {% else %}
-                                {% if cartridge.status == StatusSettings.Cartridge.in_refueling %}
+                                {% if status == StatusSettings.Cartridge.in_refueling %}
                                     В заправке
                                 {% else %}
-                                    {% if cartridge.status == StatusSettings.Cartridge.in_division %}
+                                    {% if status == StatusSettings.Cartridge.in_division %}
                                         {% set cartridge_issuance = location[-1] %}
                                         {% set printer = Printer.query.filter(Printer.id == cartridge_issuance.printer_id).first() %}
                                         Подразделение: {{ cartridge_issuance.location }}<br>

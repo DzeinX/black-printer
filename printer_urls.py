@@ -156,7 +156,6 @@ def printers():
                           location_now=location_now,
                           learning_campus_now=learning_campus_now,
                           cabinet_now=cabinet_now,
-                          status=status,
                           date_added=datetime.now())
 
         try:
@@ -188,7 +187,8 @@ def printers():
                            printers=printers,
                            buildings=buildings,
                            divisions=divisions,
-                           StatusSettings=StatusSettings)
+                           StatusSettings=StatusSettings,
+                           AllHistory=AllHistory)
 
 
 @printer_urls.route('/printer/<int:id>/statuses')
@@ -226,7 +226,6 @@ def delete_printer(id):
             return render_template("main.html")
 
         printer.efficiency = 0
-        printer.status = StatusSettings.Printer.deleted
         db.session.add(printer)
         db.session.commit()
         return redirect('/printers')
@@ -241,6 +240,11 @@ def resume_printer(id):
     printer = Printer.query.get_or_404(id)
     try:
         try:
+            all_history = AllHistory.query.filter(AllHistory.printer_id == printer.id).order_by(AllHistory.id.desc()).all()[1]
+            status = all_history.status
+            location_history = all_history.location
+            learning_campus_history = all_history.learning_campus
+            cabinet_history = all_history.cabinet
             action_history = StatusSettings.Printer.restored
             type_history = StatusSettings.Types.printer
             name_history = f"{printer.num_inventory}"
@@ -250,7 +254,10 @@ def resume_printer(id):
                                      name=name_history,
                                      user=user,
                                      date=datetime.now(),
-                                     status=StatusSettings.Cartridge.in_reserve)
+                                     status=status,
+                                     location=location_history,
+                                     learning_campus=learning_campus_history,
+                                     cabinet=cabinet_history)
             printer.all_history_id.append(all_history)
             db.session.add(all_history)
         except:
@@ -258,7 +265,6 @@ def resume_printer(id):
             return render_template("main.html")
 
         printer.efficiency = 1
-        printer.status = StatusSettings.Printer.in_reserve
         db.session.add(printer)
         db.session.commit()
         return redirect(request.referrer)
@@ -315,7 +321,6 @@ def brought_a_printer():
                                              learning_campus=learning_campus,
                                              cabinet=cabinet)
 
-                    printer.status = StatusSettings.Printer.accepted_for_repair
                     db.session.add(all_history)
 
                 except:
@@ -357,7 +362,6 @@ def brought_a_printer():
                                              learning_campus=learning_campus,
                                              cabinet=cabinet)
 
-                    printer.status = StatusSettings.Printer.accepted_for_repair
                     db.session.add(all_history)
 
                 except:
@@ -400,8 +404,6 @@ def repairing():
                 repair = Repair(user=user,
                                 date=datetime.now())
 
-                printer.status = StatusSettings.Printer.in_repair
-
                 try:
                     action_status_history = StatusSettings.Printer.in_repair
                     type_history = StatusSettings.Types.printer
@@ -428,8 +430,6 @@ def repairing():
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
                 repair = Repair(user=user,
                                 date=datetime.now())
-
-                printer.status = StatusSettings.Printer.in_repair
 
                 try:
                     action_status_history = StatusSettings.Printer.in_repair
@@ -461,7 +461,8 @@ def repairing():
     else:
         return render_template('Repairing.html',
                                printers=printers,
-                               StatusSettings=StatusSettings)
+                               StatusSettings=StatusSettings,
+                               AllHistory=AllHistory)
 
 
 @printer_urls.route('/reception_from_a_repairing', methods=['GET', 'POST'])
@@ -483,8 +484,6 @@ def receptionFromARepairing():
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
                 reception_from_a_repairing = ReceptionFromARepairing(user=user,
                                                                      date=datetime.date())
-
-                printer.status = StatusSettings.Printer.in_reserve
 
                 try:
                     action_status_history = StatusSettings.Printer.in_reserve
@@ -514,8 +513,6 @@ def receptionFromARepairing():
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
                 reception_from_a_repairing = ReceptionFromARepairing(user=user,
                                                                      date=datetime.now())
-
-                printer.status = StatusSettings.Printer.in_reserve
 
                 try:
                     action_status_history = StatusSettings.Printer.in_reserve
@@ -549,7 +546,8 @@ def receptionFromARepairing():
     else:
         return render_template('ReceptionFromARepair.html',
                                printers=printers,
-                               StatusSettings=StatusSettings)
+                               StatusSettings=StatusSettings,
+                               AllHistory=AllHistory)
 
 
 @printer_urls.route('/issuance_printers', methods=['GET', 'POST'])
@@ -596,7 +594,6 @@ def issuance_printers():
                                              learning_campus=learning_campus,
                                              cabinet=cabinet)
 
-                    printer.status = StatusSettings.Printer.in_division
                     db.session.add(all_history)
 
                 except:
@@ -644,7 +641,6 @@ def issuance_printers():
                                              learning_campus=learning_campus,
                                              cabinet=cabinet)
 
-                    printer.status = StatusSettings.Printer.in_division
                     db.session.add(all_history)
 
                 except:
