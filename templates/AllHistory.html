@@ -58,17 +58,16 @@
                     <option>В подразделении</option>
                     <option>Принят в ремонт</option>
                     <option>В ремонте</option>
-                    <option>Получен из ремонта</option>
                 </select>
             </th>
             <th>
                 <select type="text" id="sch3_s" class="select">
                     <option></option>
-                    <option>{{ StatusSettings.TYPE['WORK_LIST'] }}</option>
-                    <option>{{ StatusSettings.TYPE['CHECK'] }}</option>
-                    <option>{{ StatusSettings.TYPE['CONTRACT'] }}</option>
-                    <option>{{ StatusSettings.TYPE['CARTRIDGE'] }}</option>
-                    <option>{{ StatusSettings.TYPE['PRINTER'] }}</option>
+                    <option>{{ StatusSettings.Types.work_list }}</option>
+                    <option>{{ StatusSettings.Types.check }}</option>
+                    <option>{{ StatusSettings.Types.contract }}</option>
+                    <option>{{ StatusSettings.Types.cartridge }}</option>
+                    <option>{{ StatusSettings.Types.printer }}</option>
                 </select>
             </th>
             <th><input type="text" placeholder="Начните вводить" id="sch4" class="enter"></th>

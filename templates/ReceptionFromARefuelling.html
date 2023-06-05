@@ -28,7 +28,8 @@
                     class="select"
                     required>
                 {% for cartridge in cartridges %}
-                    {% if cartridge.status == "В заправке" or cartridge.status == "Восстановлен" %}
+                {% set status = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[0].status %}
+                    {% if status == StatusSettings.Cartridge.in_refueling %}
                         <option value="{{ cartridge.number }}">
                             {{ cartridge.number }}
                             <strong>||</strong>
@@ -83,7 +84,8 @@
                             class="select"
                             required>
                         {% for cartridge in cartridges %}
-                            {% if cartridge.status == "В заправке" or cartridge.status == "Восстановлен" %}
+                            {% set status = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[0].status %}
+                            {% if status == StatusSettings.Cartridge.in_refueling %}
                                 <option value="{{ cartridge.number }}">
                                     {{ cartridge.number }}
                                     <strong>||</strong>
@@ -136,9 +138,20 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for cartridge in cartridges %}
-                {% if cartridge.status == "В заправке" or cartridge.status == "Восстановлен" %}
+                {% set status = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[0].status %}
+                {% if status == StatusSettings.Cartridge.in_refueling %}
+                    {% set color = namespace(value='') %}
+                    {% if cartridge.refills >= 4 %}
+                        {% set color.value = '#ff7675' %}
+                    {% else %}
+                        {% if cartridge.refills <= 1 %}
+                            {% set color.value = '#05c46b' %}
+                        {% else %}
+                            {% set color.value = '#f6b93b' %}
+                        {% endif %}
+                    {% endif %}
                     {% if (cartridge.efficiency != 0) %}
-                        <tr>
+                        <tr style="color: {{ color.value }}">
                             <td class="1">
                                 {{ counter.value }}
                                 <label>
