@@ -272,7 +272,10 @@ def cartridges():
             flash('При создании картриджа произошла ошибка')
             return render_template("main.html")
     else:
-        number_cartridge = db.session.query(func.max(Cartridges.number))[0][0] + 1
+        try:
+            number_cartridge = db.session.query(func.max(Cartridges.number))[0][0] + 1
+        except:
+            number_cartridge = None
         # Выборка нужных статусов через метод __dict__
         all_statuses = dict(StatusSettings.Cartridge.__dict__)
         del all_statuses['__module__']
