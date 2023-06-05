@@ -20,13 +20,13 @@
             td.setAttribute('style', 'border: none; vertical-align: top')
             td.innerHTML = `
                 <select type="number"
-                    name="num_inventory"
+                    name="cartridge_number"
                     id="${items}"
                     class="select"
                     required>
                 {% for cartridge in cartridges %}
 
-                {% if cartridge.status == "В подразделении" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
+                {% if AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[0].status == StatusSettings.Cartridge.in_division %}
                         <option value="{{ cartridge.number }}">
                             {{ cartridge.number }}
                             <strong>||</strong>
@@ -112,8 +112,8 @@
                                     class="select"
                                     required>
                                 {% for cartridge in cartridges %}
-                                    {% if cartridge.status == "В подразделении" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
-                                        <!-- 'В резерве' вынести в отдельную форму приёма в ремонт -->
+                                    {% set status = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[0].status %}
+                                    {% if status == StatusSettings.Cartridge.in_division %}
                                         <option value="{{ cartridge.number }}">
                                             {{ cartridge.number }}
                                             <strong>||</strong>
@@ -167,46 +167,67 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for cartridge in cartridges %}
-                {% if cartridge.status == "В подразделении" or cartridge.status == "Добавлен" or cartridge.status == "Восстановлен" %}
-                    {% if (cartridge.efficiency != 0) and
-                        CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()|length > 0 %}
-                        <tr>
-                            <td class="1">
-                                {{ counter.value }}
-                                <label>
-                                    <input type="checkbox" class="checkboxClass" name="cartridge_number"
-                                           value="{{ cartridge.number }}">
-                                </label>
-                            </td>
-                            <td class="2">
-                                {{ cartridge.number }}
-                            </td>
-                            <td class="3">
-                                {% for model in cartridge.cartridge_models %}
-                                    {{ loop.index }}) {{ model.model }}<br>
-                                {% endfor %}
-                            </td>
-                            <td class="4">
-                                {% set cartridge_issuance = CartridgeIssuance.query.filter(CartridgeIssuance.cartridge_number_id == cartridge.id).all()[-1] %}
-                                Подразделение: {{ cartridge_issuance.location }}<br>
-                                Корпус: {{ cartridge_issuance.learning_campus }}<br>
-                                Кабинет: {{ cartridge_issuance.cabinet }}<br>
-                                Номер принтера: {{ cartridge_issuance.printer_id }}<br>
-                                <input type="hidden"
-                                       name="location{{ cartridge.number }}"
-                                       value="{{ cartridge_issuance.location }}">
-                                <input type="hidden"
-                                       name="learning_campus{{ cartridge.number }}"
-                                       value="{{ cartridge_issuance.learning_campus }}">
-                                <input type="hidden"
-                                       name="cabinet{{ cartridge.number }}"
-                                       value="{{ cartridge_issuance.cabinet }}">
-                                <input type="hidden"
-                                       name="user"
-                                       value="{{ current_user.username }}">
-                            </td>
-                        </tr>
-                        {% set counter.value = counter.value + 1 %}
+                {% set status = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).order_by(AllHistory.id.desc()).all()[0].status %}
+                {% set color = namespace(value='') %}
+                {% if cartridge.refills >= 4 %}
+                    {% set color.value = '#ff7675' %}
+                {% else %}
+                    {% if cartridge.refills <= 1 %}
+                        {% set color.value = '#05c46b' %}
+                    {% else %}
+                        {% set color.value = '#f6b93b' %}
+                    {% endif %}
+                {% endif %}
+
+                {% if status == StatusSettings.Cartridge.in_division %}
+                    {% if AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).all()|length != 0 %}
+                        {% set all_history = AllHistory.query.filter(AllHistory.cartridge_id == cartridge.id).all()[-1] %}
+                        {% set printer = Printer.query.filter(Printer.id == all_history.printer_id).first() %}
+                        {% if (cartridge.efficiency != 0) and
+                                all_history.location != None and
+                                all_history.learning_campus != None and
+                                all_history.cabinet != None and
+                                printer != None%}
+                            <tr style="color: {{ color.value }}">
+                                <td class="1">
+                                    {{ counter.value }}
+                                    <label>
+                                        <input type="checkbox" class="checkboxClass" name="cartridge_number"
+                                               value="{{ cartridge.number }}">
+                                    </label>
+                                </td>
+                                <td class="2">
+                                    {{ cartridge.number }}
+                                </td>
+                                <td class="3">
+                                    {% for model in cartridge.cartridge_models %}
+                                        {{ loop.index }}) {{ model.model }}<br>
+                                    {% endfor %}
+                                </td>
+                                <td class="4">
+                                    Подразделение: {{ all_history.location }}<br>
+                                    Корпус: {{ all_history.learning_campus }}<br>
+                                    Кабинет: {{ all_history.cabinet }}<br>
+                                    Номер принтера: {{ printer.num_inventory }}<br>
+                                    <input type="hidden"
+                                           name="location{{ cartridge.number }}"
+                                           value="{{ all_history.location }}">
+                                    <input type="hidden"
+                                           name="learning_campus{{ cartridge.number }}"
+                                           value="{{ all_history.learning_campus }}">
+                                    <input type="hidden"
+                                           name="cabinet{{ cartridge.number }}"
+                                           value="{{ all_history.cabinet }}">
+                                    <input type="hidden"
+                                           name="user"
+                                           value="{{ current_user.username }}">
+                                    <input type="hidden"
+                                           name="printer_id{{ cartridge.number }}"
+                                           value="{{ printer.id }}">
+                                </td>
+                            </tr>
+                            {% set counter.value = counter.value + 1 %}
+                        {% endif %}
                     {% endif %}
                 {% endif %}
             {% endfor %}

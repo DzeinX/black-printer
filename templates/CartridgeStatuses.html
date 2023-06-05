@@ -35,28 +35,32 @@
                     <td class="ctr" style="border: none">
                         <div class="radios">
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В резерве'] }}">
-                                <label>{{ StatusSettings.CARTRIDGE['В резерве'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.in_reserve }}">
+                                <label>{{ StatusSettings.Cartridge.in_reserve }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Принят в заправку'] }}">
-                                <label>{{ StatusSettings.CARTRIDGE['Принят в заправку'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.accepted_for_refuel }}">
+                                <label>{{ StatusSettings.Cartridge.accepted_for_refuel }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В заправке'] }}">
-                                <label>{{ StatusSettings.CARTRIDGE['В заправке'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.in_refueling }}">
+                                <label>{{ StatusSettings.Cartridge.in_refueling }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['В подразделении'] }}">
-                                <label>{{ StatusSettings.CARTRIDGE['В подразделении'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.in_division }}">
+                                <label>{{ StatusSettings.Cartridge.in_division }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Восстановлен'] }}">
-                                <label>{{ StatusSettings.CARTRIDGE['Восстановлен'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.deleted }}">
+                                <label>{{ StatusSettings.Cartridge.deleted }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.CARTRIDGE['Создан'] }}">
-                                <label>{{ StatusSettings.CARTRIDGE['Создан'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.created }}">
+                                <label>{{ StatusSettings.Cartridge.created }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.restored }}">
+                                <label>{{ StatusSettings.Cartridge.restored }}</label>
                             </span>
                         </div>
                     </td>
@@ -68,9 +72,9 @@
         <table id="mytable">
             <colgroup>
                 <col span="1" style="width: 5%;">
-                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 35%;">
                 <col span="1" style="width: 30%;">
-                <col span="1" style="width: 25%;">
+                <col span="1" style="width: 30%;">
             </colgroup>
             <thead>
             <tr>

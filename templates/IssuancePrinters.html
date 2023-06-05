@@ -26,7 +26,8 @@
                     class="select"
                     required>
                 {% for printer in printers %}
-                    {% if printer.status == "В резерве" or printer.status == "Восстановлен" %}
+                {% set status = AllHistory.query.filter(AllHistory.printer_id == printer.id).order_by(AllHistory.id.desc()).all()[0].status %}
+                    {% if status == StatusSettings.Printer.in_reserve %}
                         <option value="{{ printer.num_inventory }}">
                             {{ printer.num_inventory }}
                             <strong>||</strong>
@@ -70,7 +71,8 @@
                                     class="select"
                                     required>
                                 {% for printer in printers %}
-                                    {% if printer.status == "Получен из ремонта" or printer.status == "Восстановлен" %}
+                                    {% set status = AllHistory.query.filter(AllHistory.printer_id == printer.id).order_by(AllHistory.id.desc()).all()[0].status %}
+                                    {% if status == StatusSettings.Printer.in_reserve %}
                                         <option value="{{ printer.num_inventory }}">
                                             {{ printer.num_inventory }}
                                             <strong>||</strong>
@@ -149,9 +151,10 @@
             <tbody>
             {% set counter = namespace(value=1) %}
             {% for printer in printers %}
-                {% if printer.status == "Получен из ремонта" or printer.status == "Восстановлен" %}
+                {% set status = AllHistory.query.filter(AllHistory.printer_id == printer.id).order_by(AllHistory.id.desc()).all()[0].status %}
+                {% if status == StatusSettings.Printer.in_reserve %}
                     {% if (printer.efficiency != 0) and
-                        BroughtAPrinter.query.filter(BroughtAPrinter.printer_id == printer.id).all()|length > 0 %}
+                        AllHistory.query.filter(AllHistory.printer_id == printer.id).all()|length > 0 %}
                         <tr>
                             <td class="1">
                                 {{ counter.value }}
@@ -166,19 +169,19 @@
                                 {{ printer.num_inventory }}
                             </td>
                             <td class="4">
-                                {% set brought_a_printer = BroughtAPrinter.query.filter(BroughtAPrinter.printer_id == printer.id).all()[-1] %}
-                                Подразделение: {{ brought_a_printer.location }}<br>
-                                Корпус: {{ brought_a_printer.learning_campus }}<br>
-                                Кабинет: {{ brought_a_printer.cabinet }}<br>
+                                {% set all_history = AllHistory.query.filter(AllHistory.printer_id == printer.id).all()[-1] %}
+                                Подразделение: {{ all_history.location }}<br>
+                                Корпус: {{ all_history.learning_campus }}<br>
+                                Кабинет: {{ all_history.cabinet }}<br>
                                 <input type="hidden"
                                        name="location{{ printer.num_inventory }}"
-                                       value="{{ brought_a_printer.location }}">
+                                       value="{{ all_history.location }}">
                                 <input type="hidden"
                                        name="learning_campus{{ printer.num_inventory }}"
-                                       value="{{ brought_a_printer.learning_campus }}">
+                                       value="{{ all_history.learning_campus }}">
                                 <input type="hidden"
                                        name="cabinet{{ printer.num_inventory }}"
-                                       value="{{ brought_a_printer.cabinet }}">
+                                       value="{{ all_history.cabinet }}">
                                 <input type="hidden"
                                        name="user"
                                        value="{{ current_user.username }}">

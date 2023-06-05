@@ -10,7 +10,6 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -44,6 +43,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+static/assets/select2-develop/src
 nosetests.xml
 coverage.xml
 *.cover
@@ -127,5 +127,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-.idea/
+/.idea/

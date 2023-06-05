@@ -3,7 +3,7 @@ from flask import redirect
 from flask import request
 from flask import Blueprint
 from flask import flash
-from flask_login import current_user, login_required
+from flask_login import login_required
 
 from models import *
 from tabs_that_appear import *
@@ -11,14 +11,6 @@ from ScanFunctions import TypeVar
 from StatusSettings import StatusSettings
 
 printer_urls = Blueprint('printer_urls', __name__)
-
-
-@printer_urls.after_request
-def redirect_to_signin(response):
-    if response.status_code == 401:
-        return redirect('/login')
-    else:
-        return response
 
 
 @printer_urls.route('/add_works_printers', methods=['GET', 'POST'])
@@ -100,15 +92,16 @@ def update_printer(id):
                 return redirect(request.referrer)
 
         try:
-            action_h = StatusSettings.PRINTER["Изменён"]
-            type_h = StatusSettings.TYPE["PRINTER"]
-            name_h = f"{printer.num_inventory}"
+            action_history = StatusSettings.Printer.updated
+            type_history = StatusSettings.Types.printer
+            name_history = printer.num_inventory
             user = request.form['user']
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
+            ah = AllHistory(action=action_history,
+                            type=type_history,
+                            name=name_history,
                             user=user,
-                            date=datetime.now())
+                            date=datetime.now(),
+                            printer_id=printer.id)
             printer.all_history_id.append(ah)
             db.session.add(ah)
         except:
@@ -138,6 +131,12 @@ def printers():
     if request.method == 'POST':
         name = request.form['name']
         num_inventory = request.form['num_inventory']
+        check_num_inv_printer = db.session.query(Printer).filter(Printer.num_inventory == f'{num_inventory}').all()
+        # запрос в таблицу printer выведет строки, в которых инвентарник совпадает с инвентарником введенным юзером
+        if len(check_num_inv_printer) != 0:
+            # если строка/и с введенным пользователем инвентарником будут найдены сообщаем об этом пользователю
+            flash('Принтер с таким инвентарным номером уже существует!')
+            return redirect(request.referrer)
         location = request.form['location']
         learning_campus = request.form['learning_campus']
         cabinet = request.form['cabinet']
@@ -157,30 +156,30 @@ def printers():
                 flash('Incorrect value')
                 return redirect(request.referrer)
 
-        action = StatusSettings.PRINTER['Создан']
+        status = StatusSettings.Printer.in_division
         printer = Printer(name=name,
                           num_inventory=num_inventory,
                           location_now=location_now,
                           learning_campus_now=learning_campus_now,
                           cabinet_now=cabinet_now,
-                          status=action,
                           date_added=datetime.now())
 
         try:
-            action_h = StatusSettings.PRINTER["Создан"]
-            type_h = StatusSettings.TYPE["PRINTER"]
-            name_h = f"{printer.num_inventory}"
+            action_history = StatusSettings.Printer.created
+            type_history = StatusSettings.Types.printer
+            name_history = f"{printer.num_inventory}"
             user = request.form['user']
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
-                            user=user,
-                            date=datetime.now())
-            printer.all_history_id.append(ah)
-            db.session.add(ah)
+            all_history = AllHistory(action=action_history,
+                                     type=type_history,
+                                     name=name_history,
+                                     user=user,
+                                     date=datetime.now(),
+                                     status=status)
+            printer.all_history_id.append(all_history)
+            db.session.add(all_history)
         except:
             flash('При создании статуса произошла ошибка')
-            return render_template("main.html")
+            return redirect(request.referrer)
 
         try:
             db.session.add(printer)
@@ -188,13 +187,14 @@ def printers():
             return redirect('/printers')
         except:
             flash('При добавлении принтера произошла ошибка')
-            return render_template("main.html")
+            return redirect(request.referrer)
 
     return render_template("Printers.html",
                            printers=printers,
                            buildings=buildings,
                            divisions=divisions,
-                           StatusSettings=StatusSettings)
+                           StatusSettings=StatusSettings,
+                           AllHistory=AllHistory)
 
 
 @printer_urls.route('/printer/<int:id>/statuses')
@@ -215,23 +215,23 @@ def delete_printer(id):
     printer = Printer.query.get_or_404(id)
     try:
         try:
-            action_h = StatusSettings.PRINTER["Удалён"]
-            type_h = StatusSettings.TYPE["PRINTER"]
-            name_h = f"{printer.num_inventory}"
+            action_history = StatusSettings.Printer.deleted
+            type_history = StatusSettings.Types.printer
+            name_history = f"{printer.num_inventory}"
             user = current_user.username
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
-                            user=user,
-                            date=datetime.now())
-            printer.all_history_id.append(ah)
-            db.session.add(ah)
+            all_history = AllHistory(action=action_history,
+                                     type=type_history,
+                                     name=name_history,
+                                     user=user,
+                                     date=datetime.now(),
+                                     status=StatusSettings.Cartridge.deleted)
+            printer.all_history_id.append(all_history)
+            db.session.add(all_history)
         except:
             flash('При создании статуса произошла ошибка')
             return render_template("main.html")
 
         printer.efficiency = 0
-        printer.status = "Удалён"
         db.session.add(printer)
         db.session.commit()
         return redirect('/printers')
@@ -246,23 +246,31 @@ def resume_printer(id):
     printer = Printer.query.get_or_404(id)
     try:
         try:
-            action_h = StatusSettings.PRINTER["Восстановлен"]
-            type_h = StatusSettings.TYPE["PRINTER"]
-            name_h = f"{printer.num_inventory}"
+            all_history = AllHistory.query.filter(AllHistory.printer_id == printer.id).order_by(AllHistory.id.desc()).all()[1]
+            status = all_history.status
+            location_history = all_history.location
+            learning_campus_history = all_history.learning_campus
+            cabinet_history = all_history.cabinet
+            action_history = StatusSettings.Printer.restored
+            type_history = StatusSettings.Types.printer
+            name_history = f"{printer.num_inventory}"
             user = current_user.username
-            ah = AllHistory(action=action_h,
-                            type=type_h,
-                            name=name_h,
-                            user=user,
-                            date=datetime.now())
-            printer.all_history_id.append(ah)
-            db.session.add(ah)
+            all_history = AllHistory(action=action_history,
+                                     type=type_history,
+                                     name=name_history,
+                                     user=user,
+                                     date=datetime.now(),
+                                     status=status,
+                                     location=location_history,
+                                     learning_campus=learning_campus_history,
+                                     cabinet=cabinet_history)
+            printer.all_history_id.append(all_history)
+            db.session.add(all_history)
         except:
             flash('При создании статуса произошла ошибка')
             return render_template("main.html")
 
         printer.efficiency = 1
-        printer.status = "Восстановлен"
         db.session.add(printer)
         db.session.commit()
         return redirect(request.referrer)
@@ -290,6 +298,8 @@ def brought_a_printer():
     if request.method == "POST":
         printer_num = request.form.getlist('num_inventory')
         id_form = request.form['id_form']
+        action_status_history = StatusSettings.Printer.accepted_for_repair
+        type_history = StatusSettings.Types.printer
 
         if len(printer_num) == 0:
             flash('Не выбрана ни одна модель')
@@ -303,32 +313,26 @@ def brought_a_printer():
                 user = request.form['user']
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
 
-                brought_a_printer = BroughtAPrinter(location=location,
-                                                    learning_campus=learning_campus,
-                                                    cabinet=cabinet,
-                                                    user=user,
-                                                    date=datetime.now())
-
-                printer.status = "Принят в ремонт"
+                name_history = number
 
                 try:
-                    action_h = StatusSettings.PRINTER["Принят в ремонт"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
-                                    user=user,
-                                    date=datetime.now())
-                    printer.all_history_id.append(ah)
-                    db.session.add(ah)
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             printer_id=printer.id,
+                                             location=location,
+                                             learning_campus=learning_campus,
+                                             cabinet=cabinet)
+
+                    db.session.add(all_history)
+
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
 
-                printer.brought_a_printer_id.append(brought_a_printer)
-
-                db.session.add(brought_a_printer)
         else:
             location = request.form['location']
             learning_campus = request.form['learning_campus']
@@ -350,33 +354,25 @@ def brought_a_printer():
 
             for number in printer_num:
                 printer = Printer.query.filter(Printer.num_inventory == number).first()
-
-                brought_a_printer = BroughtAPrinter(location=location,
-                                                    learning_campus=learning_campus,
-                                                    cabinet=cabinet,
-                                                    user=user,
-                                                    date=datetime.now())
-
-                printer.status = "Принят в ремонт"
+                name_history = number
 
                 try:
-                    action_h = StatusSettings.PRINTER["Принят в ремонт"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
-                                    user=user,
-                                    date=datetime.now())
-                    printer.all_history_id.append(ah)
-                    db.session.add(ah)
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             printer_id=printer.id,
+                                             location=location,
+                                             learning_campus=learning_campus,
+                                             cabinet=cabinet)
+
+                    db.session.add(all_history)
+
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
-
-                printer.brought_a_printer_id.append(brought_a_printer)
-
-                db.session.add(brought_a_printer)
 
         try:
             db.session.commit()
@@ -388,9 +384,10 @@ def brought_a_printer():
     else:
         return render_template('BroughtAPrinter.html',
                                printers=printers,
-                               PrinterIssuance=PrinterIssuance,
+                               AllHistory=AllHistory,
                                buildings=buildings,
-                               divisions=divisions)
+                               divisions=divisions,
+                               StatusSettings=StatusSettings)
 
 
 @printer_urls.route('/repairing', methods=['GET', 'POST'])
@@ -413,19 +410,19 @@ def repairing():
                 repair = Repair(user=user,
                                 date=datetime.now())
 
-                printer.status = "В ремонте"
-
                 try:
-                    action_h = StatusSettings.PRINTER["В ремонте"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
-                                    user=user,
-                                    date=datetime.now())
-                    printer.all_history_id.append(ah)
-                    db.session.add(ah)
+                    action_status_history = StatusSettings.Printer.in_repair
+                    type_history = StatusSettings.Types.printer
+                    name_history = printer.num_inventory
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             printer_id=printer.id)
+                    printer.all_history_id.append(all_history)
+                    db.session.add(all_history)
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
@@ -440,19 +437,19 @@ def repairing():
                 repair = Repair(user=user,
                                 date=datetime.now())
 
-                printer.status = "В ремонте"
-
                 try:
-                    action_h = StatusSettings.PRINTER["В ремонте"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
-                                    user=user,
-                                    date=datetime.now())
-                    printer.all_history_id.append(ah)
-                    db.session.add(ah)
+                    action_status_history = StatusSettings.Printer.in_repair
+                    type_history = StatusSettings.Types.printer
+                    name_history = f"{printer.num_inventory}"
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             printer_id=printer.id)
+                    printer.all_history_id.append(all_history)
+                    db.session.add(all_history)
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
@@ -469,7 +466,9 @@ def repairing():
             return render_template("main.html")
     else:
         return render_template('Repairing.html',
-                               printers=printers)
+                               printers=printers,
+                               StatusSettings=StatusSettings,
+                               AllHistory=AllHistory)
 
 
 @printer_urls.route('/reception_from_a_repairing', methods=['GET', 'POST'])
@@ -492,19 +491,19 @@ def receptionFromARepairing():
                 reception_from_a_repairing = ReceptionFromARepairing(user=user,
                                                                      date=datetime.date())
 
-                printer.status = "Получен из ремонта"
-
                 try:
-                    action_h = StatusSettings.PRINTER["Получен из ремонта"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
-                                    user=user,
-                                    date=datetime.now())
-                    printer.all_history_id.append(ah)
-                    db.session.add(ah)
+                    action_status_history = StatusSettings.Printer.in_reserve
+                    type_history = StatusSettings.Types.printer
+                    name_history = f"{printer.num_inventory}"
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             printer_id=printer.id)
+                    printer.all_history_id.append(all_history)
+                    db.session.add(all_history)
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
@@ -521,19 +520,19 @@ def receptionFromARepairing():
                 reception_from_a_repairing = ReceptionFromARepairing(user=user,
                                                                      date=datetime.now())
 
-                printer.status = "Получен из ремонта"
-
                 try:
-                    action_h = StatusSettings.PRINTER["Получен из ремонта"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
-                                    user=user,
-                                    date=datetime.now())
-                    printer.all_history_id.append(ah)
-                    db.session.add(ah)
+                    action_status_history = StatusSettings.Printer.in_reserve
+                    type_history = StatusSettings.Types.printer
+                    name_history = f"{printer.num_inventory}"
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             printer_id=printer.id)
+                    printer.all_history_id.append(all_history)
+                    db.session.add(all_history)
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
@@ -552,7 +551,9 @@ def receptionFromARepairing():
             return render_template("main.html")
     else:
         return render_template('ReceptionFromARepair.html',
-                               printers=printers)
+                               printers=printers,
+                               StatusSettings=StatusSettings,
+                               AllHistory=AllHistory)
 
 
 @printer_urls.route('/issuance_printers', methods=['GET', 'POST'])
@@ -571,6 +572,9 @@ def issuance_printers():
             return redirect(request.referrer)
 
         if id_form == "2":
+            action_status_history = StatusSettings.Cartridge.in_division
+            type_history = StatusSettings.Types.cartridge
+
             for number in printer_num:
                 user = request.form['user']
                 location = request.form[f'location{number}']
@@ -582,37 +586,33 @@ def issuance_printers():
                 printer.learning_campus_now = learning_campus
                 printer.cabinet_now = cabinet
 
-                issuance = PrinterIssuance(user=user,
-                                           location=location,
-                                           learning_campus=learning_campus,
-                                           cabinet=cabinet,
-                                           date=datetime.now())
-
-                printer.status = "В подразделении"
+                name_history = number
 
                 try:
-                    action_h = StatusSettings.PRINTER["В подразделении"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
-                                    user=user,
-                                    date=datetime.now())
-                    printer.all_history_id.append(ah)
-                    db.session.add(ah)
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             printer_id=printer.id,
+                                             location=location,
+                                             learning_campus=learning_campus,
+                                             cabinet=cabinet)
+
+                    db.session.add(all_history)
+
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
 
-                printer.issuance_id.append(issuance)
-
-                db.session.add(issuance)
         else:
             user = request.form['user']
             location = request.form[f'location']
             learning_campus = request.form[f'learning_campus']
             cabinet = request.form[f'cabinet']
+            action_status_history = StatusSettings.Cartridge.in_division
+            type_history = StatusSettings.Types.cartridge
 
             var_check = TypeVar(location, learning_campus, cabinet, var_type='str')
             if var_check[1]:
@@ -633,33 +633,25 @@ def issuance_printers():
                 printer.location_now = location
                 printer.learning_campus_now = learning_campus
                 printer.cabinet_now = cabinet
-
-                issuance = PrinterIssuance(user=user,
-                                           location=location,
-                                           learning_campus=learning_campus,
-                                           cabinet=cabinet,
-                                           date=datetime.now())
-
-                printer.status = "В подразделении"
+                name_history = number
 
                 try:
-                    action_h = StatusSettings.PRINTER["В подразделении"]
-                    type_h = StatusSettings.TYPE["PRINTER"]
-                    name_h = f"{printer.num_inventory}"
-                    ah = AllHistory(action=action_h,
-                                    type=type_h,
-                                    name=name_h,
-                                    user=user,
-                                    date=datetime.now())
-                    printer.all_history_id.append(ah)
-                    db.session.add(ah)
+                    all_history = AllHistory(action=action_status_history,
+                                             status=action_status_history,
+                                             type=type_history,
+                                             name=name_history,
+                                             date=datetime.now(),
+                                             user=user,
+                                             printer_id=printer.id,
+                                             location=location,
+                                             learning_campus=learning_campus,
+                                             cabinet=cabinet)
+
+                    db.session.add(all_history)
+
                 except:
                     flash('При создании статуса произошла ошибка')
                     return render_template("main.html")
-
-                printer.issuance_id.append(issuance)
-
-                db.session.add(issuance)
 
         try:
             db.session.commit()
@@ -670,6 +662,7 @@ def issuance_printers():
     else:
         return render_template('IssuancePrinters.html',
                                printers=printers,
-                               BroughtAPrinter=BroughtAPrinter,
+                               AllHistory=AllHistory,
                                buildings=buildings,
-                               divisions=divisions)
+                               divisions=divisions,
+                               StatusSettings=StatusSettings)

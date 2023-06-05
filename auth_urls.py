@@ -19,14 +19,15 @@ def login_page():
         password = request.form.get('password')
 
         new_user = ldap_manager.authenticate(username=username, password=password)
-
+        # TODO: Пользователю можно выдать права админа из конфига не только в первый его вход.
         if new_user.status != AuthenticationResponseStatus.fail:
             user = User.query.filter(User.username == username).first()
+            print(str(user))
             if user is None:
                 if username in IsBoss.BOSS_LOGIN:
-                    user = save_user(new_user.user_dn, username, True)
+                    user = save_user(username, True)
                 else:
-                    user = save_user(new_user.user_dn, username, False)
+                    user = save_user(username, False)
             login_user(user)
             return redirect('/')
         flash("Не верный логин или пароль")

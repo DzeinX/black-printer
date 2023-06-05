@@ -54,7 +54,7 @@
                     </tr>
                     <tr>
                         <td style="border: none">
-                            <label for="num_inventory">Номер инвентаря: </label>
+                            <label for="num_inventory">Инвентарный номер: </label>
                             <input type="text"
                                    name="num_inventory"
                                    id="num_inventory"
@@ -78,7 +78,7 @@
                 </table>
                 <input type="hidden" name="user" value="{{ current_user.username }}">
                 <div class="btns">
-                    <input type="submit" value="Добавить" class="add_btn">
+                    <input type="submit" value="Создать принтер" class="add_btn">
                 </div>
             </div>
         </form>
@@ -107,28 +107,24 @@
                     <td class="ctr" style="border: none">
                         <div class="radios">
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Получен из ремонта'] }}">
-                                <label>{{ StatusSettings.PRINTER['Получен из ремонта'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.in_reserve }}">
+                                <label>{{ StatusSettings.Printer.in_reserve }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Принят в ремонт'] }}">
-                                <label>{{ StatusSettings.PRINTER['Принят в ремонт'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.accepted_for_repair }}">
+                                <label>{{ StatusSettings.Printer.accepted_for_repair }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['В ремонте'] }}">
-                                <label>{{ StatusSettings.PRINTER['В ремонте'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.in_repair }}">
+                                <label>{{ StatusSettings.Printer.in_repair }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['В подразделении'] }}">
-                                <label>{{ StatusSettings.PRINTER['В подразделении'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.in_division }}">
+                                <label>{{ StatusSettings.Printer.in_division }}</label>
                             </span>
                             <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Восстановлен'] }}">
-                                <label>{{ StatusSettings.PRINTER['Восстановлен'] }}</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.PRINTER['Создан'] }}">
-                                <label>{{ StatusSettings.PRINTER['Создан'] }}</label>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.restored }}">
+                                <label>{{ StatusSettings.Printer.restored }}</label>
                             </span>
                         </div>
                     </td>
@@ -166,6 +162,7 @@
             </thead>
             <tbody>
             {% for printer in printers %}
+                {% set status = AllHistory.query.filter(AllHistory.printer_id == printer.id).order_by(AllHistory.id.desc()).all()[0].status %}
                 {% if (printer.efficiency != 0) %}
                     <tr>
                         <td class="1">
@@ -178,12 +175,25 @@
                             {{ printer.num_inventory }}
                         </td>
                         <td class="4">
-                            {{ printer.status }}
+                            {{ status }}
                         </td>
                         <td class="5">
-                            Подразделение: {{ printer.location_now }}<br>
-                            Корпус: {{ printer.learning_campus_now }}<br>
-                            Кабинет: {{ printer.cabinet_now }}<br>
+                            {% if status == StatusSettings.Printer.accepted_for_repair or
+                                  status == StatusSettings.Printer.in_reserve %}
+                                У нас в подразделении
+                            {% else %}
+                                {% if status == StatusSettings.Printer.in_repair %}
+                                    В ремонте
+                                {% else %}
+                                    {% if status == StatusSettings.Printer.in_division %}
+                                        Подразделение: {{ printer.location_now }}<br>
+                                        Корпус: {{ printer.learning_campus_now }}<br>
+                                        Кабинет: {{ printer.cabinet_now }}<br>
+                                    {% else %}
+                                        Ещё не был в подразделении
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
                         </td>
                         <td class="6">
                             <a href="/printer/{{ printer.id }}/update">Изменить</a>
