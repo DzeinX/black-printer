@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Принять с заправки{% endblock %}
+
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script>
+        let items = 1;
+
+        function AddItem() {
+            const table = document.getElementById("table").getElementsByTagName('tbody')[0];
+            items++;
+            let id = "d" + items;
+            let newRow = table.insertRow();
+            newRow.setAttribute('id', id);
+            let tdFirst = document.createElement("td");
+            tdFirst.setAttribute('style', 'border: none; padding: 10px 0 0 0');
+            let tdSecond = document.createElement("td");
+            tdSecond.setAttribute('style', 'border: none; padding: 10px 0 0 10px');
+            tdFirst.innerHTML = `
+                <select type="number"
+                    name="cartridge_number"
+                    id="${items}"
+                    class="select"
+                    required>
+                {% for cartridge, status in cartridges_info %}
+                    {% if status == StatusSettings.Cartridge.in_refueling %}
+                        <option value="{{ cartridge.number }}">
+                            {{ cartridge.number }}
+                            <strong>||</strong>
+                            {% for model in cartridge.cartridge_models %}
+                                {{ model.model }}
+                            {% endfor %}
+                        </option>
+                    {% endif %}
+                {% endfor %}
+                </select>`;
+            tdSecond.innerHTML = `
+                <input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}">`;
+            newRow.appendChild(tdFirst)
+            newRow.appendChild(tdSecond)
+
+            $('select').select2({
+                placeholder: "Выберите",
+                allowClear: true
+            });
+        }
+
+        function RemoveItem(id_div) {
+            const div = document.getElementById(id_div);
+            div.remove();
+            items--;
+        }
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <h1>Принять с заправки:</h1>
+    <div class="align-center">
+        <form method="POST">
+            <input type="hidden" name="id_form" value="1">
+            <div class="form" id="items">
+                {% for msg in get_flashed_messages() %}
+                    <p class="msg"><strong>{{ msg }}</strong></p>
+                {% endfor %}
+                <table style="border: none" id="table">
+                    <colgroup>
+                        <col span="1" style="width: 95%;">
+                        <col span="1" style="width: 5%;">
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td style="border: none; padding: 10px 0 0 0">
+                            <label for="1">Номер картриджа<strong>||</strong>Модели: </label><br>
+                            <select type="number"
+                                    name="cartridge_number"
+                                    id="1"
+                                    class="select"
+                                    required>
+                                {% for cartridge, status in cartridges_info %}
+                                    {% if status == StatusSettings.Cartridge.in_refueling %}
+                                        <option value="{{ cartridge.number }}">
+                                            {{ cartridge.number }}
+                                            <strong>||</strong>
+                                            {% for model in cartridge.cartridge_models %}
+                                                {{ model.model }}
+                                            {% endfor %}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td style="border: none; padding: 10px 0 0 10px`">
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="btns">
+                    <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
+                    <input type="submit" value="Принять" class="add_btn">
+                </div>
+            </div>
+        </form>
+    </div>
+    <form method="POST">
+        <input type="hidden" name="id_form" value="2">
+        <div class="sch_bar">
+            <label for="search"><strong>Поиск по таблице:</strong></label><br>
+            <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+        </div>
+        <input type="submit" value="Принять" class="add_btn">
+        <table style="width: 100%; margin-top: 10px" id="mytable">
+            <colgroup>
+                <col span="1" style="width: 5%;">
+                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 40%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Номер</th>
+                <th>Модели</th>
+            </tr>
+            <tr style="background: lightblue">
+                <th><i class="fa-solid fa-magnifying-glass"></i></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = namespace(value=1) %}
+            {% for cartridge, status in cartridges_info %}
+                {% if status == StatusSettings.Cartridge.in_refueling %}
+                    {% set color = namespace(value='') %}
+                    {% if cartridge.refills >= 4 %}
+                        {% set color.value = '#ff7675' %}
+                    {% else %}
+                        {% if cartridge.refills <= 1 %}
+                            {% set color.value = '#05c46b' %}
+                        {% else %}
+                            {% set color.value = '#f6b93b' %}
+                        {% endif %}
+                    {% endif %}
+                    <tr style="color: {{ color.value }}">
+                        <td class="1">
+                            {{ counter.value }}
+                            <label>
+                                <input type="checkbox" name="cartridge_number" value="{{ cartridge.number }}">
+                            </label>
+                        </td>
+                        <td class="2">
+                            {{ cartridge.number }}
+                        </td>
+                        <td class="3">
+                            {% for model in cartridge.cartridge_models %}
+                                {{ loop.index }}) {{ model.model }}<br>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% set counter.value = counter.value + 1 %}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" value="Принять" class="add_btn">
+    </form>
+{% endblock %}

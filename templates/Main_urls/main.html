@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block body %}
+    <h1>Главная страница</h1>
+    {% for msg in get_flashed_messages() %}
+        <div class="msg">
+            <h2>{{ msg }}</h2>
+        </div>
+    {% endfor %}
+    {% if current_user.is_authenticated %}
+        {% if is_show_charts %}
+            <a href="/">Скрыть статистику</a>
+            {% if pie_chart_data != [0, 0, 0, 0, 0] %}
+                <canvas id="pie_chart_data" width="75" height="40"></canvas>
+            {% else %}
+                <h3>Круговую диаграмму о цикле картриджей не построить, слишком мало данных</h3>
+            {% endif %}
+            {% if pie_chart_data != [0, 0, 0] %}
+                <canvas id="created_deleted_chart" width="75" height="40"></canvas>
+            {% else %}
+                <h3>Столбчатую диаграмму по созданным и удалённым картриджам не построить, слишком мало данных</h3>
+            {% endif %}
+            {% if pie_chart_data != [0, 0] %}
+                <canvas id="refill_cycle_chart" width="75" height="40"></canvas>
+            {% else %}
+                <h3>Столбчатую диаграмму по циклам перезаправки не построить, слишком мало данных</h3>
+            {% endif %}
+            <a href="/">Скрыть статистику</a>
+        {% else %}
+            <a href="{{ url_for('main_urls.main_page', is_show_charts=1, col_amount=6) }}">Показать статистику</a>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    <script>
+        const oilCanvas = document.getElementById("pie_chart_data");
+
+        Chart.defaults.global.defaultFontFamily = "Lato";
+        Chart.defaults.global.defaultFontSize = 18;
+        let chart_data =
+        {{ pie_chart_data }}
+
+        const oilData = {
+            labels: [
+                "В резерве",
+                "В заправке",
+                "Принят в заправку",
+                "В подразделении",
+                "Другое"
+            ],
+            datasets: [
+                {
+                    data: chart_data,
+                    backgroundColor: [
+                        "#00b894",
+                        "#55efc4",
+                        "#00cec9",
+                        "#81ecec",
+                        "#d63031"
+                    ]
+                }]
+        };
+        const pieChart = new Chart(oilCanvas, {
+            type: 'pie',
+            data: oilData
+        });
+        console.log(pieChart)
+    </script>
+    <script>
+        const created_deleted_chart = document.getElementById("created_deleted_chart");
+
+        Chart.defaults.global.defaultFontFamily = "Lato";
+        Chart.defaults.global.defaultFontSize = 18;
+
+        const months =
+        {{ created_deleted_chart.0 }}
+        const created =
+        {{ created_deleted_chart.1 }}
+        const deleted =
+        {{ created_deleted_chart.2 }}
+
+        const created_chart_data = {
+            label: 'Созданы',
+            data: created,
+            backgroundColor: '#00b894',
+            borderColor: '#00b894',
+            yAxisID: "y-axis-density"
+        };
+
+        const deleted_chart_data = {
+            label: 'Утилизированы',
+            data: deleted,
+            backgroundColor: '#d63031',
+            borderColor: '#d63031',
+            yAxisID: "y-axis-density"
+        };
+
+        const data = {
+            labels: months,
+            datasets: [created_chart_data, deleted_chart_data]
+        };
+
+        const chartOptions = {
+            scales: {
+                xAxes: [{
+                    barPercentage: 1,
+                    categoryPercentage: 0.6
+                }],
+                yAxes: [{
+                    id: "y-axis-density"
+                }]
+            }
+        };
+
+        const created_deleted_chart_bar = new Chart(created_deleted_chart, {
+            type: 'bar',
+            data: data,
+            options: chartOptions
+        });
+    </script>
+    <script>
+        const refill_cycle_chart = document.getElementById("refill_cycle_chart");
+
+        Chart.defaults.global.defaultFontFamily = "Lato";
+        Chart.defaults.global.defaultFontSize = 18;
+
+        const refills =
+        {{ refill_cycle_chart.0 }}
+        const month =
+        {{ refill_cycle_chart.1 }}
+
+        const refill_cycle_chart_data = {
+            label: 'Количество  перезаправок картриджей',
+            backgroundColor: '#0984e3',
+            borderColor: '#0984e3',
+            data: refills
+        };
+
+        const refill_cycle_chart_data_bar = new Chart(refill_cycle_chart, {
+            type: 'bar',
+            data: {
+                labels: month,
+                datasets: [refill_cycle_chart_data]
+            }
+        });
+    </script>
+{% endblock %}

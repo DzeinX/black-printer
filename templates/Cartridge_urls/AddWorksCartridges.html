@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Типы работ картриджей{% endblock %}
+
+{% block script %}
+    <script>
+        let items = {{ counter_works }};
+
+        function AddItem() {
+            const table = document.getElementById("table").getElementsByTagName('tbody')[0];
+            items++;
+            let id = "d" + items
+            let newRow = table.insertRow()
+            newRow.setAttribute('id', id)
+             let tdFirst = document.createElement("td")
+            tdFirst.setAttribute('style', 'border: none; padding: 10px 20px 0 0')
+            let tdSecond = document.createElement("td")
+            tdSecond.setAttribute('style', 'border: none; padding: 10px 10px 0 0')
+            let tdThird = document.createElement("td")
+            tdThird.setAttribute('style', 'border: none; padding: 10px 0 0 0')
+            tdFirst.innerHTML = `
+                <label for="${items}">${items} </label>`;
+            tdSecond.innerHTML = `
+                <input id="${items}"
+                       type="text"
+                       value=""
+                       class="enter"
+                       name="works">`;
+            tdThird.innerHTML = `
+                <input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}">`;
+
+            newRow.appendChild(tdFirst)
+            newRow.appendChild(tdSecond)
+            newRow.appendChild(tdThird)
+        }
+
+        function RemoveItem(id_div) {
+            const div = document.getElementById(id_div);
+            div.remove();
+            items--;
+        }
+
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>Типы работ:</h1>
+    <div class="align-center">
+        <form method="POST">
+            <div class="form" id="items">
+                {% for message in get_flashed_messages() %}
+                    <div class="msg"><strong>{{ message }}</strong></div>
+                {% endfor %}
+
+                {% set counter = namespace(value=1) %}
+                <table style="border: none" id="table">
+                    <colgroup>
+                        <col span="1" style="width: 5%;">
+                        <col span="1" style="width: calc(95% - 28px);">
+                        <col span="1" style="width: 28px;">
+                    </colgroup>
+                    <tbody>
+                    {% for work in all_works_cartridges %}
+                        <tr id="d{{ loop.index }}">
+                            <td style="border: none; padding: 10px 20px 0 0">
+                                <label for="{{ loop.index }}">{{ counter.value }} </label>
+                            </td>
+                            <td style="border: none; padding: 10px 10px 0 0">
+                                <input id="{{ loop.index }}"
+                                       type="text"
+                                       value="{{ work.work }}"
+                                       name="works"
+                                       class="enter">
+                            </td>
+                            <td style="border: none; padding: 10px 0 0 0">
+                                <input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d{{ loop.index }}');" id="r{{ loop.index }}">
+                            </td>
+                            {% set counter.value = counter.value + 1 %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
+                <input type="submit" value="Обновить" class="add_btn">
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+
+

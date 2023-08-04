@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block CSS %}{% endblock %}
+{% block title %}Принесённые картриджи{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script>
+        let items = 1;
+
+        function AddItem() {
+            const table = document.getElementById("table").getElementsByTagName('tbody')[0];
+            items++;
+            let id = "d" + items
+            let newRow = table.insertRow()
+            newRow.setAttribute('id', id)
+            let td = document.createElement("td")
+            td.setAttribute('style', 'border: none; vertical-align: top; padding: 10px 10px 0 0')
+            let td2 = document.createElement("td")
+            td2.setAttribute('style', 'border: none; vertical-align: top; padding: 10px 20px 0 0')
+            td.innerHTML = `
+                <select type="number"
+                    name="cartridge_number"
+                    id="${items}"
+                    class="select"
+                    required>
+                {% for cartridge, status, _, _ in cartridges_info %}
+
+                {% if status == StatusSettings.Cartridge.in_division %}
+                        <option value="{{ cartridge.number }}">
+                            {{ cartridge.number }}
+                            <strong>||</strong>
+                            {% for model in cartridge.cartridge_models %}
+                                {{ model.model }}
+                            {% endfor %}
+                        </option>
+                    {% endif %}
+                {% endfor %}`
+            td2.innerHTML = `</select><input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}"><br>`;
+            newRow.appendChild(td)
+            newRow.appendChild(td2)
+
+
+            $('select').select2({
+                placeholder: "Выберите",
+                allowClear: true
+            });
+        }
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <h1>Принесённые картриджи:</h1>
+    <div class="align-center">
+        <form method="POST">
+            <div class="form" id="items">
+                {% for msg in get_flashed_messages() %}
+                    <p class="msg"><strong>{{ msg }}</strong></p>
+                {% endfor %}
+                <table style="border: none" id="table">
+                    <colgroup>
+                        <col span="1" style="width: calc(50% - 48px);">
+                        <col span="1" style="width: 48px;">
+                        <col span="1" style="width: 50%;">
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td style="border: none; vertical-align: top; padding: 10px 10px 0 0" id="d1">
+                            <label for="printer">Имя/Инвентарный номер принтера: </label><br>
+                            <select name="printer_id"
+                                    id="printer"
+                                    class="enter"
+                                    required>
+                                {% for printer in printers %}
+                                    <option value="{{ printer.id }}">{{ printer.name }}/{{ printer.num_inventory }}</option>
+                                {% endfor %}
+                            </select><br>
+                        </td>
+                        <td style="border: none; padding: 10px 20px 0 0">
+
+                        </td>
+                        <td style="border: none; padding: 10px 0 0 0" rowspan="3">
+                            <label for="location">Подразделение: </label><br>
+                            <select name="location"
+                                    id="location"
+                                    class="select" required>
+                                {% for d in divisions %}
+                                    <option>{{ d.division }}</option>
+                                {% endfor %}
+                            </select><br>
+
+                            <label for="learning_campus">Учебный корпус: </label><br>
+                            <select name="learning_campus"
+                                    id="learning_campus"
+                                    class="select" required>
+                                {% for b in buildings %}
+                                    <option>{{ b.building }}</option>
+                                {% endfor %}
+                            </select><br>
+
+                            <label for="cabinet">Кабинет: </label><br>
+                            <input type="text"
+                                   name="cabinet"
+                                   id="cabinet"
+                                   class="enter"
+                                   placeholder="Введите кабинет"
+                                   required>
+                        </td>
+                    </tr>
+                    <tr id="d1">
+                        <td style="border: none; padding: 10px 10px 0 0">
+                            <label for="1">Номер картриджа<strong>||</strong>Модели: </label><br>
+                            <select type="number"
+                                    name="cartridge_number"
+                                    id="1"
+                                    class="select"
+                                    required>
+                                {% for cartridge, status, _, _ in cartridges_info %}
+                                    {% if status == StatusSettings.Cartridge.in_division %}
+                                        <option value="{{ cartridge.number }}">
+                                            {{ cartridge.number }}
+                                            <strong>||</strong>
+                                            {% for model in cartridge.cartridge_models %}
+                                                {{ model.model }}
+                                            {% endfor %}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="btns">
+                    <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
+                    <input type="submit" value="Принять" class="add_btn">
+                </div>
+                <input type="hidden" name="id_form" value="1">
+            </div>
+        </form>
+    </div>
+    <form method="POST">
+        <input type="hidden" name="id_form" value="2">
+        <div class="sch_bar">
+            <label for="search"><strong> Поиск по таблице:</strong> </label><br>
+            <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+        </div>
+        <input type="submit" value="Принять" class="add_btn">
+        <table style="width: 100%; margin-top: 10px" id="mytable">
+            <colgroup>
+                <col span="1" style="width: 5%;">
+                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 30%;">
+                <col span="1" style="width: 30%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Номер</th>
+                <th>Модели</th>
+                <th>Отдали в</th>
+            </tr>
+            <tr style="background: lightblue">
+                <th><i class="fa-solid fa-magnifying-glass"></i></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch4" class="enter"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = namespace(value=1) %}
+            {% for cartridge, status, printer, all_history in cartridges_info %}
+                {% set color = namespace(value='') %}
+                {% if cartridge.refills >= 4 %}
+                    {% set color.value = '#ff7675' %}
+                {% else %}
+                    {% if cartridge.refills <= 1 %}
+                        {% set color.value = '#05c46b' %}
+                    {% else %}
+                        {% set color.value = '#f6b93b' %}
+                    {% endif %}
+                {% endif %}
+
+                {% if status == StatusSettings.Cartridge.in_division %}
+                    {% if all_history|length != 0 %}
+                        {% if all_history[-1].location != None and
+                              all_history[-1].learning_campus != None and
+                              all_history[-1].cabinet != None and
+                              printer != None%}
+                            <tr style="color: {{ color.value }}">
+                                <td class="1">
+                                    {{ counter.value }}
+                                    <label>
+                                        <input type="checkbox" class="checkboxClass" name="cartridge_number"
+                                               value="{{ cartridge.number }}">
+                                    </label>
+                                </td>
+                                <td class="2">
+                                    {{ cartridge.number }}
+                                </td>
+                                <td class="3">
+                                    {% for model in cartridge.cartridge_models %}
+                                        {{ loop.index }}) {{ model.model }}<br>
+                                    {% endfor %}
+                                </td>
+                                <td class="4">
+                                    Подразделение: {{ all_history[-1].location }}<br>
+                                    Корпус: {{ all_history[-1].learning_campus }}<br>
+                                    Кабинет: {{ all_history[-1].cabinet }}<br>
+                                    Номер принтера: {{ printer.num_inventory }}<br>
+                                    <input type="hidden"
+                                           name="location{{ cartridge.number }}"
+                                           value="{{ all_history[-1].location }}">
+                                    <input type="hidden"
+                                           name="learning_campus{{ cartridge.number }}"
+                                           value="{{ all_history[-1].learning_campus }}">
+                                    <input type="hidden"
+                                           name="cabinet{{ cartridge.number }}"
+                                           value="{{ all_history[-1].cabinet }}">
+                                    <input type="hidden"
+                                           name="printer_id{{ cartridge.number }}"
+                                           value="{{ printer.id }}">
+                                </td>
+                            </tr>
+                            {% set counter.value = counter.value + 1 %}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" value="Принять" class="add_btn">
+    </form>
+{% endblock %}

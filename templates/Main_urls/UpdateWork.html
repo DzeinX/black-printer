@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Изменение списка работ{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
+    <script>
+
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>Изменение списка работ ({{ work.date_work.date().strftime('%d.%m.%Y') }})</h1>
+    {% for msg in get_flashed_messages() %}
+        <div class="msg">
+            <h4>{{ msg }}</h4>
+        </div>
+    {% endfor %}
+    <div class="align-center">
+        <form method="POST">
+            <table>
+                <colgroup>
+                    <col span="1" style="width: 5%;">
+                    <col span="1" style="width: 20%;">
+                    <col span="1" style="width: 20%;">
+                    <col span="1" style="width: 20%;">
+                    <col span="1" style="width: 20%;">
+                    <col span="1" style="width: 15%;">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Наименование</th>
+                    <th>Номер/Имя</th>
+                    <th>Модель/Номер</th>
+                    <th>Услуга</th>
+                    <th>Цена</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% set counter = namespace(value=1) %}
+                {% for price, work, cartridge, id in entries_cartridges_data %}
+                    <tr>
+                        <td>
+                            {{ counter.value }}
+                        </td>
+                        <td>
+                            Картридж
+                        </td>
+                        <td>
+                            {{ cartridge.number }}
+                        </td>
+                        <td>
+                            {% for model in cartridge.cartridge_models %}
+                                {{ loop.index }}) {{ model.model }}<br>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {{ work }}<br>
+                        </td>
+                        <td>
+                            <input type="number" name="prices_c" value="{{ price }}" class="enter">
+                            <input type="hidden" name="works_c_id" value="{{ id }}">
+                        </td>
+                    </tr>
+                    {% set counter.value = counter.value + 1 %}
+                {% endfor %}
+                {% for price, work, printer, id in entries_printers_data %}
+                    <tr>
+                        <td>
+                            {{ counter.value }}
+                        </td>
+                        <td>
+                            <p>Принтер</p>
+                        </td>
+                        <td>
+                            {{ printer.name }}
+                        </td>
+                        <td>
+                            {{ printer.num_inventory }}
+                        </td>
+                        <td>
+                            {{ work }}<br>
+                        </td>
+                        <td>
+                            <input type="number" name="prices_p" value="{{ price }}" class="enter">
+                            <input type="hidden" name="works_p_id" value="{{ id }}">
+                        </td>
+                    </tr>
+                    {% set counter.value = counter.value + 1 %}
+                {% endfor %}
+                </tbody>
+            </table>
+            <input type="submit" class="add_btn" value="Изменить">
+        </form>
+    </div>
+{% endblock %}

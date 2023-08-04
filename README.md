@@ -5,7 +5,6 @@
 - - Установить зависимости из <i>requirements.txt</i>;
 - - Изменить в файле <i>migrations/versions/50609ad96891_удаление_колонки_dn_в_user.py</i> 14 строку с <i>(down_revision = None)</i> на <i>(down_revision = 'f6f0c3fafff6')</i>;
 - - Запустить миграции командой <i>flask db upgrade f6f0c3fafff6@head</i> в терминале;
-- - Открыть БД <i>printerDb.db</i>, зайти в таблицу <i>Cartridges</i> и там для всей колонки <i>refills</i> поставить значение нуль;
 - - Всё сохранить и можно запускать;
  
 
@@ -14,5 +13,4 @@
 - - Установить зависимости из <i>requirements.txt</i>;
 - - Проверить, что в файле <i>migrations/versions/50609ad96891_удаление_колонки_dn_в_user.py</i> в 14 строке стоит <i>(down_revision = None)</i>;
 - - Запустить миграции командой <i>flask db upgrade 50609ad96891@head</i> в терминале;
-- - Открыть БД <i>printerDb.db</i>, зайти в таблицу <i>Cartridges</i> и там для всей колонки <i>refills</i> поставить значение нуль;
 - - Всё сохранить и можно запускать;

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Активный договор{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
+    <script>
+
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>Активный договор</h1>
+    {% for msg in get_flashed_messages() %}
+        <div class="msg">
+            <h4>{{ msg }}</h4>
+        </div>
+    {% endfor %}
+    {% if last_contract != None %}
+        <div style="background-color: lightblue">
+            <h2>Номер активного договора:</h2>
+            <h4>{{ last_contract.name }} ({{ last_contract.date_contract.date().strftime('%d.%m.%Y') }}) на сумму {{ last_contract.sum }}
+                Рублей</h4>
+            <h5>Действительная сумма договора: {{ contract_price }} Рублей</h5>
+            <strong>Счета:</strong><br>
+            {% set counter = namespace(value=1) %}
+            {% for check in check_lists %}
+                <div>
+                    {{ loop.index }})
+                    {% if check.date_check == last_contract.date_contract %}
+                        <strong>Дата от: </strong>Не указана
+                    {% else %}
+                        <strong>Дата от: </strong>{{ check.date_check.date().strftime('%d.%m.%Y') }}
+                    {% endif %}
+                    {% if check.sum == 0 %}
+                        <strong>Сумма счёта: </strong>Не указана
+                    {% else %}
+                        <strong>Сумма счёта: </strong>{{ check.sum }} Рублей
+                    {% endif %}
+
+                    <a href="/active_contract/{{ check.id }}/more" class="#">Подробнее</a>
+                    {% if check.active %}
+                        <a href="/active_contract/{{ check.id }}/close_check" style="color: darkred !important;">Закрыть счёт</a>
+                    {% else %}
+                        <a href="/active_contract/{{ check.id }}/reopen_check">Переоткрыть счёт</a>
+                    {% endif %}
+                </div>
+                {% set counter.value = counter.value + 1 %}
+            {% endfor %}
+            {% if not all_checks_active %}
+                <a href="/active_contract/{{ last_contract.id }}/new_check">Создать счёт</a><br>
+                <a href="/active_contract/{{ last_contract.id }}/close_contract" style="color: darkred !important;">Закрыть договор</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="align-center" style="background-color: gray">
+            <form method="POST" action="/active_contract">
+                <div class="form" id="items">
+                    <label>Введите номер договора:<br><input type="text"
+                                                             name="name"
+                                                             class="enter"
+                                                             placeholder="Введите номер" required></label>
+                    <label>Введите сумму договора:<br><input type="number"
+                                                             name="sum_contract"
+                                                             class="enter"
+                                                             placeholder="Введите сумму" required></label>
+                    <label>Введите дату договора:<br><input type="date"
+                                                            name="date_contract"
+                                                            class="enter"
+                                                            placeholder="Введите дату" required></label>
+                    <input type="submit" value="Создать" class="add_btn">
+                </div>
+            </form>
+        </div>
+
+    {% endif %}
+{% endblock %}

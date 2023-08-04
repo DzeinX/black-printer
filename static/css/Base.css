@@ -4,6 +4,10 @@
     box-sizing: border-box;
 }
 
+.all_page {
+    min-height: 100vh;
+}
+
 :root {
     --main_color: #2C79B3;
     --text-light-color: #ecf0f1;
@@ -13,7 +17,10 @@
 body {
     font-family: 'Roboto', sans-serif;
     font-weight: 500;
-    min-height: calc(100vh - 80px);
+}
+
+body a {
+    color: #0984e3;
 }
 
 .nav-item {
@@ -150,11 +157,6 @@ a {
     text-decoration: none;
 }
 
-footer {
-    background-color: gainsboro;
-    height: 200px;
-}
-
 h1 {
     text-align: center;
 }
@@ -167,17 +169,16 @@ h1 {
     width: 70%;
     margin: 80px auto;
     padding: 20px;
-    border-radius: 10px;
-    background-color: white;
-    border: darkgray solid 2px;
-    box-shadow: 0 0 10px #888888;
+    /*border-radius: 10px;*/
+    /*background-color: white;*/
+    /*border: darkgray solid 2px;*/
+    /*box-shadow: 0 0 10px #888888;*/
 }
 
 .align-center {
     width: 100%;
 }
 
-.form,
 h1 {
     width: 100%;
     padding: 30px;
@@ -186,8 +187,14 @@ h1 {
 
 }
 
+.form {
+    width: 100%;
+    margin: 0 auto;
+    background-color: #ffffff;
+}
+
 td .enter {
-    width: 90%;
+    width: 100%;
     margin: 0;
 }
 
@@ -197,27 +204,33 @@ th {
 
 .enter {
     width: 100%;
-    height: 40px;
+    height: 28px;
     margin: 10px 0;
+    background-color: white;
     outline: none;
-    border: none;
-    background: inherit;
-    border-bottom: darkgray solid 2px;
+    border: 1px solid #aaa;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 4px;
     transition: 0.3s;
+    font-family: sans-serif;
+    font-weight: bold;
+    font-size: 100%;
+    color: #444;
 }
 
-.enter:focus {
-    border-bottom: var(--main_color) solid 2px;
+.enter::placeholder {
+    color: #999;
 }
 
 .delete_btn {
-    border-radius: 50%;
+    border-radius: 4px;
     margin-left: 2%;
     border: darkred solid 1px;
     background: var(--white);
     color: darkred;
-    height: 24px;
-    width: 24px;
+    height: 28px;
+    width: 28px;
     text-align: center;
     transition: 0.3s;
 }
@@ -235,6 +248,7 @@ input {
 .btn_clr,
 .add_field {
     padding: 10px 15px;
+    margin-bottom: 20px;
     transition: 0.3s;
 }
 
@@ -292,8 +306,9 @@ td a {
 
 .msg {
     background: var(--white);
+    border-radius: 4px;
     color: darkred;
-    border: darkred solid 2px;
+    border: darkred solid 1px;
     padding: 10px;
     text-align: center;
     margin: 10px auto;
@@ -322,7 +337,7 @@ td a {
     background: #ffffff;
     border-radius: 1px;
     display: block;
-    padding: 30px;
+    /*padding: 30px;*/
 }
 
 .ctr {
@@ -371,7 +386,7 @@ td a {
 }
 
 td .select2 {
-    width: 90% !important;
+    width: 100% !important;
 }
 
 .btns {
@@ -384,4 +399,40 @@ td .select2 {
 
 .btns > * {
     margin: 0 20px;
+}
+
+.footer-main {
+    background: var(--main_color);
+    width: 100%;
+    color: var(--text-light-color);
+    font-size: 14px;
+    box-shadow: 0 0 10px #888888;
+}
+
+.footer {
+    padding: 20px;
+}
+
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+}
+
+.footer-top .footer__elements {
+    text-align: inherit;
+    width: calc(100% / 3);
+}
+
+.footer-top .footer__elements a {
+    color: #ffffff;
+}
+
+.footer-top .footer__elements.organization {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer__elements.organization .left {
+    text-align: end;
 }

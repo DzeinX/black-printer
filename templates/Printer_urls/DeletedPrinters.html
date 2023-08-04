@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Удалённые принтеры{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <h1>Удалённые принтеры</h1>
+    {% if printers|length > 0 %}
+        <div class="sch_bar">
+            <label for="search"><strong>Поиск по таблице:</strong></label><br>
+            <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+        </div>
+        <table id="mytable">
+            <colgroup>
+                <col span="1" style="width: 5%;">
+                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 30%;">
+                <col span="1" style="width: 30%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Имя</th>
+                <th>Инвентарный номер</th>
+                <th></th>
+            </tr>
+            <tr style="background: lightblue">
+                <th><i class="fa-solid fa-magnifying-glass"></i></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = namespace(value=1) %}
+            {% for printer in printers %}
+                <tr>
+                    <td class="1">
+                        {{ counter.value }}
+                    </td>
+                    <td class="2">
+                        {{ printer.name }}
+                    </td>
+                    <td class="3">
+                        {{ printer.num_inventory }}
+                    </td>
+                    <td class="5">
+                        <a href="/printer/{{ printer.id }}/resume">Восстановить</a>
+                        <a href="/printer/{{ printer.id }}/statuses">Статусы</a>
+                    </td>
+                </tr>
+                {% set counter.value = counter.value + 1 %}
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h3>Ни один принтер ещё не удалён...</h3>
+    {% endif %}
+{% endblock %}

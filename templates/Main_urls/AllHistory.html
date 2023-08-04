@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block CSS %}{% endblock %}
+{% block title %}Вся история{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <h1>История статусов</h1>
+    {% if current_user.is_boss or current_user.is_admin %}
+        <div class="align-center">
+            <form method="POST" action="{{ url_for("main_urls.all_history") }}">
+                <div class="form">
+                    <table style="border: none">
+                        <colgroup>
+                            <col span="1" style="width: 25%;">
+                            <col span="1" style="width: 25%;">
+                            <col span="1" style="width: 16.67%;">
+                            <col span="1" style="width: 16.67%;">
+                            <col span="1" style="width: 16.67%;">
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <td style="border: none; padding: 10px 20px 0 0">
+                                <label for="action">
+                                    <span style="color: darkred">*</span>Действие:
+                                </label>
+                                <select name="action"
+                                        id="action"
+                                        class="select" required>
+                                    {% for _, action in actions.items() %}
+                                        <option value="{{ action }}">{{ action }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td style="border: none; padding: 10px 20px 0 0">
+                                <label for="type">
+                                    <span style="color: darkred">*</span>Тип:
+                                </label>
+                                <select name="type"
+                                        id="type"
+                                        class="select" required>
+                                    {% for _, type in entries_type.items() %}
+                                        <option value="{{ type }}">{{ type }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td style="border: none; padding: 10px 20px 0 0" colspan="2">
+                                <label for="name">
+                                    <span style="color: darkred">*</span>Имя:
+                                </label>
+                                <input type="text"
+                                       name="name"
+                                       id="name"
+                                       class="enter"
+                                       placeholder="Введите имя" required>
+                            </td>
+                            <td style="border: none; padding: 10px 0 0 0">
+                                <label for="date">
+                                    <span style="color: darkred">*</span>Дата:
+                                </label>
+                                <input type="date"
+                                       name="date"
+                                       id="date"
+                                       class="enter"
+                                       placeholder="Введите дату" required>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: none; padding: 10px 20px 0 0">
+                                <label for="learning_campus">Учебный корпус: </label>
+                                <select name="learning_campus"
+                                        id="learning_campus"
+                                        class="select">
+                                    <option selected></option>
+                                    {% for b in buildings %}
+                                        <option value="{{ b.building }}">{{ b.building }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td style="border: none; padding: 10px 20px 0 0">
+                                <label for="location">Подразделение: </label>
+                                <select name="location"
+                                        id="location"
+                                        class="select">
+                                    <option selected></option>
+                                    {% for location in locations %}
+                                        <option value="{{ location.division }}">{{ location.division }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td style="border: none; padding: 10px 20px 0 0">
+                                <label for="cabinet">Кабинет: </label>
+                                <input type="text"
+                                       name="cabinet"
+                                       id="cabinet"
+                                       class="enter"
+                                       placeholder="Введите кабинет">
+                            </td>
+                            <td style="border: none; padding: 10px 20px 0 0">
+                                <label for="user">
+                                    <span style="color: darkred">*</span>Пользователь:
+                                </label>
+                                <select name="user"
+                                        id="user"
+                                        class="select" required>
+                                    {% for user in users %}
+                                        <option value="{{ user.username }}">{{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td style="border: none; padding: 10px 0 0 0">
+                                <label for="status">Статус: </label>
+                                <select name="status"
+                                        id="status"
+                                        class="select">
+                                    <option selected></option>
+                                    {% for _, status in statuses.items() %}
+                                        <option value="{{ status }}">{{ status }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div style="font-size: 12px; color: darkred; margin-top: 5px">
+                        Знаком * обозначаются обязательные поля
+                    </div>
+                    <div class="btns">
+                        <input type="submit" value="Создать запись" class="add_btn">
+                    </div>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+    {% if is_show_paginate == 1 %}
+        <a href="{{ url_for('main_urls.all_history', is_show_paginate=0) }}">Показать всю историю</a>
+    {% else %}
+        <a href="{{ url_for('main_urls.all_history') }}">Разбить историю по страницам</a>
+    {% endif %}
+    {% for msg in get_flashed_messages() %}
+        <div class="msg">
+            <h2>{{ msg }}</h2>
+        </div>
+    {% endfor %}
+    <div class="sch_bar" style="margin: 20px 0">
+        <div class="ctr">
+            <label for="search"><strong>Поиск по таблице:</strong></label><br>
+            <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+        </div>
+    </div>
+    {% if is_show_paginate == 1 %}
+        <div style="display: flex; justify-content: space-between">
+            {% if all_history.has_prev %}
+                <a href="{{ url_for('main_urls.all_history', page=all_history.prev_num) }}">
+                    &lt;&lt; Предыдущая страница
+                </a>
+            {% else %}
+                &lt;&lt; Предыдущая страница
+            {% endif %}
+            <span>Страница {{ page }}</span>
+            {% if all_history.has_next %}
+                <a href="{{ url_for('main_urls.all_history', page=all_history.next_num) }}">
+                    Следующая страница &gt;&gt;
+                </a>
+            {% else %}
+                Следующая страница &gt;&gt;
+            {% endif %}
+        </div>
+    {% endif %}
+    <table style="margin-top: 15px; margin-bottom: 15px" id="mytable">
+        <colgroup>
+            <col span="1" style="width: 5%;">
+            <col span="1" style="width: 20%;">
+            <col span="1" style="width: 20%;">
+            <col span="1" style="width: 20%;">
+            <col span="1" style="width: 20%;">
+            <col span="1" style="width: 15%;">
+        </colgroup>
+        <thead>
+        <tr>
+            <th>№</th>
+            <th>Действие</th>
+            <th>Тип</th>
+            <th>Имя</th>
+            <th>Дата</th>
+            <th>Пользователь</th>
+            <th>Статус</th>
+        </tr>
+        <tr style="background: lightblue">
+            <th><i class="fa-solid fa-magnifying-glass"></i></th>
+            <th>
+                <select type="text" id="sch2_s" class="select">
+                    <option></option>
+                    <option>Создан</option>
+                    <option>Пополнен</option>
+                    <option>Переоткрыт</option>
+                    <option>Закрыт</option>
+                    <option>Изменён</option>
+                    <option>Удалён</option>
+                    <option>Восстановлен</option>
+                    <option>Принят в заправку</option>
+                    <option>В заправке</option>
+                    <option>В резерве</option>
+                    <option>В подразделении</option>
+                    <option>Принят в ремонт</option>
+                    <option>В ремонте</option>
+                </select>
+            </th>
+            <th>
+                <select type="text" id="sch3_s" class="select">
+                    <option></option>
+                    {% if current_user.is_boss %}
+                        <option>{{ StatusSettings.Types.work_list }}</option>
+                        <option>{{ StatusSettings.Types.check }}</option>
+                        <option>{{ StatusSettings.Types.contract }}</option>
+                    {% endif %}
+                    <option>{{ StatusSettings.Types.cartridge }}</option>
+                    <option>{{ StatusSettings.Types.printer }}</option>
+                </select>
+            </th>
+            <th><input type="text" placeholder="Начните вводить" id="sch4" class="enter"></th>
+            <th><input type="text" placeholder="Начните вводить" id="sch5" class="enter"></th>
+            <th><input type="text" placeholder="Начните вводить" id="sch6" class="enter"></th>
+            <th><input type="text" placeholder="Начните вводить" id="sch7" class="enter"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if is_show_paginate == 1 %}
+            {% for history in all_history.items %}
+                <tr>
+                    <td class="1">{{ loop.index }}</td>
+                    <td class="2">
+                        {{ history.action }}
+                    </td>
+                    <td class="3">
+                        {{ history.type }}
+                    </td>
+                    <td class="4">
+                        {{ history.name }}
+                    </td>
+                    <td class="5">
+                        {{ history.date.date().strftime("%d.%m.%Y") }} {{ history.date.time().strftime("%H:%M") }}
+                    </td>
+                    <td class="6">
+                        {{ history.user }}
+                    </td>
+                    <td class="7">
+                        {% if history.status != None %}
+                            {{ history.status }}
+                        {% else %}
+                            Нету
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            {% for history in all_history %}
+                <tr>
+                    <td class="1">{{ loop.index }}</td>
+                    <td class="2">
+                        {{ history.action }}
+                    </td>
+                    <td class="3">
+                        {{ history.type }}
+                    </td>
+                    <td class="4">
+                        {{ history.name }}
+                    </td>
+                    <td class="5">
+                        {{ history.date.date().strftime("%d.%m.%Y") }} {{ history.date.time().strftime("%H:%M") }}
+                    </td>
+                    <td class="6">
+                        {{ history.user }}
+                    </td>
+                    <td class="7">
+                        {% if history.status != None %}
+                            {{ history.status }}
+                        {% else %}
+                            Нету
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+    {% if is_show_paginate == 1 %}
+        <div style="display: flex; justify-content: space-between">
+            {% if all_history.has_prev %}
+                <a href="{{ url_for('main_urls.all_history', page=all_history.prev_num) }}">
+                    &lt;&lt; Предыдущая страница
+                </a>
+            {% else %}
+                &lt;&lt; Предыдущая
+            {% endif %}
+            <span>Страница {{ page }}</span>
+            {% if all_history.has_next %}
+                <a href="{{ url_for('main_urls.all_history', page=all_history.next_num) }}">
+                    Следующая страница &gt;&gt;
+                </a>
+            {% else %}
+                Следующая страница &gt;&gt;
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}

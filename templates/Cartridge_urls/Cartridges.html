@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+
+{% block title %}Картриджи{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+
+    <script>
+        let items = 1;
+
+        function AddItem() {
+            const table = document.getElementById("table").getElementsByTagName('tbody')[0];
+            items++;
+            let id = "d" + items
+            let newRow = table.insertRow()
+            newRow.setAttribute('id', id)
+            let td = document.createElement("td")
+            td.setAttribute('style', 'border: none; padding: 10px 10px 0 0')
+            let td2 = document.createElement("td")
+            td2.setAttribute('style', 'border: none; padding: 10px 20px 0 0')
+            td.innerHTML = `
+                <select name="model"
+                        class="select"
+                        id="${items}"
+                        placeholder="Выберите модель" required>
+                    {% for el in list_models %}
+                        {% if not (el.model in list_models) %}
+                            <option>{{ el.model }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>`;
+            td2.innerHTML = `<input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}">`
+            newRow.appendChild(td)
+            newRow.appendChild(td2)
+
+
+            $('select').select2({
+                placeholder: "Выберите",
+                allowClear: true
+            });
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>Картриджи:</h1>
+    <div class="align-center">
+        <form method="POST">
+            <div class="form" id="items">
+                {% for msg in get_flashed_messages() %}
+                    <div class="msg">
+                        {{ msg }}
+                    </div>
+                {% endfor %}
+                <table style="border: none" id="table">
+                    <colgroup>
+                        <col span="1" style="width: calc(50% - 48px)">
+                        <col span="1" style="width: 48px">
+                        <col span="1" style="width: 25%;">
+                        <col span="1" style="width: 25%;">
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td style="border: none; padding: 10px 10px 0 0">
+                            <label for="1">Модели: </label>
+                        </td>
+                        <td style="border: none; padding: 10px 20px 0 0">
+
+                        </td>
+                        <td style="border: none; padding: 10px 0 0 0">
+                            <label for="number">Номер: </label>
+                        </td>
+                        <td style="border: none; padding: 10px 0 0 20px">
+                            <label for="number">Начальный статус: </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: none; padding: 10px 10px 0 0" id="d1">
+                            <select name="model"
+                                    class="select"
+                                    id="1" required>
+                                {% for el in list_models %}
+                                    {% if not (el.model in list_models) %}
+                                        <option>{{ el.model }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td style="border: none; padding: 10px 20px 0 0">
+
+                        </td>
+                        <td style="border: none;  vertical-align: top; padding: 10px 0 0 0">
+                            <input type="number"
+                                   name="number"
+                                   id="number"
+                                   class="enter"
+                                   value="{{ new_cartridge_number }}"
+                                   placeholder="Введите номер"><br>
+                        </td>
+                        <td style="border: none;  vertical-align: top; padding: 10px 0 0 20px">
+                            <select name="status">
+                                {% for _, status in all_statuses.items() %}
+                                    <option value="{{ status }}">{{ status }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="btns">
+                    <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
+                    <input type="submit" value="Создать Картридж" class="add_btn">
+                </div>
+            </div>
+        </form>
+    </div>
+    {% if current_user.buildings_id|length == 0 %}
+        <div style="display: flex; justify-content: center; border: goldenrod 2px solid; color: goldenrod; padding: 10px">
+            У вас не заполнены здания, за которые вы ответственны. Чтобы было удобнее работать
+            <a href="{{ url_for('auth_urls.profile') }}">, заполните их</a>.
+        </div>
+    {% endif %}
+    {% if cartridges_info|length > 0 %}
+        <div class="sch_bar">
+            <table style="border: none">
+                <colgroup>
+                    <col span="1" style="width: 40%;">
+                    <col span="1" style="width: 60%;">
+                </colgroup>
+                <tbody>
+                <tr>
+                    <td class="ctr" style="border: none; padding: 50px 0 0 0">
+                        <strong>Поиск по таблице:</strong>
+                    </td>
+                    <td class="ctr" style="border: none; padding: 50px 0 0 20px">
+                        <strong>Поиск по статусу:</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="ctr" style="border: none; padding: 10px 0 0 0">
+                        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+                    </td>
+                    <td class="ctr" style="border: none; padding: 10px 0 0 20px">
+                        <div class="radios">
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.in_reserve }}">
+                                <label>{{ StatusSettings.Cartridge.in_reserve }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status"
+                                       value="{{ StatusSettings.Cartridge.accepted_for_refuel }}">
+                                <label>{{ StatusSettings.Cartridge.accepted_for_refuel }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.in_refueling }}">
+                                <label>{{ StatusSettings.Cartridge.in_refueling }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.in_division }}">
+                                <label>{{ StatusSettings.Cartridge.in_division }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.restored }}">
+                                <label>{{ StatusSettings.Cartridge.restored }}</label>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <input type="button" id="btn_off" value="Снять выделение" class="btn_clr">
+        </div>
+        {% if current_user.buildings_id|length != 0 %}
+            {% if is_show_own %}
+                <a href="{{ url_for('cartridge_urls.cartridges', is_show_own=0) }}">Показать все</a>
+            {% else %}
+                <a href="{{ url_for('cartridge_urls.cartridges', is_show_own=1) }}">Показать свои</a>
+            {% endif %}
+        {% endif %}
+        <table style="width: 100%; margin-top: 10px" id="mytable">
+            <colgroup>
+                <col span="1" style="width: 5%;">
+                <col span="1" style="width: 25%;">
+                <col span="1" style="width: 15%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 15%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Номер</th>
+                <th>Модели</th>
+                <th>Статус</th>
+                <th>Локация</th>
+                <th>Действия</th>
+            </tr>
+            <tr style="background: lightblue">
+                <th><i class="fa-solid fa-magnifying-glass"></i></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = namespace(value=1) %}
+            {% for cartridge, location, status, printer in cartridges_info %}
+                {% set color = namespace(value='') %}
+                {% if cartridge.refills >= 4 %}
+                    {% set color.value = '#ff7675' %}
+                {% else %}
+                    {% if cartridge.refills <= 1 %}
+                        {% set color.value = '#05c46b' %}
+                    {% else %}
+                        {% set color.value = '#f6b93b' %}
+                    {% endif %}
+                {% endif %}
+                {% if (cartridge.efficiency != 0) %}
+                    <tr style="color: {{ color.value }}">
+                        <td class="1">
+                            {{ counter.value }}
+                        </td>
+                        <td class="2">
+                            {{ cartridge.number }}
+                        </td>
+                        <td class="3">
+                            {% for model in cartridge.cartridge_models %}
+                                {{ loop.index }}) {{ model.model }}<br>
+                            {% endfor %}
+                        </td>
+                        <td class="4">
+                            {{ status }}
+                        </td>
+                        <td class="5">
+                            {% if status == StatusSettings.Cartridge.accepted_for_refuel or status == StatusSettings.Cartridge.in_reserve %}
+                                У нас в подразделении
+                            {% else %}
+                                {% if status == StatusSettings.Cartridge.in_refueling %}
+                                    В заправке
+                                {% else %}
+                                    {% if status == StatusSettings.Cartridge.in_division %}
+                                        Подразделение: {{ location.location }}<br>
+                                        Корпус: {{ location.learning_campus }}<br>
+                                        Кабинет: {{ location.cabinet }}<br>
+                                        Номер принтера: {{ printer.num_inventory }}<br>
+                                    {% else %}
+                                        Ещё не был в подразделении
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td class="6">
+                            <a href="/cartridge/{{ cartridge.id }}/update">Изменить</a>
+                            <a href="/cartridge/{{ cartridge.id }}/delete">Утилизировать</a>
+                            <a href="/cartridge/{{ cartridge.id }}/statuses">Статусы</a>
+                        </td>
+                    </tr>
+                    {% set counter.value = counter.value + 1 %}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h2 style="text-align: center; color: #8395a7">
+            Картриджи не найдены.
+            {% if is_not_find %}
+                Возможно потому, что вы выбрали не тот УК (СК и т.д.). Вы можете исправть это в
+                <a href="{{ url_for('auth_urls.profile') }}">профиле</a> или нажать на
+                "<a href="{{ url_for('cartridge_urls.cartridges', is_show_own=0) }}">Показать все</a>", чтобы увидеть
+                все картриджи.
+            {% endif %}
+        </h2>
+    {% endif %}
+{% endblock %}

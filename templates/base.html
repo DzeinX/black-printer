@@ -4,6 +4,16 @@
     <link rel="stylesheet" href="{% block CSS %}{% endblock %}">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icons8-печать-50.png') }}">
 
+    {# Base CSS loads #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Base.css') }}">
+
+    {#  Link jQuery  #}
+    <script src="{{ url_for('static', filename='assets/jQuery/jquery-3.6.4.js') }}"></script>
+
+    {#  Link Select2  #}
+    <script src="{{ url_for('static', filename='assets/select2-develop/dist/js/select2.js') }}"></script>
+    <link href="{{ url_for('static', filename='assets/select2-develop/dist/css/select2.css') }}" rel="stylesheet"/>
+
     {#  Google Fonts Roboto  #}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,24 +21,21 @@
           rel="stylesheet">
 
     {#  Link FontAwersome #}
-    <link href="{{ url_for('static', filename='assets/fontawesome/css/fontawesome.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='assets/fontawesome/css/brands.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='assets/fontawesome/css/solid.css') }}" rel="stylesheet">
     <script defer src="{{ url_for('static', filename='assets/fontawesome/js/brands.js') }}"></script>
     <script defer src="{{ url_for('static', filename='assets/fontawesome/js/solid.js') }}"></script>
     <script defer src="{{ url_for('static', filename='assets/fontawesome/js/fontawesome.js') }}"></script>
+    <link href="{{ url_for('static', filename='assets/fontawesome/css/fontawesome.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/fontawesome/css/brands.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/fontawesome/css/solid.css') }}" rel="stylesheet">
 
-    {#  Link jQuery  #}
-    <script src="{{ url_for('static', filename='assets/jQuery/jquery-3.6.4.js') }}"></script>
-
-    {#  Link Select2  #}
-    <script src="{{ url_for('static', filename='assets/select2-develop/dist/js/select2.js') }}"></script>
-    <link href="{{ url_for('static', filename='assets/select2-develop/dist/css/select2.css') }}" rel="stylesheet" />
+    {# Link Chart.js #}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
 
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
+<div class="all_page">
     <div class="navigation">
         <ul>
             <div class="main">
@@ -46,15 +53,19 @@
                         <ul class="submenu">
                             <li class="nav-item">
                                 <a href="/brought_a_printer" class="nav-link">Принесённые принтеры</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
                             <li class="nav-item">
                                 <a href="/repairing" class="nav-link">Отправить в ремонт</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
                             <li class="nav-item">
                                 <a href="/reception_from_a_repairing" class="nav-link">Принять из ремонта</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
                             <li class="nav-item">
                                 <a href="/issuance_printers" class="nav-link">Выдать в подразделение</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
                             <li class="nav-item">
                                 <a href="/deleted_printers" class="nav-link">Удалённые принтеры</a>
@@ -69,15 +80,19 @@
                         <ul class="submenu">
                             <li class="nav-item">
                                 <a href="/brought_a_cartridge" class="nav-link">Принесённые картриджи</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
                             <li class="nav-item">
                                 <a href="/refueling" class="nav-link">Отправить в заправку</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
                             <li class="nav-item">
                                 <a href="/reception_from_a_refuelling" class="nav-link">Принять с заправки</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
                             <li class="nav-item">
                                 <a href="/issuance_cartridges" class="nav-link">Выдать в подразделение</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
                             <li class="nav-item">
                                 <a href="/deleted_cartridges" class="nav-link">Удалённые картриджи</a>
@@ -92,16 +107,20 @@
                         <ul class="submenu">
                             <li class="nav-item">
                                 <a href="/add_models" class="nav-link">Модели</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
                             {% if current_user.is_boss %}
                                 <li class="nav-item">
                                     <a href="/add_works_cartridges" class="nav-link">Тип работ картриждей</a>
+                                    <hr style="margin-top: 10px; border-color: #2e86de">
                                 </li>
                                 <li class="nav-item">
                                     <a href="/add_works_printers" class="nav-link">Тип работ принтеров</a>
+                                    <hr style="margin-top: 10px; border-color: #2e86de">
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/buildings" class="nav-link">Корпуса</a>
+                                    <a href="/buildings" class="nav-link">Корпусы</a>
+                                    <hr style="margin-top: 10px; border-color: #2e86de">
                                 </li>
                                 <li class="nav-item">
                                     <a href="/divisions" class="nav-link">Подразделения</a>
@@ -117,7 +136,7 @@
                             <a href="/progress_report" class="nav-link">Отчёт</a>
                         </li>
                         <li class="nav-item">
-                            <a href="/list_of_completed_works" class="nav-link">Проделанные работы</a>
+                            <a href="/list_of_completed_works" class="nav-link">Выполненные работы</a>
                         </li>
                         <li class="nav-item">
                             <a href="/active_contract" class="nav-link">Активный договор</a>
@@ -125,7 +144,7 @@
                     {% endif %}
                 {% endif %}
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ url_for('auth_urls.profile') }}" class="nav-link">
                         <div class="label">Профиль</div>
                         <i class="fa-solid fa-angle-down"></i>
                     </a>
@@ -149,12 +168,40 @@
 
         {% endblock %}
     </div>
-    {% block script %}{% endblock %}
-</body>
+</div>
+
 <footer>
-    <div>
-        <h4>@ВоГУ</h4>
+    <div class="footer-main">
+        <div class="footer">
+            <div class="footer-top">
+                <div class="footer__elements">
+                    <div><strong>Контактная информация:</strong></div>
+                    <div>Почта: ******@vogu35.ru</div>
+                    <div>Номер телефона: (****) **-**-**</div>
+                </div>
+                <div class="footer__elements organization">
+                    <div class="left">
+                        <div>
+                            Сайт разработан отделом<br>
+                            <strong>Информационно-коммуникационных ресурсов и технологий ВоГУ</strong>
+                        </div>
+                        <div>тел. 72-02-92</div>
+                    </div>
+                    <div class="right">
+                        <div class="image">
+                            <img src="{{ url_for('static', filename='images/ИКР&Т.png') }}" alt="ИКР&Т">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-bottom__element">
+
+                </div>
+            </div>
+        </div>
     </div>
 </footer>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/Base.css') }}">
+</body>
+{% block script %}{% endblock %}
 </html>

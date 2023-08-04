@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}Счёт {{ check.date_check.date() }} в договоре {{ last_contract.name }}{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <h1>Счёт {{ check.date_check.date() }} в договоре {{ last_contract.name }}
+        ({{ last_contract.date_contract.date() }})</h1>
+    {% for msg in get_flashed_messages() %}
+        <div class="msg">
+            <h2>{{ msg }}</h2>
+        </div>
+    {% endfor %}
+    <a href={{ request.referrer }}>Назад</a><br>
+    <div class="sch_bar">
+        <div class="ctr">
+            <label for="search_locw"><strong>Поиск по проделанным работам:</strong></label><br>
+            <input type="text" placeholder="Начните вводить" id="search_locw" class="enter"><br>
+        </div>
+    </div>
+    {% for is_belong, work, wlc, wlp, full_price in work_list_data %}
+        {% if is_belong %}
+            <div id="d{{ loop.index }}" style="background: lightgreen; margin: 5px; padding: 5px" class="dtls">
+                <h4>Проделанные работы {{ work.number }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
+                Общая сумма: {{ full_price }}<br>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Наименование</th>
+                        <th>Номер/Имя</th>
+                        <th>Модель/Номер</th>
+                        <th>Услуга</th>
+                        <th>Цена</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% set counter = namespace(value=1) %}
+                    {% for price, work, cartridge, _ in wlc %}
+                        <tr>
+                            <td>
+                                {{ counter.value }}
+                            </td>
+                            <td>
+                                Картридж
+                            </td>
+                            <td>
+                                {{ cartridge.number }}
+                            </td>
+                            <td>
+                                {% for model in cartridge.cartridge_models %}
+                                    {{ loop.index }}) {{ model.model }}<br>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {{ work }}<br>
+                            </td>
+                            <td>
+                                {{ price }}
+                            </td>
+                        </tr>
+                        {% set counter.value = counter.value + 1 %}
+                    {% endfor %}
+                    {% for price, work, printer, _ in wlp %}
+                        <tr>
+                            <td>
+                                {{ counter.value }}
+                            </td>
+                            <td>
+                                <p>Принтер</p>
+                            </td>
+                            <td>
+                                {{ printer.name }}
+                            </td>
+                            <td>
+                                {{ printer.num_inventory }}
+                            </td>
+                            <td>
+                                {{ work }}<br>
+                            </td>
+                            <td>
+                                {{ price }}
+                            </td>
+                        </tr>
+                        {% set counter.value = counter.value + 1 %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% if check.active == 1 and last_contract.active == 1 %}
+                    <a href="/list_of_completed_works/{{ work.id }}/update">Изменить</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+    {% if check.active == 1 and last_contract.active == 1 %}
+        <form method="POST">
+            <div id="items">
+                {% for is_belong, work, wlc, wlp, full_price in work_list_data %}
+                    {% if not is_belong %}
+                        <div id="d{{ loop.index }}" style="background: lightblue; margin: 5px; padding: 5px"
+                             class="dtls">
+                            <label for="cb">Добавить список</label>
+                            <input type="checkbox" id="cb" value="{{ work.id }}" name="works">
+                            <h4>Проделанные работы {{ work.number }}
+                                ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
+                            Общая сумма: {{ full_price }}<br>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>№</th>
+                                    <th>Наименование</th>
+                                    <th>Номер/Имя</th>
+                                    <th>Модель/Номер</th>
+                                    <th>Услуга</th>
+                                    <th>Цена</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% set counter = namespace(value=1) %}
+                                {% for price, work, cartridge, _ in wlc %}
+                                    <tr>
+                                        <td>
+                                            {{ counter.value }}
+                                        </td>
+                                        <td>
+                                            Картридж
+                                        </td>
+                                        <td>
+                                            {{ cartridge.number }}
+                                        </td>
+                                        <td>
+                                            {% for model in cartridge.cartridge_models %}
+                                                ({{ model.model }})
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            {{ work }}<br>
+                                        </td>
+                                        <td>
+                                            {{ price }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                {% set counter.value = counter.value + 1 %}
+                                {% for price, work, printer, _ in wlp %}
+                                    <tr>
+                                        <td>
+                                            {{ counter.value }}
+                                        </td>
+                                        <td>
+                                            <p>Принтер</p>
+                                        </td>
+                                        <td>
+                                            {{ printer.name }}
+                                        </td>
+                                        <td>
+                                            {{ printer.num_inventory }}
+                                        </td>
+                                        <td>
+                                            {{ work }}<br>
+                                        </td>
+                                        <td>
+                                            {{ price }}
+                                        </td>
+                                        {% set counter.value = counter.value + 1 %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <input type="submit" value="Добавить" class="add_field">
+            </div>
+        </form>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Отчёты{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <h1>Отчёты</h1>
+    {% for msg in get_flashed_messages() %}
+        <div class="msg">
+            <h2>{{ msg }}</h2>
+        </div>
+    {% endfor %}
+    <div class="sch_bar">
+        <div class="ctr">
+            <label for="search"><strong>Поиск по договорам:</strong></label><br>
+            <input type="text" placeholder="Начните вводить" id="search_progress_report" class="enter"><br>
+        </div>
+    </div>
+
+    {% if active_contract != None %}
+        <div style="background-color: lightgreen" class="dtls">
+            <h2>Номер договора:</h2>
+            <a href="/active_contract">Посмотреть</a>
+            <details>
+                <summary>
+                    {{ active_contract.name }} {{ active_contract.date_contract.date().strftime('%d.%m.%Y') }}
+                </summary>
+                <strong>Счета:</strong><br>
+                {% for check in active_contract_checks %}
+                    {{ loop.index }})
+                    {% if check.date_check == active_contract.date_contract %}
+                        <strong>Дата от:</strong>Не указана
+                    {% else %}
+                        <strong>Дата от:</strong>{{ check.date_check.date().strftime('%d.%m.%Y') }}
+                    {% endif %}
+                    {% if check.sum == 0 %}
+                        <strong>Сумма счёта:</strong>Не указана
+                    {% else %}
+                        <strong>Сумма счёта:</strong>{{ check.sum }} Рублей
+                    {% endif %}
+                    <a href="/active_contract/{{ check.id }}/more" class="#">Подробнее</a><br>
+                {% endfor %}
+            </details>
+        </div>
+    {% endif %}
+
+
+    {% for contract, checks in contract_data %}
+        <div style="background-color: lightblue" class="dtls">
+            <h2>Номер договора:</h2>
+            <details>
+                <summary>
+                    {{ contract.name }} {{ contract.date_contract.date().strftime('%d.%m.%Y') }}
+                </summary>
+                <strong>Счета:</strong><br>
+                {% for check in checks %}
+                    {{ loop.index }})
+                    {% if check.date_check == contract.date_contract %}
+                        <strong>Дата от:</strong>Не указана
+                    {% else %}
+                        <strong>Дата от:</strong>{{ check.date_check.date().strftime('%d.%m.%Y') }}
+                    {% endif %}
+                    {% if check.sum == 0 %}
+                        <strong>Сумма счёта:</strong>Не указана
+                    {% else %}
+                        <strong>Сумма счёта:</strong>{{ check.sum }} Рублей
+                    {% endif %}
+                    <a href="/progress_report/{{ check.id }}/{{ contract.id }}/more" class="#">Подробнее</a><br>
+                {% endfor %}
+            </details>
+        </div>
+    {% endfor %}
+
+{% endblock %}

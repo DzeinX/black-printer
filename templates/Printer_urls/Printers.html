@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}Принтеры{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <h1>Принтеры: </h1>
+    {% for msg in get_flashed_messages() %}
+        <div class="msg">
+            {{ msg }}
+        </div>
+    {% endfor %}
+    <div class="align-center">
+        <form method="POST">
+            <div class="form">
+                <table style="border: none">
+                    <colgroup>
+                        <col span="1" style="width: 50%;">
+                        <col span="1" style="width: 30%;">
+                        <col span="1" style="width: 20%;">
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td style="border: none; padding: 10px 20px 0 0">
+                            <label for="name">Имя принтера: </label>
+                            <input type="text"
+                                   name="name"
+                                   id="name"
+                                   class="enter"
+                                   placeholder="Введите имя" required>
+                        </td>
+                        <td style="border: none; padding: 10px 20px 0 0">
+                            <label for="learning_campus">Учебный корпус: </label>
+                            <select name="learning_campus"
+                                    id="learning_campus"
+                                    class="select" required>
+                                {% for b in buildings %}
+                                    <option>{{ b.building }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td style="border: none; padding: 10px 0 0 0">
+                            <label for="cabinet">Кабинет: </label>
+                            <input type="text"
+                                   name="cabinet"
+                                   id="cabinet"
+                                   class="enter"
+                                   placeholder="Введите кабинет" required>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: none; padding: 10px 20px 0 0">
+                            <label for="num_inventory">Инвентарный номер: </label>
+                            <input type="text"
+                                   name="num_inventory"
+                                   id="num_inventory"
+                                   class="enter"
+                                   placeholder="Введите номер" required>
+                        </td>
+                        <td style="border: none; padding: 10px 20px 0 0">
+                            <label for="location">Подразделение: </label>
+                            <select name="location"
+                                    id="location"
+                                    class="select" required>
+                                {% for d in divisions %}
+                                    <option>{{ d.division }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td style="border: none; padding: 10px 0 0 0">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="btns">
+                    <input type="submit" value="Создать принтер" class="add_btn">
+                </div>
+            </div>
+        </form>
+    </div>
+    {% if current_user.buildings_id|length == 0 %}
+        <div style="display: flex; justify-content: center; border: goldenrod 2px solid; color: goldenrod; padding: 10px">
+            У вас не заполнены здания, за которые вы ответственны. Чтобы было удобнее работать
+            <a href="{{ url_for('auth_urls.profile') }}">, заполните их</a>.
+        </div>
+    {% endif %}
+    {% if printers_data|length > 0 %}
+        <div class="sch_bar">
+            <table style="border: none">
+                <colgroup>
+                    <col span="1" style="width: 40%;">
+                    <col span="1" style="width: 60%;">
+                </colgroup>
+                <tbody>
+                <tr>
+                    <td class="ctr" style="border: none; padding: 50px 0 0 0">
+                        <strong>Поиск по таблице:</strong>
+                    </td>
+                    <td class="ctr" style="border: none; padding: 50px 0 0 20px">
+                        <strong>Поиск по статусу:</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="ctr" style="border: none; padding: 10px 0 0 0">
+                        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
+                    </td>
+                    <td class="ctr" style="border: none; padding: 10px 0 0 20px">
+                        <div class="radios">
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.in_reserve }}">
+                                <label>{{ StatusSettings.Printer.in_reserve }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status"
+                                       value="{{ StatusSettings.Printer.accepted_for_repair }}">
+                                <label>{{ StatusSettings.Printer.accepted_for_repair }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.in_repair }}">
+                                <label>{{ StatusSettings.Printer.in_repair }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.in_division }}">
+                                <label>{{ StatusSettings.Printer.in_division }}</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="status" value="{{ StatusSettings.Printer.restored }}">
+                                <label>{{ StatusSettings.Printer.restored }}</label>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <input type="button" id="btn_off" value="Снять выделение" class="btn_clr">
+        </div>
+        {% if current_user.buildings_id|length != 0 %}
+            {% if is_show_own %}
+                <a href="{{ url_for('printer_urls.printers', is_show_own=0) }}">Показать все</a>
+            {% else %}
+                <a href="{{ url_for('printer_urls.printers', is_show_own=1) }}">Показать свои</a>
+            {% endif %}
+        {% endif %}
+        <table style="width: 100%; margin-top: 10px" id="mytable">
+            <colgroup>
+                <col span="1" style="width: 5%;">
+                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 25%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 20%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Имя принтера</th>
+                <th>Номер инвентаря</th>
+                <th>Статус</th>
+                <th>Локация</th>
+                <th>Действие</th>
+            </tr>
+            <tr style="background: lightblue">
+                <th><i class="fa-solid fa-magnifying-glass"></i></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for printer, status in printers_data %}
+                {% if (printer.efficiency != 0) %}
+                    <tr>
+                        <td class="1">
+                            {{ loop.index }}
+                        </td>
+                        <td class="2">
+                            {{ printer.name }}
+                        </td>
+                        <td class="3">
+                            {{ printer.num_inventory }}
+                        </td>
+                        <td class="4">
+                            {{ status }}
+                        </td>
+                        <td class="5">
+                            {% if status == StatusSettings.Printer.accepted_for_repair or
+                                  status == StatusSettings.Printer.in_reserve %}
+                                У нас в подразделении
+                            {% else %}
+                                {% if status == StatusSettings.Printer.in_repair %}
+                                    В ремонте
+                                {% else %}
+                                    {% if status == StatusSettings.Printer.in_division %}
+                                        Подразделение: {{ printer.location_now }}<br>
+                                        Корпус: {{ printer.learning_campus_now }}<br>
+                                        Кабинет: {{ printer.cabinet_now }}<br>
+                                    {% else %}
+                                        Ещё не был в подразделении
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td class="6">
+                            <a href="/printer/{{ printer.id }}/update">Изменить</a>
+                            <a href="/printer/{{ printer.id }}/delete">Утилизировать</a>
+                            <a href="/printer/{{ printer.id }}/statuses">Статусы</a>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h2 style="text-align: center; color: #8395a7">
+            Принтеры не найдены.
+            {% if is_not_find %}
+                Возможно потому, что вы выбрали не тот УК (СК и т.д.). Вы можете исправть это в
+                <a href="{{ url_for('auth_urls.profile') }}">профиле</a> или нажать на
+                "<a href="{{ url_for('printer_urls.printers', is_show_own=0) }}">Показать все</a>", чтобы увидеть все картриджи.
+            {% endif %}
+        </h2>
+    {% endif %}
+{% endblock %}

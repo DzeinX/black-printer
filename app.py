@@ -1,53 +1,71 @@
-import os
-
 from flask import Flask
-from models import db
-from models import ldap_manager
-from models import login_manager
-from cartridge_urls import cartridge_urls
-from printer_urls import printer_urls
-from main_urls import main_urls
-from auth_urls import auth_urls
+
+from Authentication.AuthManager import AuthInterface
+
+# Не удалять, нужно для корректного запуска
+from Controller.printer_urls import *
+from Controller.cartridge_urls import *
+from Controller.auth_urls import *
+from Controller.main_urls import *
+
+from Settings.Blueprint import BlueprintInterface
+
 from flask_migrate import Migrate
+from Config import *
+from Model.models import db
 
-reset_key_db = False  # Ключ на случай перезагрузки базы данных (полное удаление всей базы и создание её заново)
 
-app = Flask(__name__)
-db.init_app(app)
-migration = Migrate(app, db, render_as_batch=True)
+class APP:
+    def __init__(self, data_base):
+        self.db = data_base
 
-BASE_DIR = __file__[:-6]
-is_config = os.path.exists(str(BASE_DIR) + "Config.py")
+        # Ключ на случай перезагрузки базы данных (полное удаление всей базы и создание её заново)
+        self.__reset_key_db = False
 
-if is_config:
-    from Config import *
-    app.config['SECRET_KEY'] = AppSettings.SECRET_KEY
-    app.config['SQLALCHEMY_DATABASE_URI'] = AppSettings.SQLALCHEMY_DATABASE_URI
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = AppSettings.SQLALCHEMY_TRACK_MODIFICATIONS
+        self.app = Flask(import_name=__name__,
+                         template_folder='templates')
+        self.db.init_app(self.app)
+        self.migration = Migrate(self.app, self.db, render_as_batch=True)
 
-    app.config['LDAP_HOST'] = LDAPSettings.LDAP_HOST
-    app.config['LDAP_BASE_DN'] = LDAPSettings.LDAP_BASE_DN
-    app.config['LDAP_ALWAYS_SEARCH_BIND'] = True
-    app.config['LDAP_USER_SEARCH_SCOPE'] = 'SUBTREE'
-    app.config['LDAP_USER_RDN_ATTR'] = LDAPSettings.LDAP_USER_RDN_ATTR
-    app.config['LDAP_USER_LOGIN_ATTR'] = LDAPSettings.LDAP_USER_LOGIN_ATTR
-    app.config['LDAP_BIND_USER_DN'] = LDAPSettings.LDAP_BIND_USER_DN
-    app.config['LDAP_BIND_USER_PASSWORD'] = LDAPSettings.LDAP_BIND_USER_PASSWORD
-else:
-    raise "Конфигурация не заданна... Положите файл Config.py в корень проекта (рядом с файлом app.py)."
+        self.get_config()
+        self.register_blueprints()
+        self.init_auth()
+        self.check_rest_key_db()
 
-ldap_manager.init_app(app)
-login_manager.init_app(app)
+    def get_config(self):
+        self.app.config['SECRET_KEY'] = AppSettings.SECRET_KEY
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = AppSettings.SQLALCHEMY_DATABASE_URI
+        self.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = AppSettings.SQLALCHEMY_TRACK_MODIFICATIONS
+        self.app.config['LDAP_HOST'] = LDAPSettings.LDAP_HOST
+        self.app.config['LDAP_BASE_DN'] = LDAPSettings.LDAP_BASE_DN
+        self.app.config['LDAP_ALWAYS_SEARCH_BIND'] = LDAPSettings.LDAP_ALWAYS_SEARCH_BIND
+        self.app.config['LDAP_USER_SEARCH_SCOPE'] = LDAPSettings.LDAP_USER_SEARCH_SCOPE
+        self.app.config['LDAP_USER_RDN_ATTR'] = LDAPSettings.LDAP_USER_RDN_ATTR
+        self.app.config['LDAP_USER_LOGIN_ATTR'] = LDAPSettings.LDAP_USER_LOGIN_ATTR
+        self.app.config['LDAP_BIND_USER_DN'] = LDAPSettings.LDAP_BIND_USER_DN
+        self.app.config['LDAP_BIND_USER_PASSWORD'] = LDAPSettings.LDAP_BIND_USER_PASSWORD
 
-with app.app_context():
-    if reset_key_db:
-        db.drop_all()
-        db.create_all()
+    def init_auth(self):
+        subclasses = AuthInterface.__subclasses__()
+        for subclass in subclasses:
+            manager = subclass()
+            manager.get_manager().init_app(self.app)
 
-app.register_blueprint(cartridge_urls)
-app.register_blueprint(printer_urls)
-app.register_blueprint(main_urls)
-app.register_blueprint(auth_urls)
+    def check_rest_key_db(self):
+        with self.app.app_context():
+            if self.__reset_key_db:
+                self.db.drop_all()
+                self.db.create_all()
+
+    def register_blueprints(self):
+        subclasses = BlueprintInterface.__subclasses__()
+        for subclass in subclasses:
+            blueprint = subclass()
+            self.app.register_blueprint(blueprint.get_url())
+
+
+application = APP(data_base=db)
+app = application.app
 
 if __name__ == '__main__':
     app.run(debug=True)
