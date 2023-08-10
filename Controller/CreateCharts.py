@@ -28,8 +28,10 @@ def create_chart() -> list:
             if cartridge_actions[0].status is not None:
                 last_action = cartridge_actions[0].status
                 if last_action.lower() in chart_data:
+
                     chart_data[last_action.lower()] += 1
                 else:
+                    print(cartridge_actions[0].name)
                     chart_data["другое"] += 1
     else:
         return [0, 0, 0, 0, 0]
@@ -96,8 +98,8 @@ def refill_cycle_chart(amount_months=6) -> list:
         statuses = [action.action for action in cartridge_actions if action.action in permanent_actions]
         dates = [action.date.month for action in cartridge_actions if action.action in permanent_actions]
 
-        if set(permanent_actions).issubset(set(statuses)):
-            while len(statuses) > 3:
+        while len(statuses) > 3:
+            if set(permanent_actions).issubset(set(statuses)):
                 dates.pop(statuses.index(permanent_actions[0]))
                 statuses.pop(statuses.index(permanent_actions[0]))
 
@@ -112,5 +114,7 @@ def refill_cycle_chart(amount_months=6) -> list:
 
                 if in_reserve_date in data_per_month.keys():
                     data_per_month[in_reserve_date] += 1
+            else:
+                break
 
     return [list(data_per_month.values()), list(data_per_month.keys())]

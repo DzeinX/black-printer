@@ -253,8 +253,8 @@ input {
 }
 
 .add_btn {
-    border-radius: 5px;
-    border: darkgreen solid 2px;
+    border-radius: 4px;
+    border: darkgreen solid 1px;
     background: var(--white);
     color: darkgreen;
     margin: 7px 0 0 0;
@@ -267,7 +267,7 @@ input {
 
 .add_field {
     border-radius: 5px;
-    border: darkgoldenrod solid 2px;
+    border: darkgoldenrod solid 1px;
     background: var(--white);
     color: darkgoldenrod;
     margin: 7px 0 7px 0;
@@ -345,8 +345,8 @@ td a {
 }
 
 .btn_clr {
-    border-radius: 5px;
-    border: darkred solid 2px;
+    border-radius: 4px;
+    border: darkred solid 1px;
     background: var(--white);
     color: darkred;
     text-align: center;
