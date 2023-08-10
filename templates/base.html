@@ -107,7 +107,9 @@
                         <ul class="submenu">
                             <li class="nav-item">
                                 <a href="/add_models" class="nav-link">Модели</a>
-                                <hr style="margin-top: 10px; border-color: #2e86de">
+                                {% if current_user.is_boss %}
+                                    <hr style="margin-top: 10px; border-color: #2e86de">
+                                {% endif %}
                             </li>
                             {% if current_user.is_boss %}
                                 <li class="nav-item">
