@@ -64,6 +64,8 @@ class MainURLs:
                 c_d_chat = [0, 0, 0]
                 r_c_chart = [0, 0]
 
+            print(c_d_chat)
+
             return render_template("Main_urls/main.html",
                                    pie_chart_data=pie_chart_data,
                                    created_deleted_chart=c_d_chat,

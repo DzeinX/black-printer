@@ -7,6 +7,17 @@ from Settings.StatusSettings import StatusSettings
 model_controller = ModelController()
 
 
+def month_name(num, lang):
+    en = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september',
+          'october', 'november', 'december']
+    ru = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь',
+          'октябрь', 'ноябрь', 'декабрь']
+    if lang == 'en':
+        return en[num - 1]
+    else:
+        return ru[num - 1]
+
+
 def create_chart() -> list:
     cartridges = model_controller.filter_by_model(model_name="Cartridges",
                                                   mode="all",
@@ -31,13 +42,13 @@ def create_chart() -> list:
                 if last_status.lower() in chart_data:
                     chart_data[last_status.lower()] += 1
                 else:
-                    chart_data["в резерве"] += 1
+                    chart_data["другое"] += 1
     else:
         return [0, 0, 0, 0, 0]
     return list(chart_data.values())
 
 
-def created_deleted_chart(amount_months=6) -> [int, int, int]:
+def created_deleted_chart(amount_months=6) -> list:
     deleted_cartridges = model_controller.filter_by_model(model_name="AllHistory",
                                                           mode="all",
                                                           action="Удалён",
@@ -69,6 +80,7 @@ def created_deleted_chart(amount_months=6) -> [int, int, int]:
     created_cartridges_data = list(data_per_month_created.values())
     deleted_cartridges_data = list(data_per_month_deleted.values())
     data_months = list(data_per_month_deleted.keys())
+    data_months = [str(month_name(num_month, "ru")) for num_month in data_months]
     return [data_months, created_cartridges_data, deleted_cartridges_data]
 
 
@@ -116,4 +128,6 @@ def refill_cycle_chart(amount_months=6) -> list:
             else:
                 break
 
-    return [list(data_per_month.values()), list(data_per_month.keys())]
+    data_months = [str(month_name(num_month, "ru")) for num_month in list(data_per_month.keys())]
+
+    return [list(data_per_month.values()), data_months]

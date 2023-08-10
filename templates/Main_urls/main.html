@@ -41,7 +41,7 @@
         Chart.defaults.global.defaultFontFamily = "Lato";
         Chart.defaults.global.defaultFontSize = 18;
         let chart_data =
-        {{ pie_chart_data }}
+        {{ pie_chart_data|tojson }}
 
         const oilData = {
             labels: [
@@ -67,7 +67,6 @@
             type: 'pie',
             data: oilData
         });
-        console.log(pieChart)
     </script>
     <script>
         const created_deleted_chart = document.getElementById("created_deleted_chart");
@@ -76,11 +75,11 @@
         Chart.defaults.global.defaultFontSize = 18;
 
         const months =
-        {{ created_deleted_chart.0 }}
+        {{ created_deleted_chart.0|tojson }}
         const created =
-        {{ created_deleted_chart.1 }}
+        {{ created_deleted_chart.1|tojson }}
         const deleted =
-        {{ created_deleted_chart.2 }}
+        {{ created_deleted_chart.2|tojson }}
 
         const created_chart_data = {
             label: 'Созданы',
@@ -128,9 +127,9 @@
         Chart.defaults.global.defaultFontSize = 18;
 
         const refills =
-        {{ refill_cycle_chart.0 }}
+        {{ refill_cycle_chart.0|tojson }}
         const month =
-        {{ refill_cycle_chart.1 }}
+        {{ refill_cycle_chart.1|tojson }}
 
         const refill_cycle_chart_data = {
             label: 'Количество  перезаправок картриджей',
