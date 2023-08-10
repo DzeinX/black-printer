@@ -24,15 +24,14 @@ def create_chart() -> list:
                                                                  mode="all",
                                                                  cartridge_id=cartridge.id)
             cartridge_actions.sort(key=lambda c: c.date,
-                                   reverse=True)
-            if cartridge_actions[0].status is not None:
-                last_action = cartridge_actions[0].status
-                if last_action.lower() in chart_data:
+                                   reverse=False)
 
-                    chart_data[last_action.lower()] += 1
+            if cartridge_actions[-1].status is not None:
+                last_status = cartridge_actions[-1].status
+                if last_status.lower() in chart_data:
+                    chart_data[last_status.lower()] += 1
                 else:
-                    print(cartridge_actions[0].name)
-                    chart_data["другое"] += 1
+                    chart_data["в резерве"] += 1
     else:
         return [0, 0, 0, 0, 0]
     return list(chart_data.values())
