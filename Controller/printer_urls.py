@@ -667,7 +667,7 @@ class PrinterURLs:
                 learning_campus = request.form[f'learning_campus'].strip()
                 cabinet = request.form[f'cabinet'].strip()
 
-                action_history = StatusSettings.Cartridge.in_division
+                action_history = StatusSettings.Printer.in_division
                 type_history = StatusSettings.Types.cartridge
 
                 for number in printer_num:
@@ -696,7 +696,7 @@ class PrinterURLs:
                 return try_to_commit(redirect_to='printer_urls.issuance_printers')
 
             if id_form == "2":
-                action_history = StatusSettings.Cartridge.in_division
+                action_history = StatusSettings.Printer.in_division
                 type_history = StatusSettings.Types.cartridge
 
                 for number in printer_num:
