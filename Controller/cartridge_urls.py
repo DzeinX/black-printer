@@ -127,15 +127,16 @@ class CartridgeURLs:
             if type(number) is not int:
                 return number
 
-            is_numer_exist = model_controller.filter_by_model(model_name="Cartridges",
-                                                              mode="first",
-                                                              number=number) != []
-            if is_numer_exist:
-                flash('Такой номер уже есть')
-                return redirect(url_for('cartridge_urls.update_cartridge', pk=cartridge.id))
-            else:
-                model_controller.update(model_entry=cartridge,
-                                        number=number)
+            if number != cartridge.number:
+                is_numer_exist = model_controller.filter_by_model(model_name="Cartridges",
+                                                                  mode="first",
+                                                                  number=number) != []
+                if is_numer_exist:
+                    flash('Такой номер уже есть')
+                    return redirect(url_for('cartridge_urls.update_cartridge', pk=cartridge.id))
+                else:
+                    model_controller.update(model_entry=cartridge,
+                                            number=number)
 
             cartridge_models_list = []
             for model in cartridge_models:
