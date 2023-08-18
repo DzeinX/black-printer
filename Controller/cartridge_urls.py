@@ -50,7 +50,7 @@ class CartridgeURLs:
                     is_not_available = model_controller.filter_by_model(model_name="AllWorksCartridges",
                                                                         mode="first",
                                                                         work=work) is None
-                    if work != '' and not work.isspace() and is_not_available:
+                    if work != '' and is_not_available:
                         model = model_controller.create(model_name="AllWorksCartridges",
                                                         work=work)
                         model_controller.add_in_session(model)

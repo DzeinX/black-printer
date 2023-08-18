@@ -49,7 +49,7 @@
         <form method="POST">
             <div class="form" id="items">
                 {% for message in get_flashed_messages() %}
-                    <p style="color: darkred"><strong>{{ message }}</strong></p>
+                    <p class="msg"><strong>{{ message }}</strong></p>
                 {% endfor %}
                 {% set counter = namespace(value=1) %}
                 <table style="border: none" id="table">
@@ -68,7 +68,7 @@
                                 <input id="{{ loop.index }}"
                                        type="text"
                                        value="{{ work.work }}"
-                                       name="model"
+                                       name="works"
                                        class="enter">
                             </td>
                             <td style="border: none; padding: 10px 0 0 0">

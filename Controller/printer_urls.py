@@ -38,11 +38,6 @@ class PrinterURLs:
         if request.method == "POST":
             all_works_printers = request.form.getlist('works')
 
-            all_works_printers = prevent_valid(var_type='str',
-                                               variables=all_works_printers)
-            if type(all_works_printers) is not list:
-                return all_works_printers
-
             if len(all_works_printers) == 0:
                 flash('Нельзя удалить все модели')
                 return redirect(url_for('printer_urls.add_works_printers'))
@@ -51,10 +46,11 @@ class PrinterURLs:
 
             try:
                 for work in all_works_printers:
+                    work = work.strip()
                     is_not_available = model_controller.filter_by_model(model_name="AllWorksPrinters",
                                                                         mode="first",
-                                                                        work=work.strip()) is None
-                    if work != '' and not work.isspace() and is_not_available:
+                                                                        work=work) is None
+                    if work != '' and is_not_available:
                         model = model_controller.create(model_name="AllWorksPrinters",
                                                         work=work)
                         model_controller.add_in_session(model)
@@ -62,7 +58,7 @@ class PrinterURLs:
                 flash(f'Не удалось сохранить изменения. Ошибка: {e}')
                 return redirect(url_for('main_urls.main_page'))
 
-            return try_to_commit(redirect_to='cartridge_urls.add_works_cartridges')
+            return try_to_commit(redirect_to='printer_urls.add_works_printers')
 
         flash(f'Не определён метод запроса!')
         return redirect(url_for('main_urls.main_page'))
