@@ -15,7 +15,9 @@
             let newRow = table.insertRow()
             newRow.setAttribute('id', id)
             let td = document.createElement("td")
-            td.setAttribute('style', 'border: none;')
+            td.setAttribute('style', 'border: none; padding: 10px 10px 0 0')
+            let td2 = document.createElement("td")
+            td2.setAttribute('style', 'border: none; padding: 10px 20px 0 0')
             td.innerHTML = `
                 <select name="model"
                         class="select"
@@ -26,9 +28,11 @@
                             <option>{{ el.model }}</option>
                         {% endif %}
                     {% endfor %}
-                </select>
+                </select>`
+            td2.innerHTML = `
                 <input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}">`;
             newRow.appendChild(td)
+            newRow.appendChild(td2)
 
 
             $('select').select2({
@@ -48,21 +52,25 @@
         <div class=form id="items">
             <table style="border: none" id="table">
                 <colgroup>
-                    <col span="1" style="width: 50%;">
+                    <col span="1" style="width: calc(50% - 48px);">
+                    <col span="1" style="width: 48px;">
                     <col span="1" style="width: 50%;">
                 </colgroup>
                 <tbody>
                 <tr>
-                    <td style="border: none">
+                    <td style="border: none; padding: 10px 10px 0 0">
                         <label for="1">Модели: </label>
                     </td>
-                    <td style="border: none">
+                    <td style="border: none; padding: 10px 20px 0 0">
+
+                    </td>
+                    <td style="border: none; padding: 10px 0 0 0">
                         <label for="number">Номер: </label>
                     </td>
                 </tr>
                 {% for model in cartridge.cartridge_models %}
                     <tr>
-                        <td style="border: none" id="d{{ loop.index }}">
+                        <td style="border: none; padding: 10px 10px 0 0" id="d{{ loop.index }}">
                             {% if loop.index == 1 %}
                                 <select name="model"
                                         class="select" required>
@@ -85,12 +93,16 @@
                                         {% endif %}
                                     {% endfor %}
                                 </select>
+                            {% endif %}
+                        </td>
+                        <td style="border: none; padding: 10px 20px 0 0">
+                            {% if loop.index != 1 %}
                                 <input type="button" value="✕" class="delete_btn"
                                        onclick="RemoveItem('d{{ loop.index }}');" id="r{{ loop.index }}">
                             {% endif %}
                         </td>
                         {% if loop.index == 1 %}
-                            <td style="border: none;  vertical-align: top">
+                            <td style="border: none;  vertical-align: top; padding: 10px 0 0 0">
                                 <input type="number"
                                        name="number"
                                        id="number"

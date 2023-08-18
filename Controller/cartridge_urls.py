@@ -130,7 +130,7 @@ class CartridgeURLs:
             if number != cartridge.number:
                 is_numer_exist = model_controller.filter_by_model(model_name="Cartridges",
                                                                   mode="first",
-                                                                  number=number) != []
+                                                                  number=number) is not None
                 if is_numer_exist:
                     flash('Такой номер уже есть')
                     return redirect(url_for('cartridge_urls.update_cartridge', pk=cartridge.id))
