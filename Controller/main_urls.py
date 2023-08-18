@@ -603,11 +603,13 @@ class MainURLs:
 
         if request.method == "POST":
             date_work_list = request.form['date_work']
+            name = request.form['name'].strip()
             date_work_list = datetime.fromisoformat(f'{date_work_list}')
             user = current_user.username
 
             work_list = model_controller.create(model_name="WorkList",
                                                 date_work=date_work_list,
+                                                name=name,
                                                 date_create=datetime.now())
 
             cartridges = model_controller.get_all_entries(model_name="Cartridges")
@@ -694,7 +696,7 @@ class MainURLs:
 
             action_history = StatusSettings.WorkList.created
             type_history = StatusSettings.Types.work_list
-            name_history = f"{work_list.date_work.date().strftime('%d.%m.%Y')}"
+            name_history = work_list.name
             request_redirect = save_in_history(action=action_history,
                                                type=type_history,
                                                name=name_history,

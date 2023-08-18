@@ -113,6 +113,12 @@
                            class="enter"
                            placeholder="Введите дату" required>
                     </label><br>
+                    Имя списка работ:
+                    <input type="text"
+                           name="name"
+                           class="enter"
+                           placeholder="Введите имя" required>
+                    </label><br>
                     <input type="hidden"
                            name="num_work"
                            value="${counter}">
@@ -222,7 +228,7 @@
         <input type="button" id="add_work_done" value="Добавить" class="add_btn" onclick="AddCheck()">
         {% for work, wlc, wlp, full_price in work_list_data %}
             <div id="d{{ loop.index }}" style="margin-top: 25px;" class="dtls">
-                <h4>Проделанные работы {{ work.number }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
+                <h4>Проделанные работы {{ work.name }} {{ work.number }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
                 Общая сумма:{{ full_price }}<br>
                 <table>
                     <thead>

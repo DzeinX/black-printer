@@ -250,6 +250,7 @@ class WorkList(db.Model, ModelInterface):
     __tablename__ = "WorkList"
     __sql_query_amount_rows__ = 2
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
     date_create = db.Column(db.DateTime, nullable=False)
     date_work = db.Column(db.DateTime, nullable=False)
 

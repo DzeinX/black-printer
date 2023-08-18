@@ -21,6 +21,9 @@ def upgrade():
     with op.batch_alter_table('User', schema=None) as batch_op:
         batch_op.add_column(sa.Column('is_admin', sa.Boolean(), nullable=True))
 
+    with op.batch_alter_table('WorkList', schema=None) as batch_op:
+        batch_op.add_column(sa.Column('name', sa.String(length=100), nullable=True, server_default="ИП0000"))
+
     # ### end Alembic commands ###
 
 
