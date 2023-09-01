@@ -54,6 +54,17 @@
             items--;
         }
     </script>
+    <script>
+        const numberPattern = /\d+/g;
+
+        function Highlight(tr) {
+            tr.firstElementChild.classList.toggle("highlight");
+
+            const ID = tr.id.match(numberPattern).join('');
+            const checkbox = document.getElementById("cb" + ID);
+            checkbox.checked = !checkbox.checked;
+        }
+    </script>
 {% endblock %}
 
 
@@ -63,9 +74,11 @@
         <form method="POST">
             <input type="hidden" name="id_form" value="1">
             <div class="form" id="items">
-                {% for msg in get_flashed_messages() %}
-                    <p class="msg"><strong>{{ msg }}</strong></p>
-                {% endfor %}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endwith %}
                 <table style="border: none" id="table">
                     <colgroup>
                         <col span="1" style="width: calc(100% - 38px);">
@@ -133,11 +146,11 @@
             {% set counter = namespace(value=1) %}
             {% for printer, status in printers_data %}
                 {% if status == StatusSettings.Printer.in_repair %}
-                    <tr>
-                        <td class="1">
+                    <tr id="tr{{ loop.index }}" onclick="Highlight(this)">
+                        <td class="1" style="text-align: center">
                             {{ counter.value }}
                             <label>
-                                <input type="checkbox" name="num_inventory" value="{{ printer.num_inventory }}">
+                                <input type="checkbox" id="cb{{ loop.index }}" name="num_inventory" value="{{ printer.num_inventory }}" style="opacity: 0; position: absolute">
                             </label>
                         </td>
                         <td class="2">

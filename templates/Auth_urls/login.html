@@ -7,30 +7,30 @@
     <div class="align-center" style="background-color: gray">
         <form method="POST">
             <div class="form" id="items">
-                {% for msg in get_flashed_messages() %}
-                    <div class="msg">
-                        {{ msg }}
-                    </div>
-                {% endfor %}
-                <table style="border: none">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endwith %}
+                <table style="border: none; margin-bottom: 30px">
                     <colgroup>
                         <col span="1" style="width: 50%;">
                         <col span="1" style="width: 50%;">
                     </colgroup>
                     <tbody>
                     <tr>
-                        <td style="border: none">
+                        <td style="border: none; padding: 10px 20px 0 0">
                             <label for="login">Логин</label>
                         </td>
-                        <td style="border: none">
+                        <td style="border: none; padding: 10px 0 0 0">
                             <label for="password1">Пароль</label>
                         </td>
                     </tr>
                     <tr>
-                        <td style="border: none">
+                        <td style="border: none; padding: 10px 20px 0 0">
                             <input id="login" type="text" name="login" class="enter">
                         </td>
-                        <td style="border: none">
+                        <td style="border: none; padding: 10px 0 0 0">
                             <input id="password1" type="password" name="password" class="enter">
                         </td>
                     </tr>

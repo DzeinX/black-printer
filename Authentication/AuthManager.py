@@ -19,7 +19,15 @@ class AuthManager(AuthInterface, metaclass=MetaSingleton):
         return self.manager
 
 
-class LDAPManager(AuthInterface, metaclass=MetaSingleton):
+class LDAPManagerAUP(AuthInterface, metaclass=MetaSingleton):
+    def __init__(self):
+        self.manager = LDAP3LoginManager()
+
+    def get_manager(self):
+        return self.manager
+
+
+class LDAPManagerEDU(AuthInterface, metaclass=MetaSingleton):
     def __init__(self):
         self.manager = LDAP3LoginManager()
 

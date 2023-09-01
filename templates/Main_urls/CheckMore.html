@@ -6,16 +6,27 @@
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script>
+        const numberPattern = /\d+/g;
+
+        function HighlightWorkList(card) {
+            card.classList.toggle("highlight");
+
+            const ID = card.id.match(numberPattern).join('');
+            const checkbox = document.getElementById("cb" + ID);
+            checkbox.checked = !checkbox.checked;
+        }
+    </script>
 {% endblock %}
 
 {% block body %}
     <h1>Счёт {{ check.date_check.date() }} в договоре {{ last_contract.name }}
         ({{ last_contract.date_contract.date() }})</h1>
-    {% for msg in get_flashed_messages() %}
-        <div class="msg">
-            <h2>{{ msg }}</h2>
-        </div>
-    {% endfor %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <a href={{ request.referrer }}>Назад</a><br>
     <div class="sch_bar">
         <div class="ctr">
@@ -25,10 +36,10 @@
     </div>
     {% for is_belong, work, wlc, wlp, full_price in work_list_data %}
         {% if is_belong %}
-            <div id="d{{ loop.index }}" style="background: lightgreen; margin: 5px; padding: 5px" class="dtls">
-                <h4>Проделанные работы {{ work.number }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
+            <div id="d{{ loop.index }}" class="dtls active_checks" style="margin-bottom: 10px">
+                <h4>{{ work.name }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
                 Общая сумма: {{ full_price }}<br>
-                <table>
+                <table style="margin-bottom: 10px">
                     <thead>
                     <tr>
                         <th>№</th>
@@ -97,19 +108,22 @@
             </div>
         {% endif %}
     {% endfor %}
+    <div class="total">
+        <strong>Текущая сумма счёта: </strong>{{ check_price }} рублей.
+    </div>
     {% if check.active == 1 and last_contract.active == 1 %}
         <form method="POST">
             <div id="items">
+                {% if work_list_data|length > 4 and not is_all_belong %}
+                    <input type="submit" value="Добавить" class="add_field">
+                {% endif %}
                 {% for is_belong, work, wlc, wlp, full_price in work_list_data %}
                     {% if not is_belong %}
-                        <div id="d{{ loop.index }}" style="background: lightblue; margin: 5px; padding: 5px"
-                             class="dtls">
-                            <label for="cb">Добавить список</label>
-                            <input type="checkbox" id="cb" value="{{ work.id }}" name="works">
-                            <h4>Проделанные работы {{ work.number }}
-                                ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
+                        <div id="d{{ loop.index }}" class="dtls closed_checks" style="margin-bottom: 10px" onclick="HighlightWorkList(this)">
+                            <input type="checkbox" id="cb{{ loop.index }}" value="{{ work.id }}" name="works" style="opacity: 0; position: absolute">
+                            <h4>{{ work.name }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
                             Общая сумма: {{ full_price }}<br>
-                            <table>
+                            <table style="margin-bottom: 10px">
                                 <thead>
                                 <tr>
                                     <th>№</th>
@@ -172,10 +186,15 @@
                                 {% endfor %}
                                 </tbody>
                             </table>
+                            <a href="/list_of_completed_works/{{ work.id }}/update">Изменить</a>
                         </div>
                     {% endif %}
                 {% endfor %}
-                <input type="submit" value="Добавить" class="add_field">
+                {% if not is_all_belong %}
+                    <input type="submit" value="Добавить" class="add_field">
+                {% else %}
+                    <h2>Выполненных работ <a href="/list_of_completed_works">нет</a>... </h2>
+                {% endif %}
             </div>
         </form>
     {% endif %}

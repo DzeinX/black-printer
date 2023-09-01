@@ -29,7 +29,7 @@ def prevent_valid(var_type: str, variables):
             flash(var_check[0])
             return redirect(request.referrer)
         else:
-            flash('Недопустимое значение в форме')
+            flash('Недопустимое значение в форме', 'error')
             return redirect(request.referrer)
 
 
@@ -41,10 +41,12 @@ def try_to_commit(redirect_to: str):
     """
     try:
         model_controller.commit_session()
-        flash(f'Успешно сохранено')
+        flash(f'Успешно сохранено', 'success')
+        if 'http' in redirect_to:
+            return redirect(redirect_to)
         return redirect(url_for(redirect_to))
     except Exception as e:
-        flash(f'Не удалось сохранить изменения. Ошибка: {e}')
+        flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
         return redirect(url_for('main_urls.main_page'))
 
 
@@ -64,7 +66,7 @@ def save_in_history(**kwargs):
 
         return model_controller.add_in_session(history)
     except Exception as e:
-        flash(f'При создании статуса произошла ошибка. Ошибка: {e}')
+        flash(f'При создании статуса произошла ошибка. Ошибка: {e}', 'error')
         return redirect(url_for('main_urls.main_page'))
 
 
@@ -98,9 +100,9 @@ def get_entries_for_work_list_printers(work_list_printers):
 
 def all_checks_is_active(contract) -> bool:
     for check in contract.check_lists_id:
-        if check.active:
-            return True
-    return False
+        if not check.active:
+            return False
+    return True
 
 
 def get_check_price(check) -> float:

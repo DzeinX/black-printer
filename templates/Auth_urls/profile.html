@@ -47,8 +47,8 @@
             newRow.appendChild(tdThird)
 
             $('select').select2({
-                    placeholder: "Выберите",
-                    allowClear: true
+                placeholder: "Выберите",
+                allowClear: true
             });
         }
 
@@ -66,9 +66,11 @@
     <div class="align-center">
         <form method="POST">
             <div class="form" id="items">
-                {% for message in get_flashed_messages() %}
-                    <div class="msg"><strong>{{ message }}</strong></div>
-                {% endfor %}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endwith %}
                 {% set counter = namespace(value=1) %}
                 <table style="border: none" id="table">
                     <colgroup>
@@ -89,7 +91,8 @@
                                         class="select">
                                     {% for in_all_building in buildings %}
                                         {% if in_all_building == building %}
-                                            <option value="{{ in_all_building.id }}" selected>{{ in_all_building.building }}</option>
+                                            <option value="{{ in_all_building.id }}"
+                                                    selected>{{ in_all_building.building }}</option>
                                         {% else %}
                                             <option value="{{ in_all_building.id }}">{{ in_all_building.building }}</option>
                                         {% endif %}

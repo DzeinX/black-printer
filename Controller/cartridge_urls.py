@@ -39,7 +39,7 @@ class CartridgeURLs:
             all_works_cartridges = request.form.getlist('works')
 
             if len(all_works_cartridges) == 0:
-                flash('Нельзя удалить все модели')
+                flash('Нельзя удалить все модели', 'warning')
                 return redirect(url_for('cartridge_urls.add_works_cartridges'))
 
             model_controller.delete_all_entries_in_model(model_name="AllWorksCartridges")
@@ -55,12 +55,12 @@ class CartridgeURLs:
                                                         work=work)
                         model_controller.add_in_session(model)
             except Exception as e:
-                flash(f'Не удалось сохранить изменения. Ошибка: {e}')
+                flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
                 return redirect(url_for('main_urls.main_page'))
 
             return try_to_commit(redirect_to='cartridge_urls.add_works_cartridges')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -78,7 +78,7 @@ class CartridgeURLs:
             list_models = request.form.getlist('model')
 
             if len(list_models) == 0:
-                flash('Нельзя удалить все модели')
+                flash('Нельзя удалить все модели', 'warning')
                 return redirect('cartridge_urls.add_models')
 
             model_controller.delete_all_entries_in_model(model_name="ListModels")
@@ -93,12 +93,12 @@ class CartridgeURLs:
                                                         model=model)
                         model_controller.add_in_session(model_entry=model)
             except Exception as e:
-                flash(f'Не удалось сохранить изменения. Ошибка: {e}')
+                flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
                 return redirect(url_for('main_urls.main_page'))
 
             return try_to_commit(redirect_to='cartridge_urls.add_models')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -132,7 +132,7 @@ class CartridgeURLs:
                                                                   mode="first",
                                                                   number=number) is not None
                 if is_numer_exist:
-                    flash('Такой номер уже есть')
+                    flash('Такой номер уже есть', 'warning')
                     return redirect(url_for('cartridge_urls.update_cartridge', pk=cartridge.id))
                 else:
                     model_controller.update(model_entry=cartridge,
@@ -171,7 +171,7 @@ class CartridgeURLs:
 
             return try_to_commit(redirect_to='cartridge_urls.cartridges')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -191,7 +191,7 @@ class CartridgeURLs:
                                    cartridge=cartridge,
                                    StatusSettings=StatusSettings)
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -312,14 +312,14 @@ class CartridgeURLs:
                 return number
 
             if len(cartridge_models) == 0:
-                flash('Не выбрана ни одна модель')
+                flash('Не выбрана ни одна модель', 'warning')
                 return redirect(url_for('cartridge_urls.cartridges'))
 
             is_number_exist = model_controller.filter_by_model(model_name='Cartridges',
                                                                mode='first',
                                                                number=number)
             if is_number_exist:
-                flash('Такой номер уже есть')
+                flash('Такой номер уже есть', 'warning')
                 return redirect(url_for('cartridge_urls.cartridges'))
 
             cartridge = model_controller.create(model_name='cartridges',
@@ -354,7 +354,7 @@ class CartridgeURLs:
 
             return try_to_commit(redirect_to='cartridge_urls.cartridges')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -390,10 +390,10 @@ class CartridgeURLs:
                                         efficiency=0)
                 return try_to_commit(redirect_to='cartridge_urls.cartridges')
             except Exception as e:
-                flash(f'Ошибка удаления картриджа. Ошибка: {e}')
+                flash(f'Ошибка удаления картриджа. Ошибка: {e}', 'error')
                 return redirect(url_for('main_urls.main_page'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -430,10 +430,10 @@ class CartridgeURLs:
 
                 return try_to_commit(redirect_to='cartridge_urls.cartridges')
             except Exception as e:
-                flash(f'Ошибка восстановления картриджа. Ошибка: {e}')
+                flash(f'Ошибка восстановления картриджа. Ошибка: {e}', 'error')
                 return redirect(url_for('main_urls.main_page'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -445,7 +445,7 @@ class CartridgeURLs:
             return render_template('Cartridge_urls/DeletedCartridges.html',
                                    cartridges=cartridges)
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -490,8 +490,8 @@ class CartridgeURLs:
             user = current_user.username
 
             if len(cartridge_number) == 0:
-                flash('Не выбрана ни одна модель')
-                return redirect(url_for('cartridge_url.brought_a_cartridge'))
+                flash('Не выбрана ни одна модель', 'warning')
+                return redirect(url_for('cartridge_urls.brought_a_cartridge'))
 
             if id_form == "1":
                 location = request.form['location'].strip()
@@ -534,8 +534,10 @@ class CartridgeURLs:
                 return try_to_commit(redirect_to='cartridge_urls.cartridges')
 
             if id_form == "2":
+                print(cartridge_number)
                 for number in cartridge_number:
                     number = number.strip()
+                    print(number)
                     location = request.form[f'location{number}'].strip()
                     learning_campus = request.form[f'learning_campus{number}'].strip()
                     cabinet = request.form[f'cabinet{number}'].strip()
@@ -564,12 +566,12 @@ class CartridgeURLs:
                     if request_redirect is not None:
                         return request_redirect
 
-                    return try_to_commit(redirect_to='cartridge_urls.cartridges')
+                return try_to_commit(redirect_to='cartridge_urls.cartridges')
 
-            flash(f'Не верная идентификация формы!')
+            flash(f'Не верная идентификация формы!', 'error')
             return redirect(url_for('main_urls.main_page'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -604,8 +606,8 @@ class CartridgeURLs:
             user = current_user.username
 
             if len(cartridge_number) == 0:
-                flash('Не выбрана ни одна модель')
-                return redirect(url_for('cartridge_url.refueling'))
+                flash('Не выбрана ни одна модель', 'warning')
+                return redirect(url_for('cartridge_urls.refueling'))
 
             for number in cartridge_number:
                 number = number.strip()
@@ -616,7 +618,7 @@ class CartridgeURLs:
                 # TODO: Добавить возможность заправить картридж даже если он уже был заправлен более 4 раз,
                 #  но с предупреждением
                 if cartridge.refills > 4:
-                    flash(f"Картридж №{cartridge.number} был заправлен более 4 раз. Его следует утилизировать.")
+                    flash(f"Картридж №{cartridge.number} был заправлен более 4 раз. Его следует утилизировать.", 'warning')
                     return redirect(url_for('cartridge_url.refueling'))
 
             for number in cartridge_number:
@@ -653,7 +655,7 @@ class CartridgeURLs:
 
             return try_to_commit(redirect_to='cartridge_urls.cartridges')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -682,7 +684,7 @@ class CartridgeURLs:
             user = current_user.username
 
             if len(cartridge_number) == 0:
-                flash('Не выбрана ни одна модель')
+                flash('Не выбрана ни одна модель', 'warning')
                 return redirect(url_for('cartridge_url.reception_from_a_refuelling'))
 
             for number in cartridge_number:
@@ -725,7 +727,7 @@ class CartridgeURLs:
 
             return try_to_commit(redirect_to='cartridge_urls.cartridges')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -786,7 +788,7 @@ class CartridgeURLs:
             user = current_user.username
 
             if len(cartridge_number) == 0:
-                flash('Не выбрана ни одна модель')
+                flash('Не выбрана ни одна модель', 'warning')
                 return redirect(request.referrer)
 
             if id_form == "1":
@@ -862,8 +864,8 @@ class CartridgeURLs:
 
                 return try_to_commit(redirect_to='cartridge_urls.cartridges')
 
-            flash(f'Не верная идентификация формы!')
+            flash(f'Не верная идентификация формы!', 'error')
             return redirect(url_for('main_urls.main_page'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))

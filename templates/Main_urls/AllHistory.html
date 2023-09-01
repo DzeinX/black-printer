@@ -142,11 +142,11 @@
     {% else %}
         <a href="{{ url_for('main_urls.all_history') }}">Разбить историю по страницам</a>
     {% endif %}
-    {% for msg in get_flashed_messages() %}
-        <div class="msg">
-            <h2>{{ msg }}</h2>
-        </div>
-    {% endfor %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <div class="sch_bar" style="margin: 20px 0">
         <div class="ctr">
             <label for="search"><strong>Поиск по таблице:</strong></label><br>

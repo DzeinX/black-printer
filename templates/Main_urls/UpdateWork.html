@@ -6,91 +6,332 @@
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script>
+        function initSelect() {
+            $('select').select2();
+        }
+        let rows_counter = {{ entries_cartridges_data|length + entries_printers_data|length + 1 }};
+        let numberPattern = /\d+/g;
 
+        initSelect();
+
+        function ChangeCategory(e) {
+            let rowID = e.id.match(numberPattern).join('');
+            let td_obj = document.getElementById("td_obj_" + rowID);
+            let td_work = document.getElementById("td_work_" + rowID);
+            if (e.value === "Картридж") {
+                td_obj.innerHTML = `
+                    <select name="object"
+                            class="select"
+                            id="object_${rowID}">
+                        {% for cartridge in cartridges %}
+                        <option value="{{ cartridge.id }}">
+                            {{ cartridge.number }}
+                            {% for model in cartridge.cartridge_models %}
+                            / {{ model.model }}
+                            {% endfor %}
+                        </option>
+                        {% endfor %}
+                    </select>`
+                td_work.innerHTML = `
+                <select name="work"
+                        class="select"
+                        id="work_${rowID}">
+                    {% for work in all_works_cartridges %}
+                        <option value="{{ work.id }}">
+                            {{ work.work }}
+                        </option>
+                    {% endfor %}
+                </select>`
+            } else {
+                td_obj.innerHTML = `
+                    <select name="object"
+                            class="select"
+                            id="object_${rowID}">
+                        {% for printer in printers %}
+                            <option value="{{ printer.id }}">
+                                {{ printer.name }} / {{ printer.num_inventory }}
+                            </option>
+                        {% endfor %}
+                </select>`
+                td_work.innerHTML = `
+                <select name="work"
+                        class="select"
+                        id="work_${rowID}">
+                    {% for work in all_works_printers %}
+                        <option value="{{ work.id }}">
+                            {{ work.work }}
+                        </option>
+                    {% endfor %}
+                </select>`
+            }
+
+            initSelect();
+        }
+
+        function DeleteRow(e) {
+            let rowID = e.id.match(numberPattern).join('');
+            let row = document.getElementById("row_" + rowID);
+            row.remove();
+        }
+
+        function CreateRowForTable() {
+            let row = document.createElement("tr");
+            row.setAttribute("id", "row_" + rows_counter);
+
+            let td1 = document.createElement("td");
+            td1.innerHTML = `${rows_counter}`;
+
+            let td2 = document.createElement("td");
+            td2.innerHTML = `
+                <select name="category"
+                        class="select"
+                        id="category_${rows_counter}"
+                        onchange="ChangeCategory(this)">
+                    <option>Картридж</option>
+                    <option>Принтер</option>
+                </select>`
+
+            let td3 = document.createElement("td");
+            td3.setAttribute("id", "td_obj_" + rows_counter);
+            td3.innerHTML = `
+                <select name="object"
+                        class="select"
+                        id="object_${rows_counter}">
+                    {% for cartridge in cartridges %}
+                    <option value="{{ cartridge.id }}">
+                        {{ cartridge.number }}
+                        {% for model in cartridge.cartridge_models %}
+                        / {{ model.model }}
+                        {% endfor %}
+                    </option>
+                    {% endfor %}
+                </select>`
+
+            let td4 = document.createElement("td");
+            td4.setAttribute("id", "td_work_" + rows_counter);
+            td4.innerHTML = `
+                <select name="work"
+                        class="select"
+                        id="work_${rows_counter}">
+                    {% for work in all_works_cartridges %}
+                    <option value="{{ work.id }}">
+                        {{ work.work }}
+                    </option>
+                    {% endfor %}
+                </select>`
+
+            let td5 = document.createElement("td");
+            td5.innerHTML = `
+                <input type="number" class="enter" name="price" required>`
+
+            let td6 = document.createElement("td");
+            if (rows_counter > 1) {
+                td6.innerHTML = `
+                    <input type="button" value="✕" class="delete_btn" onclick="DeleteRow(this)" id="delete_${rows_counter}">`;
+            } else {
+                td6.innerHTML = ``;
+            }
+
+            row.appendChild(td1);
+            row.appendChild(td2);
+            row.appendChild(td3);
+            row.appendChild(td4);
+            row.appendChild(td5);
+            row.appendChild(td6);
+
+            let table = document.getElementById("new_work_done");
+            table.appendChild(row);
+
+            initSelect();
+            rows_counter += 1;
+        }
     </script>
 {% endblock %}
 
 {% block body %}
     <h1>Изменение списка работ ({{ work.date_work.date().strftime('%d.%m.%Y') }})</h1>
-    {% for msg in get_flashed_messages() %}
-        <div class="msg">
-            <h4>{{ msg }}</h4>
-        </div>
-    {% endfor %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <div class="align-center">
         <form method="POST">
-            <table>
-                <colgroup>
-                    <col span="1" style="width: 5%;">
-                    <col span="1" style="width: 20%;">
-                    <col span="1" style="width: 20%;">
-                    <col span="1" style="width: 20%;">
-                    <col span="1" style="width: 20%;">
-                    <col span="1" style="width: 15%;">
-                </colgroup>
+            <table id="new_work_done">
                 <thead>
                 <tr>
-                    <th>№</th>
-                    <th>Наименование</th>
-                    <th>Номер/Имя</th>
-                    <th>Модель/Номер</th>
-                    <th>Услуга</th>
-                    <th>Цена</th>
+                    <th style="width: 5px; max-width: 5px">№</th>
+                    <th style="width: 15%; max-width: 15%">Наименование</th>
+                    <th style="width: 45%; max-width: 45%">Объект</th>
+                    <th style="width: 20%; max-width: 20%">Услуга</th>
+                    <th style="width: calc(20% - 55px); max-width: calc(20% - 55px)">Цена</th>
+                    <th style="width: 50px; max-width: 50px"></th>
                 </tr>
                 </thead>
                 <tbody>
                 {% set counter = namespace(value=1) %}
                 {% for price, work, cartridge, id in entries_cartridges_data %}
-                    <tr>
+                    <tr id="row_{{ counter.value }}">
                         <td>
                             {{ counter.value }}
                         </td>
                         <td>
-                            Картридж
+                            <select name="category"
+                                    class="select"
+                                    id="category_{{ counter.value }}"
+                                    onchange="ChangeCategory(this)">
+                                <option selected>Картридж</option>
+                                <option>Принтер</option>
+                            </select>
                         </td>
                         <td>
-                            {{ cartridge.number }}
+                            <select name="object"
+                                    class="select"
+                                    id="object_{{ counter.value }}">
+                                {% for c in cartridges %}
+                                    {% if cartridge.id == c.id %}
+                                        <option value="{{ c.id }}" selected>
+                                            {{ c.number }}
+                                            {% for model in c.cartridge_models %}
+                                                / {{ model.model }}
+                                            {% endfor %}
+                                        </option>
+                                    {% else %}
+                                        <option value="{{ c.id }}">
+                                            {{ c.number }}
+                                            {% for model in c.cartridge_models %}
+                                                / {{ model.model }}
+                                            {% endfor %}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
                         </td>
                         <td>
-                            {% for model in cartridge.cartridge_models %}
-                                {{ loop.index }}) {{ model.model }}<br>
-                            {% endfor %}
+                            <select name="work"
+                                    class="select"
+                                    id="work_{{ counter.value }}">
+                                {% for w in all_works_cartridges %}
+                                    {% if work == w.work %}
+                                        <option value="{{ w.id }}" selected>
+                                            {{ w.work }}
+                                        </option>
+                                    {% else %}
+                                        <option value="{{ w.id }}">
+                                            {{ w.work }}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
                         </td>
                         <td>
-                            {{ work }}<br>
+                            <input type="number" name="price" value="{{ price }}" class="enter">
                         </td>
-                        <td>
-                            <input type="number" name="prices_c" value="{{ price }}" class="enter">
-                            <input type="hidden" name="works_c_id" value="{{ id }}">
-                        </td>
+                        {% if counter.value == 1 %}
+                            <td></td>
+                        {% else %}
+                            <td>
+                                <input type="button" value="✕" class="delete_btn" onclick="DeleteRow(this)"
+                                       id="delete_{{ counter.value }}">
+                            </td>
+                        {% endif %}
                     </tr>
                     {% set counter.value = counter.value + 1 %}
                 {% endfor %}
                 {% for price, work, printer, id in entries_printers_data %}
-                    <tr>
+                    <tr id="row_{{ counter.value }}">
                         <td>
                             {{ counter.value }}
                         </td>
                         <td>
-                            <p>Принтер</p>
+                            <select name="category"
+                                    class="select"
+                                    id="category_{{ counter.value }}"
+                                    onchange="ChangeCategory(this)">
+                                <option>Картридж</option>
+                                <option selected>Принтер</option>
+                            </select>
                         </td>
                         <td>
-                            {{ printer.name }}
+                            <select name="object"
+                                    class="select"
+                                    id="object_{{ counter.value }}">
+                                {% for p in printers %}
+                                    {% if printer.id == p.id %}
+                                        <option value="{{ p.id }}" selected>
+                                            {{ p.name }} / {{ p.num_inventory }}
+                                        </option>
+                                    {% else %}
+                                        <option value="{{ p.id }}">
+                                            {{ p.name }} / {{ p.num_inventory }}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
                         </td>
                         <td>
-                            {{ printer.num_inventory }}
+                            <select name="work"
+                                    class="select"
+                                    id="work_{{ counter.value }}">
+                                {% for w in all_works_printers %}
+                                    {% if work.id == w.id %}
+                                        <option value="{{ w.id }}" selected>
+                                            {{ w.work }}
+                                        </option>
+                                    {% else %}
+                                        <option value="{{ w.id }}">
+                                            {{ w.work }}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
                         </td>
                         <td>
-                            {{ work }}<br>
+                            <input type="number" name="price" value="{{ price }}" class="enter">
                         </td>
-                        <td>
-                            <input type="number" name="prices_p" value="{{ price }}" class="enter">
-                            <input type="hidden" name="works_p_id" value="{{ id }}">
-                        </td>
+                        {% if counter.value == 1 %}
+                            <td></td>
+                        {% else %}
+                            <td>
+                                <input type="button" value="✕" class="delete_btn" onclick="DeleteRow(this)"
+                                       id="delete_{{ counter.value }}">
+                            </td>
+                        {% endif %}
                     </tr>
                     {% set counter.value = counter.value + 1 %}
                 {% endfor %}
                 </tbody>
+            </table>
+            <div class="container_add_btn">
+                <input type="button" value="+" class="row_add_btn" onclick="CreateRowForTable()">
+            </div>
+            <table style="border: none; margin-top: 20px; margin-bottom: 10px">
+                <tr>
+                    <th style="border: none; width: 50%; padding: 10px 10px 0 0; background: inherit; text-align: left">
+                        <label for="date_work">Дата списка работ</label>
+                    </th>
+                    <th style="border: none; width: 50%; padding: 10px 0 0 0; background: inherit; text-align: left">
+                        <label for="name">Имя списка работ</label>
+                    </th>
+                </tr>
+                <tr>
+                    <td style="border: none; padding: 10px 10px 0 0">
+                        <input type="date"
+                           name="date_work"
+                           class="enter"
+                           id="date_work"
+                           value="{{ work.date_work.date() }}"
+                           placeholder="Введите дату" required>
+                    </td>
+                    <td style="border: none; padding: 10px 0 0 0">
+                        <input type="text"
+                           name="name"
+                           class="enter"
+                           id="name"
+                           value="{{ work.name }}"
+                           placeholder="Введите имя" required>
+                    </td>
+                </tr>
             </table>
             <input type="submit" class="add_btn" value="Изменить">
         </form>

@@ -45,9 +45,11 @@
 
 {% block body %}
     <h1>Картридж:</h1>
-    {% for msg in get_flashed_messages() %}
-        <p class="msg"><strong>{{ msg }}</strong></p>
-    {% endfor %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <form method="POST" id="form">
         <div class=form id="items">
             <table style="border: none" id="table">

@@ -7,229 +7,264 @@
     <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
     <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
     <script>
-        let items = 1;
-        let counter = {{ len_wl }} +1;
-        let isFirst = false;
+        let rows_counter = 1;
+        let numberPattern = /\d+/g;
 
-        function AddCheck() {
-            isFirst = true;
-            const div = document.getElementById("items");
-            const button = document.getElementById("add_work_done");
-            items++;
-            let newitem = document.createElement("div");
-            let id = "new";
-            newitem.setAttribute("id", id);
-            newitem.innerHTML = `
-                <form method="POST">
-                {% for ctg in cartridges %}
-                {% if ctg.work_done > 0 %}
-                    <details>
-                        <summary>
-                            <strong>Картридж</strong>
-                                {{ ctg.number }} (
-                                {% for model in ctg.cartridge_models %}
-                                    {{ model.model }}
-                                {% endfor %})
-                        </summary>
-                        Выберите тип сделанной работы:<br>
-                        <div id="main{{ ctg.number }}">
-                            <div id=dc${items}>
-                                <select id="s"
-                                        name="work{{ ctg.number }}"
-                                        class="select">
-                                             <option value="NAN">--Не выбрано--</option>
-                                        {% for el in all_works_cartridges %}
-                                             <option>{{ el.work }}</option>
-                                        {% endfor %}
-                                </select>
-                                по цене
-                                <input id="ic${items}"
-                                       type="number"
-                                       name="price{{ ctg.number }}"
-                                       class="enter"
-                                       value="0">
-                                Рублей
-                                <input type="button"
-                                       value="✕"
-                                       class="delete_btn"
-                                       onclick="RemoveItem('dc${items}');">
-                                <br>
-                                </div>
-                                <input type="button"
-                                       id="ac{{ ctg.number }}"
-                                       value="Добавить поле"
-                                       class="add_field"
-                                       onclick="AddItemC('{{ ctg.number }}')"><br>
-                                </div>
-                            </div>
-                    </details>
-                {% endif %}
-                {% endfor %}
-                    {% for prtr in printers %}
-                    {% if prtr.work_done > 0 %}
-                        <details>
-                            <summary>
-                                <strong>Принтер</strong>
-                                {{ prtr.name }} ({{ prtr.num_inventory }})
-                            </summary>
-                            Выберите тип сделанной работы:<br>
-                            <div id="main{{ prtr.num_inventory }}">
-                                <div id=dp${items}>
-                                    <select id="s"
-                                            name="work{{ prtr.num_inventory }}"
-                                            class="select">
-                                                <option value="NAN">--Не выбрано--</option>
-                                            {% for el in all_works_printers %}
-                                                <option>{{ el.work }}</option>
-                                            {% endfor %}
-                                    </select>
-                                    по цене
-                                    <input id="ic${items}"
-                                           type="number"
-                                           name="price{{ prtr.num_inventory }}"
-                                           class="enter"
-                                           value="0">
-                                    Рублей
-                                    <input type="button"
-                                           value="✕"
-                                           class="delete_btn"
-                                           onclick="RemoveItem('dp${items}');">
-                                    <br>
-                                    </div>
-                                    <input type="button"
-                                           id="ap{{ prtr.num_inventory }}"
-                                           value="Добавить поле"
-                                           class="add_field"
-                                           onclick="AddItemP('{{ prtr.num_inventory }}')"><br>
-                                </div>
-                            </div>
-                        </details>
-                    {% endif %}
+        function initSelect() {
+            $('select').select2();
+        }
+
+        function ChangeCategory(e) {
+            let rowID = e.id.match(numberPattern).join('');
+            let td_obj = document.getElementById("td_obj_" + rowID);
+            let td_work = document.getElementById("td_work_" + rowID);
+            if (e.value === "Картридж") {
+                td_obj.innerHTML = `
+                    <select name="object"
+                            class="select"
+                            id="object_${rowID}">
+                        {% for cartridge in cartridges %}
+                        <option value="{{ cartridge.id }}">
+                            {{ cartridge.number }}
+                            {% for model in cartridge.cartridge_models %}
+                            / {{ model.model }}
+                            {% endfor %}
+                        </option>
+                        {% endfor %}
+                    </select>`
+                td_work.innerHTML = `
+                <select name="work"
+                        class="select"
+                        id="work_${rowID}">
+                    {% for work in all_works_cartridges %}
+                        <option value="{{ work.id }}">
+                            {{ work.work }}
+                        </option>
                     {% endfor %}
-                    <label>
-                    Дата списка работ:
-                    <input type="date"
-                           name="date_work"
-                           class="enter"
-                           placeholder="Введите дату" required>
-                    </label><br>
-                    Имя списка работ:
-                    <input type="text"
-                           name="name"
-                           class="enter"
-                           placeholder="Введите имя" required>
-                    </label><br>
-                    <input type="hidden"
-                           name="num_work"
-                           value="${counter}">
-                    <input type="submit"
-                           name="check_submit"
-                           value="Применить изменения"
-                           class="add_btn">
-                </form>`;
+                </select>`
+            } else {
+                td_obj.innerHTML = `
+                    <select name="object"
+                            class="select"
+                            id="object_${rowID}">
+                        {% for printer in printers %}
+                            <option value="{{ printer.id }}">
+                                {{ printer.name }} / {{ printer.num_inventory }}
+                            </option>
+                        {% endfor %}
+                </select>`
+                td_work.innerHTML = `
+                <select name="work"
+                        class="select"
+                        id="work_${rowID}">
+                    {% for work in all_works_printers %}
+                        <option value="{{ work.id }}">
+                            {{ work.work }}
+                        </option>
+                    {% endfor %}
+                </select>`
+            }
 
-            div.insertBefore(newitem, button);
-            button.remove();
-
-            $('select').select2({
-                placeholder: "Выберите",
-                allowClear: true
-            });
-        }
-    </script>
-    <script>
-        function AddItemP(printer_num) {
-            const div = document.getElementById("main" + printer_num);
-            const button = document.getElementById("ap" + printer_num);
-            console.log(button)
-            items++;
-            let newitem = document.createElement("div");
-            let id = "dp" + items;
-            newitem.setAttribute("id", id);
-            newitem.innerHTML = `<select id="s"
-                                        name="work${printer_num}"
-                                        placeholder="Выберите тип работы"
-                                        style="width: 240px; height: 30px; border-radius: 4px">
-                                            <option value="NAN">--Не выбрано--</option>
-                                        {% for el in all_works_printers %}
-                                            <option>{{ el.work }}</option>
-                                        {% endfor %}
-                                </select>
-                                по цене
-                                <input id="ip${items}"
-                                       type="number"
-                                       name="price${printer_num}"
-                                       class="enter"
-                                       value="0">
-                                Рублей
-                                <input type="button"
-                                       value="✕"
-                                       class="delete_btn"
-                                       onclick="RemoveItem('dp${items}');">
-                                <br>`;
-
-            div.insertBefore(newitem, button);
-
-            $('select').select2({
-                placeholder: "Выберите",
-                allowClear: true
-            });
+            initSelect();
         }
 
-        function AddItemC(cartridge_num) {
-            const div = document.getElementById("main" + cartridge_num);
-            const button = document.getElementById("ac" + cartridge_num);
-            console.log(button)
-            items++;
-            let newitem = document.createElement("div");
-            let id = "dc" + items;
-            newitem.setAttribute("id", id);
-            newitem.innerHTML = `<select id="s"
-                                        name="work${cartridge_num}"
-                                        placeholder="Выберите тип работы"
-                                        class="select">
-                                            <option value="NAN">--Не выбрано--</option>
-                                        {% for el in all_works_cartridges %}
-                                            <option>{{ el.work }}</option>
-                                        {% endfor %}
-                                </select>
-                                по цене
-                                <input id="ic${items}"
-                                       type="number"
-                                       name="price${cartridge_num}"
-                                       class="enter"
-                                       value="0">
-                                Рублей
-                                <input type="button"
-                                       value="✕"
-                                       class="delete_btn"
-                                       onclick="RemoveItem('dc${items}');">
-                                <br>`;
+        function DeleteRow(e) {
+            let rowID = e.id.match(numberPattern).join('');
+            let row = document.getElementById("row_" + rowID);
+            row.remove();
+        }
 
-            div.insertBefore(newitem, button);
+        function CreateRowForTable() {
+            let row = document.createElement("tr");
+            row.setAttribute("id", "row_" + rows_counter);
+
+            let td1 = document.createElement("td");
+            td1.innerHTML = `${rows_counter}`;
+
+            let td2 = document.createElement("td");
+            td2.innerHTML = `
+                <select name="category"
+                        class="select"
+                        id="category_${rows_counter}"
+                        onchange="ChangeCategory(this)">
+                    <option>Картридж</option>
+                    <option>Принтер</option>
+                </select>`
+
+            let td3 = document.createElement("td");
+            td3.setAttribute("id", "td_obj_" + rows_counter);
+            td3.innerHTML = `
+                <select name="object"
+                        class="select"
+                        id="object_${rows_counter}">
+                    {% for cartridge in cartridges %}
+                    <option value="{{ cartridge.id }}">
+                        {{ cartridge.number }}
+                        {% for model in cartridge.cartridge_models %}
+                        / {{ model.model }}
+                        {% endfor %}
+                    </option>
+                    {% endfor %}
+                </select>`
+
+            let td4 = document.createElement("td");
+            td4.setAttribute("id", "td_work_" + rows_counter);
+            td4.innerHTML = `
+                <select name="work"
+                        class="select"
+                        id="work_${rows_counter}">
+                    {% for work in all_works_cartridges %}
+                    <option value="{{ work.id }}">
+                        {{ work.work }}
+                    </option>
+                    {% endfor %}
+                </select>`
+
+            let td5 = document.createElement("td");
+            td5.innerHTML = `
+                <input type="number" class="enter" name="price" required>`
+
+            let td6 = document.createElement("td");
+            if (rows_counter > 1) {
+                td6.innerHTML = `
+                <input type="button" value="✕" class="delete_btn" onclick="DeleteRow(this)" id="delete_${rows_counter}">`;
+            } else {
+                td6.innerHTML = ``;
+            }
+
+            row.appendChild(td1);
+            row.appendChild(td2);
+            row.appendChild(td3);
+            row.appendChild(td4);
+            row.appendChild(td5);
+            row.appendChild(td6);
+
+            let table = document.getElementById("new_work_done");
+            table.appendChild(row);
+
+            initSelect();
+            rows_counter += 1;
+        }
+
+        function CreateTable() {
+            let table = document.createElement("table");
+            table.setAttribute("class", "table");
+            table.setAttribute("id", "new_work_done");
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th style="width: 5px; max-width: 5px">№</th>
+                        <th style="width: 15%; max-width: 15%">Наименование</th>
+                        <th style="width: 45%; max-width: 45%">Объект</th>
+                        <th style="width: 20%; max-width: 20%">Услуга</th>
+                        <th style="width: calc(20% - 55px); max-width: calc(20% - 55px)">Цена</th>
+                        <th style="width: 50px; max-width: 50px"></th>
+                    </tr>
+                </thead>`
+            return table;
+        }
+
+        function CancelForm() {
+            let form = document.getElementById("main_form");
+            form.innerHTML = `
+                <div id="btn_container" class="btn_container">
+                    <input type="button" id="add_work_done_table" value="Добавить" class="add_btn" onclick="AddForm()">
+                </div>`;
+            rows_counter = 1;
+        }
+
+        function AddForm() {
+            let table = CreateTable();
+
+            let rowAddBtn = document.createElement("div");
+            rowAddBtn.setAttribute("class", "container_add_btn");
+            rowAddBtn.innerHTML = `
+                <input type="button" value="+" class="row_add_btn" onclick="CreateRowForTable()">`;
+
+            let form_inputs = document.createElement("div");
+            form_inputs.setAttribute("class", "form_inputs");
+            form_inputs.innerHTML = `
+                <table style="border: none; margin-top: 20px; margin-bottom: 10px">
+                    <tr>
+                        <th style="border: none; width: 50%; padding: 10px 10px 0 0; background: inherit; text-align: left">
+                            <label for="date_work">Дата списка работ</label>
+                        </th>
+                        <th style="border: none; width: 50%; padding: 10px 0 0 0; background: inherit; text-align: left">
+                            <label for="date_work">Имя списка работ</label>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td style="border: none; padding: 10px 10px 0 0">
+                            <input type="date"
+                               name="date_work"
+                               class="enter"
+                               id="date_work"
+                               placeholder="Введите дату" required>
+                        </td>
+                        <td style="border: none; padding: 10px 0 0 0">
+                            <input type="text"
+                               name="name"
+                               class="enter"
+                               id="name"
+                               placeholder="Введите имя" required>
+                        </td>
+                    </tr>
+                </table>`
+
+            let form_button = document.getElementById("add_work_done_table");
+            form_button.removeAttribute("onclick");
+            form_button.setAttribute("type", "submit");
+            form_button.setAttribute("style", "margin: 0 10px 0 0;");
+
+            let cancel_button = document.createElement("input");
+            cancel_button.setAttribute("type", "button");
+            cancel_button.setAttribute("class", "btn_clr");
+            cancel_button.setAttribute("onclick", "CancelForm()");
+            cancel_button.setAttribute("value", "Отменить");
+            cancel_button.setAttribute("style", "margin: 0;");
+
+            let btn_container = document.getElementById("btn_container");
+            btn_container.appendChild(form_button);
+            btn_container.appendChild(cancel_button);
+
+            const form = document.getElementById("main_form");
+            form.append(table)
+            form.append(rowAddBtn)
+            form.append(form_inputs)
+            form.append(btn_container)
+
+            CreateRowForTable();
         }
     </script>
 {% endblock %}
 
 {% block body %}
     <h1>Списки выполненных работ</h1>
-    {% for msg in get_flashed_messages() %}
-        <div class="msg">
-            <h2>{{ msg }}</h2>
-        </div>
-    {% endfor %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <div class="sch_bar">
         <div class="ctr">
             <label for="search_locw"><strong>Поиск по проделанным работам:</strong></label><br>
             <input type="text" placeholder="Начните вводить" id="search_locw" class="enter"><br>
         </div>
     </div>
+    <form method="post" id="main_form">
+        <div id="btn_container" class="btn_container">
+            <input type="button" id="add_work_done_table" value="Добавить" class="add_btn" onclick="AddForm()">
+        </div>
+    </form>
+    {% if active_check_id != None %}
+        <a href="/active_contract/{{ active_check_id }}/more">Перейти к активному счёту</a>
+    {% endif %}
     <div id="items">
-        <input type="button" id="add_work_done" value="Добавить" class="add_btn" onclick="AddCheck()">
         {% for work, wlc, wlp, full_price in work_list_data %}
             <div id="d{{ loop.index }}" style="margin-top: 25px;" class="dtls">
-                <h4>Проделанные работы {{ work.name }} {{ work.number }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
-                Общая сумма:{{ full_price }}<br>
+                <h4>Проделанные работы {{ work.name }} {{ work.number }}
+                    ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
+                Общая сумма: {{ full_price }} рублей<br>
                 <table>
                     <thead>
                     <tr>
@@ -293,6 +328,7 @@
                     {% endfor %}
                     </tbody>
                 </table>
+                <a href="/list_of_completed_works/{{ work.id }}/update">Изменить</a>
             </div>
         {% endfor %}
     </div>

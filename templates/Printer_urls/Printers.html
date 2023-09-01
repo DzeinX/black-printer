@@ -9,11 +9,11 @@
 
 {% block body %}
     <h1>Принтеры: </h1>
-    {% for msg in get_flashed_messages() %}
-        <div class="msg">
-            {{ msg }}
-        </div>
-    {% endfor %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <div class="align-center">
         <form method="POST">
             <div class="form">
@@ -176,7 +176,7 @@
             {% for printer, status in printers_data %}
                 {% if (printer.efficiency != 0) %}
                     <tr>
-                        <td class="1">
+                        <td class="1" style="text-align: center; color: black">
                             {{ loop.index }}
                         </td>
                         <td class="2">

@@ -72,7 +72,7 @@ class MainURLs:
                                    refill_cycle_chart=r_c_chart,
                                    is_show_charts=is_show_charts)
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -98,7 +98,7 @@ class MainURLs:
                 return list_division
 
             if len(list_division) == 0:
-                flash('Нельзя удалить все подразделения')
+                flash('Нельзя удалить все подразделения', 'warning')
                 return redirect(url_for('main_urls.main_page'))
 
             model_controller.delete_all_entries_in_model(model_name="Division")
@@ -113,12 +113,12 @@ class MainURLs:
                                                            division=division)
                         model_controller.add_in_session(model_entry=division)
             except Exception as e:
-                flash(f'Не удалось сохранить изменения. Ошибка: {e}')
+                flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
                 return redirect(url_for('main_urls.main_page'))
 
             return try_to_commit(redirect_to='main_urls.add_divisions')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -144,7 +144,7 @@ class MainURLs:
                 return list_buildings
 
             if len(list_buildings) == 0:
-                flash('Нельзя удалить все корпусы')
+                flash('Нельзя удалить все корпусы', 'warning')
                 return redirect(url_for('main_urls.main_page'))
 
             model_controller.delete_all_entries_in_model(model_name="Buildings")
@@ -158,12 +158,12 @@ class MainURLs:
                                                            building=building)
                         model_controller.add_in_session(building)
             except Exception as e:
-                flash(f'Не удалось сохранить изменения. Ошибка: {e}')
+                flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
                 return redirect(url_for('main_urls.main_page'))
 
             return try_to_commit(redirect_to='main_urls.add_buildings')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -276,10 +276,10 @@ class MainURLs:
                 model_controller.add_in_session(all_history)
                 return try_to_commit(redirect_to="main_urls.all_history")
 
-            flash(f'У вас нет доступа к этому функционалу')
+            flash(f'У вас нет доступа к этому функционалу', 'warning')
             return redirect(url_for('main_urls.main_page'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -290,29 +290,32 @@ class MainURLs:
             return redirect(url_for('main_urls.main_page'))
 
         if request.method == "GET":
+            last_contract = None
+            all_checks_active = False
+            contract_price = None
+            check_lists_with_price = []
             list_of_contracts = model_controller.get_all_entries(model_name="ListsOfContracts")
             if len(list_of_contracts) > 0:
                 last_contract = model_controller.filter_by_model(model_name="ListsOfContracts",
                                                                  mode="first",
                                                                  active=1)
-            else:
-                last_contract = None
+                if last_contract is not None:
+                    check_lists = model_controller.filter_by_model(model_name="CheckLists",
+                                                                   mode="all",
+                                                                   list_of_contracts_id=last_contract.id)
+                    check_lists_with_price = [[round(get_check_price(check)), check] for check in check_lists]
 
-            check_lists = model_controller.filter_by_model(model_name="CheckLists",
-                                                           mode="all",
-                                                           list_of_contracts_id=last_contract.id)
-
-            all_checks_active = False
-            contract_price = 0
-            for contract in list_of_contracts:
-                if contract.active:
-                    all_checks_active = all_checks_is_active(last_contract)
-                    contract_price = get_contract_price(last_contract)
-                    break
+                all_checks_active = False
+                contract_price = 0
+                for contract in list_of_contracts:
+                    if contract.active:
+                        all_checks_active = all_checks_is_active(last_contract)
+                        contract_price = round(get_contract_price(last_contract))
+                        break
 
             return render_template('Main_urls/WorkDone.html',
                                    last_contract=last_contract,
-                                   check_lists=check_lists,
+                                   check_lists_with_price=check_lists_with_price,
                                    all_checks_active=all_checks_active,
                                    contract_price=contract_price)
 
@@ -345,7 +348,7 @@ class MainURLs:
 
             return try_to_commit(redirect_to='main_urls.active_contract')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -357,8 +360,6 @@ class MainURLs:
 
         if request.method == "GET":
             contract = model_controller.get_model_by_id(model_name="ListsOfContracts", pk=contract_id)
-            model_controller.update(model_entry=contract,
-                                    active=False)
 
             action_history = StatusSettings.Contract.close
             type_history = StatusSettings.Types.contract
@@ -375,14 +376,16 @@ class MainURLs:
 
             contract_price = get_contract_price(contract)
             if contract_price == contract.sum:
+                model_controller.update(model_entry=contract,
+                                        active=False)
                 return try_to_commit(redirect_to='main_urls.active_contract')
             else:
                 flash(f'Указанная сумма контракта не совпадает с действительной на \
                         {contract.sum - contract_price} \
-                        рублей')
+                        рублей', 'warning')
                 return redirect(url_for('main_urls.active_contract'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -426,7 +429,7 @@ class MainURLs:
 
             return try_to_commit(redirect_to='main_urls.active_contract')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -459,10 +462,10 @@ class MainURLs:
                 return try_to_commit(redirect_to='main_urls.active_contract')
 
             else:
-                flash(f'Указанная сумма счёта не совпадает с действительной на {check.sum - check_price} рублей')
+                flash(f'Указанная сумма счёта не совпадает с действительной на {check.sum - check_price} рублей', 'warning')
                 return redirect(url_for('main_urls.active_contract'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -491,7 +494,7 @@ class MainURLs:
 
             return try_to_commit(redirect_to='main_urls.active_contract')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -504,6 +507,7 @@ class MainURLs:
         if request.method == "GET":
             check = model_controller.get_model_by_id(model_name="CheckLists",
                                                      pk=check_id)
+            check_price = get_check_price(check)
 
             list_of_contracts = model_controller.get_all_entries(model_name="ListsOfContracts")
             if len(list_of_contracts) > 0:
@@ -511,13 +515,16 @@ class MainURLs:
                                                                  mode="first",
                                                                  active=1)
             else:
-                flash(f'Контрактов нет')
+                flash(f'Контрактов нет', 'error')
                 return redirect(url_for('main_urls.main_page'))
 
             work_lists = model_controller.get_all_entries(model_name="WorkList")
             work_list_data = []
+            is_belong_counter_true = 0
+            is_access = 0
             for work in work_lists:
                 if work.check_lists_id == check.id or work.check_lists_id is None:
+                    is_access += 1
                     work_list_cartridges = model_controller.filter_by_model(model_name="WorkListsCartridges",
                                                                             mode="all",
                                                                             work_list=work.id)
@@ -529,13 +536,20 @@ class MainURLs:
                     wlp = get_entries_for_work_list_printers(work_list_printers=work_list_printers)
 
                     is_belong = True if work.check_lists_id == check.id else False
+                    is_belong_counter_true = is_belong_counter_true + 1 if is_belong else is_belong_counter_true
 
                     work_list_data.append([is_belong, work, wlc, wlp, get_work_done_price(work)])
+
+            is_all_belong = False
+            if is_belong_counter_true == is_access:
+                is_all_belong = True
 
             return render_template('Main_urls/CheckMore.html',
                                    work_list_data=work_list_data,
                                    check=check,
-                                   last_contract=last_contract)
+                                   last_contract=last_contract,
+                                   is_all_belong=is_all_belong,
+                                   check_price=round(check_price))
 
         if request.method == "POST":
             works_id = request.form.getlist('works')
@@ -562,7 +576,7 @@ class MainURLs:
 
             return try_to_commit(redirect_to='main_urls.active_contract')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -575,6 +589,7 @@ class MainURLs:
         if request.method == "GET":
             work_lists = model_controller.get_all_entries(model_name="WorkList")
             work_list_data = []
+            active_check_id = None
             for work in work_lists:
                 if work.check_lists_id is None:
                     work_list_cartridges = model_controller.filter_by_model(model_name="WorkListsCartridges",
@@ -589,108 +604,111 @@ class MainURLs:
 
                     work_list_data.append([work, wlc, wlp, get_work_done_price(work)])
 
+            # Нахождение активного счёта активного договора
+            checks = model_controller.get_all_entries(model_name="CheckLists")
+            checks.reverse()
+            for check in checks:
+                all_price = get_check_price(check)
+                contract = model_controller.get_model_by_id(model_name="ListsOfContracts",
+                                                            pk=check.list_of_contracts_id)
+                if contract.active and check.active and all_price != check.sum:
+                    active_check_id = check.id
+
+            work_list_data.reverse()
+
             all_works_cartridges = model_controller.get_all_entries(model_name="AllWorksCartridges")
             all_works_printers = model_controller.get_all_entries(model_name="AllWorksPrinters")
 
-            cartridges = model_controller.get_all_entries(model_name="Cartridges")
-            printers = model_controller.get_all_entries(model_name="Printer")
+            all_cartridges = model_controller.get_all_entries(model_name="Cartridges")
+            all_printers = model_controller.get_all_entries(model_name="Printer")
+
+            cartridges = []
+            for cartridge in all_cartridges:
+                if cartridge.work_done > 0:
+                    cartridges.append(cartridge)
+            printers = []
+            for printer in all_printers:
+                if printer.work_done > 0:
+                    printers.append(printer)
+
             return render_template('Main_urls/ListOfCompletedWorks.html',
                                    work_list_data=work_list_data,
                                    cartridges=cartridges,
                                    printers=printers,
                                    all_works_printers=all_works_printers,
-                                   all_works_cartridges=all_works_cartridges, )
+                                   all_works_cartridges=all_works_cartridges,
+                                   active_check_id=active_check_id)
 
         if request.method == "POST":
+            categories = request.form.getlist("category")
+            objects = request.form.getlist("object")
+            works = request.form.getlist("work")
+            prices = request.form.getlist("price")
+
             date_work_list = request.form['date_work']
-            name = request.form['name'].strip()
             date_work_list = datetime.fromisoformat(f'{date_work_list}')
+            name = request.form['name'].strip()
+
             user = current_user.username
 
             work_list = model_controller.create(model_name="WorkList",
                                                 date_work=date_work_list,
                                                 name=name,
                                                 date_create=datetime.now())
+            exist_cartridges = []
+            exist_printers = []
+            for index, category in enumerate(categories):
+                if category == "Картридж":
+                    cartridge = model_controller.get_model_by_id(model_name="Cartridges",
+                                                                 pk=int(objects[index]))
 
-            cartridges = model_controller.get_all_entries(model_name="Cartridges")
-            cartridges_0 = []
-            for cartridge in cartridges:
-                if cartridge.work_done > 0:
-                    cartridges_0.append(cartridge)
+                    try:
+                        wl_c = model_controller.create(model_name="WorkListsCartridges",
+                                                       user=user,
+                                                       date=datetime.now(),
+                                                       cartridge_id=cartridge.id)
+                        work_list.work_list_cartridges_id.append(wl_c)
+                        wpc = model_controller.create(model_name="WorksPricesCartridges",
+                                                      price=prices[index],
+                                                      all_works_cartridges_id=int(works[index]))
+                        wl_c.works_prices_cartridges_id.append(wpc)
+                        model_controller.add_in_session(wl_c)
+                        model_controller.add_in_session(wpc)
 
-            for ctg_0 in cartridges_0:
-                prices = request.form.getlist(f'price{ctg_0.number}')
-                works = request.form.getlist(f'work{ctg_0.number}')
+                        if cartridge.id not in exist_cartridges:
+                            new_work_done = cartridge.work_done - 1
+                            model_controller.update(model_entry=cartridge,
+                                                    work_done=new_work_done)
+                            exist_cartridges.append(cartridge.id)
+                    except Exception as e:
+                        flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
+                        return redirect(url_for('main_urls.list_of_completed_works'))
 
-                if not works[0] == 'NAN' and not prices[0] == "0":
-                    for i in range(0, len(works)):
-                        if not works[i] == 'NAN':
-                            if not prices[i] == 0:
-                                wl_c = model_controller.create(model_name="WorkListsCartridges",
-                                                               user=user,
-                                                               date=datetime.now(),
-                                                               cartridge_id=ctg_0.id)
-                                work_list.work_list_cartridges_id.append(wl_c)
-                                work = model_controller.filter_by_model(model_name="AllWorksCartridges",
-                                                                        mode="first",
-                                                                        work=works[i])
-                                wpc = model_controller.create(model_name="WorksPricesCartridges",
-                                                              price=prices[i],
-                                                              all_works_cartridges_id=work.id)
-                                wl_c.works_prices_cartridges_id.append(wpc)
-                                model_controller.add_in_session(wl_c)
-                                model_controller.add_in_session(wpc)
-                            else:
-                                flash(f'Цена за {works[i]} у картриджа {ctg_0.number} не указана')
-                                return redirect(request.referrer)
-                        else:
-                            flash(f'Тип работы у картриджа {ctg_0.number} не выбран')
-                            return redirect(request.referrer)
+                if category == "Принтер":
+                    printer = model_controller.get_model_by_id(model_name="printer",
+                                                               pk=int(objects[index]))
 
-                    new_work_done = ctg_0.work_done - 1
-                    model_controller.update(model_entry=ctg_0,
-                                            work_done=new_work_done)
+                    try:
+                        wl_p = model_controller.create(model_name="WorkListsPrinters",
+                                                       user=user,
+                                                       date=datetime.now(),
+                                                       printer_id=printer.id)
+                        work_list.work_list_printers_id.append(wl_p)
+                        wpp = model_controller.create(model_name="WorksPricesPrinters",
+                                                      price=prices[index],
+                                                      all_works_printers_id=int(works[index]))
+                        wl_p.works_prices_printers_id.append(wpp)
+                        model_controller.add_in_session(wl_p)
+                        model_controller.add_in_session(wpp)
 
-            printers = model_controller.get_all_entries(model_name="Printer")
-            printers_0 = []
-            for printer in printers:
-                if printer.work_done > 0:
-                    printers_0.append(printer)
-
-            for pr_0 in printers_0:
-                prices = request.form.getlist(f'price{pr_0.num_inventory}')
-                works = request.form.getlist(f'work{pr_0.num_inventory}')
-
-                if not works[0] == 'NAN' and not prices[0] == "0":
-                    for i in range(0, len(works)):
-                        if not works[i] == 'NAN':
-                            if not prices[i] == 0:
-                                wl_p = model_controller.create(model_name="WorkListsPrinters",
-                                                               user=user,
-                                                               date=datetime.now(),
-                                                               printer_id=pr_0.id,
-                                                               work_list=work_list.id)
-                                work_list.work_list_printers_id.append(wl_p)
-                                work = model_controller.filter_by_model(model_name="AllWorksPrinters",
-                                                                        mode="first",
-                                                                        work=works[i])
-                                wpp = model_controller.create(model_name="WorksPricesPrinters",
-                                                              price=prices[i],
-                                                              all_works_printers_id=work.id,
-                                                              work_lists_printers_id=wl_p.id)
-                                wl_p.works_prices_printers_id.append(wpp)
-                                model_controller.add_in_session(wl_p)
-                                model_controller.add_in_session(wpp)
-                            else:
-                                flash(f'Цена за {works[i]} у принтера {pr_0.name} не указана')
-                                return redirect(request.referrer)
-                        else:
-                            flash(f'Тип работы у принтера {pr_0.name} не выбран')
-                            return redirect(request.referrer)
-
-                    new_work_done = pr_0.work_done - 1
-                    model_controller.update(model_entry=pr_0,
-                                            work_done=new_work_done)
+                        if printer.id not in exist_printers:
+                            new_work_done = printer.work_done - 1
+                            model_controller.update(model_entry=printer,
+                                                    work_done=new_work_done)
+                            exist_printers.append(printer.id)
+                    except Exception as e:
+                        flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
+                        return redirect(url_for('main_urls.list_of_completed_works'))
 
             model_controller.add_in_session(work_list)
 
@@ -707,7 +725,7 @@ class MainURLs:
 
             return try_to_commit(redirect_to='main_urls.list_of_completed_works')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -722,13 +740,20 @@ class MainURLs:
                                                     pk=work_id)
             check = model_controller.get_model_by_id(model_name="CheckLists",
                                                      pk=work.check_lists_id)
-            if check is None:
-                flash(f'Список проделанных работ не принадлежит ни одному счёту')
-                return redirect(url_for('main_urls.active_contract'))
-
-            if not check.active:
-                flash(f'Счёт закрыт')
-                return redirect(url_for('main_urls.active_contract'))
+            # Проверка на доступ: привязан ли список работ к счёту?
+            if check is not None:
+                contract = model_controller.get_model_by_id(model_name="ListsOfContracts",
+                                                            pk=check.list_of_contracts_id)
+                # Проверка на доступ: привязан ли счёт к договору?
+                if contract is not None:
+                    # Проверка активности договора
+                    if not contract.active:
+                        flash(f'Договор закрыт', 'error')
+                        return redirect(url_for('main_urls.main_page'))
+                    # Проверка активности счёта
+                    if not check.active:
+                        flash(f'Счёт закрыт', 'error')
+                        return redirect(url_for('main_urls.main_page'))
 
             work_list_cartridges = model_controller.filter_by_model(model_name="WorkListsCartridges",
                                                                     mode="all",
@@ -740,39 +765,116 @@ class MainURLs:
             entries_cartridges_data = get_entries_for_work_list_cartridges(work_list_cartridges=work_list_cartridges)
             entries_printers_data = get_entries_for_work_list_printers(work_list_printers=work_list_printers)
 
+            all_works_cartridges = model_controller.get_all_entries(model_name="AllWorksCartridges")
+            all_works_printers = model_controller.get_all_entries(model_name="AllWorksPrinters")
+
+            all_cartridges = model_controller.get_all_entries(model_name="Cartridges")
+            all_printers = model_controller.get_all_entries(model_name="Printer")
+
+            cartridges = []
+            for cartridge in all_cartridges:
+                if cartridge.work_done > 0:
+                    cartridges.append(cartridge)
+            printers = []
+            for printer in all_printers:
+                if printer.work_done > 0:
+                    printers.append(printer)
+
             return render_template("Main_urls/UpdateWork.html",
                                    entries_cartridges_data=entries_cartridges_data,
                                    entries_printers_data=entries_printers_data,
-                                   work=work)
+                                   work=work,
+                                   cartridges=all_cartridges,
+                                   printers=all_printers,
+                                   all_works_cartridges=all_works_cartridges,
+                                   all_works_printers=all_works_printers)
 
         if request.method == "POST":
             work = model_controller.get_model_by_id(model_name="WorkList",
                                                     pk=work_id)
-            prices_c = request.form.getlist('prices_c')
-            prices_p = request.form.getlist('prices_p')
-            works_c_id = request.form.getlist('works_c_id')
-            works_p_id = request.form.getlist('works_p_id')
 
+            categories = request.form.getlist("category")
+            objects = request.form.getlist("object")
+            works = request.form.getlist("work")
+            prices = request.form.getlist("price")
+
+            date_work_list = request.form['date_work']
+            date_work_list = datetime.fromisoformat(f'{date_work_list}')
+            name = request.form['name'].strip()
+
+            model_controller.update(model_entry=work,
+                                    date_work=date_work_list,
+                                    name=name)
+
+            user = current_user.username
+
+            was_list_cartridges = []
             for wlc in work.work_list_cartridges_id:
+                was_list_cartridges.append(wlc.cartridge_id)
                 for wpc in wlc.works_prices_cartridges_id:
-                    for i in range(0, len(works_c_id)):
-                        if int(works_c_id[i]) == wpc.id:
-                            model_controller.update(model_entry=wpc,
-                                                    price=prices_c[i])
-                            break
+                    model_controller.delete_entry(model_entry=wpc)
+                model_controller.delete_entry(model_entry=wlc)
 
+            was_list_printers = []
             for wlp in work.work_list_printers_id:
+                was_list_printers.append(wlp.printer_id)
                 for wpp in wlp.works_prices_printers_id:
-                    for i in range(0, len(works_p_id)):
-                        if int(works_p_id[i]) == wpp.id:
-                            model_controller.update(model_entry=wpp,
-                                                    price=prices_p[i])
-                            break
+                    model_controller.delete_entry(model_entry=wpp)
+                model_controller.delete_entry(model_entry=wlp)
+
+            for index, category in enumerate(categories):
+                if category == "Картридж":
+                    cartridge = model_controller.get_model_by_id(model_name="Cartridges",
+                                                                 pk=int(objects[index]))
+                    try:
+                        wl_c = model_controller.create(model_name="WorkListsCartridges",
+                                                       user=user,
+                                                       date=datetime.now(),
+                                                       cartridge_id=cartridge.id)
+                        work.work_list_cartridges_id.append(wl_c)
+                        wpc = model_controller.create(model_name="WorksPricesCartridges",
+                                                      price=prices[index],
+                                                      all_works_cartridges_id=int(works[index]))
+                        wl_c.works_prices_cartridges_id.append(wpc)
+                        model_controller.add_in_session(wl_c)
+                        model_controller.add_in_session(wpc)
+
+                        if cartridge.id not in was_list_cartridges:
+                            new_work_done = cartridge.work_done - 1
+                            model_controller.update(model_entry=cartridge,
+                                                    work_done=new_work_done)
+                    except Exception as e:
+                        flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
+                        return redirect(url_for('main_urls.list_of_completed_works'))
+
+                if category == "Принтер":
+                    printer = model_controller.get_model_by_id(model_name="printer",
+                                                               pk=int(objects[index]))
+
+                    try:
+                        wl_p = model_controller.create(model_name="WorkListsPrinters",
+                                                       user=user,
+                                                       date=datetime.now(),
+                                                       printer_id=printer.id)
+                        work.work_list_printers_id.append(wl_p)
+                        wpp = model_controller.create(model_name="WorksPricesPrinters",
+                                                      price=prices[index],
+                                                      all_works_printers_id=int(works[index]))
+                        wl_p.works_prices_printers_id.append(wpp)
+                        model_controller.add_in_session(wl_p)
+                        model_controller.add_in_session(wpp)
+
+                        if printer.id not in was_list_printers:
+                            new_work_done = printer.work_done - 1
+                            model_controller.update(model_entry=printer,
+                                                    work_done=new_work_done)
+                    except Exception as e:
+                        flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
+                        return redirect(url_for('main_urls.list_of_completed_works'))
 
             action_history = StatusSettings.WorkList.updated
             type_history = StatusSettings.Types.work_list
             name_history = f"{work.date_work.date().strftime('%d.%m.%Y')}"
-            user = current_user.username
             request_redirect = save_in_history(action=action_history,
                                                type=type_history,
                                                name=name_history,
@@ -783,7 +885,7 @@ class MainURLs:
 
             return try_to_commit(redirect_to='main_urls.active_contract')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -813,13 +915,13 @@ class MainURLs:
                                                                           list_of_contracts_id=active_contract.id)
             else:
                 active_contract_checks = []
-
+            contract_data.reverse()
             return render_template('Main_urls/ProgressReport.html',
                                    active_contract=active_contract,
                                    active_contract_checks=active_contract_checks,
                                    contract_data=contract_data)
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -838,7 +940,7 @@ class MainURLs:
                 last_contract = model_controller.get_model_by_id(model_name="ListsOfContracts",
                                                                  pk=contract_id)
             else:
-                flash(f'Контрактов нет')
+                flash(f'Контрактов нет', 'error')
                 return redirect(url_for('main_urls.main_page'))
 
             work_lists = model_controller.get_all_entries(model_name="WorkList")
@@ -864,5 +966,5 @@ class MainURLs:
                                    check=check,
                                    last_contract=last_contract)
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))

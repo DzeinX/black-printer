@@ -12,45 +12,68 @@
 
 {% block body %}
     <h1>Активный договор</h1>
-    {% for msg in get_flashed_messages() %}
-        <div class="msg">
-            <h4>{{ msg }}</h4>
-        </div>
-    {% endfor %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     {% if last_contract != None %}
-        <div style="background-color: lightblue">
-            <h2>Номер активного договора:</h2>
-            <h4>{{ last_contract.name }} ({{ last_contract.date_contract.date().strftime('%d.%m.%Y') }}) на сумму {{ last_contract.sum }}
-                Рублей</h4>
-            <h5>Действительная сумма договора: {{ contract_price }} Рублей</h5>
-            <strong>Счета:</strong><br>
-            {% set counter = namespace(value=1) %}
-            {% for check in check_lists %}
-                <div>
-                    {{ loop.index }})
-                    {% if check.date_check == last_contract.date_contract %}
-                        <strong>Дата от: </strong>Не указана
+        <div class="active_contract">
+            <div class="active_contract_title">
+                <h4>{{ last_contract.name }} ({{ last_contract.date_contract.date().strftime('%d.%m.%Y') }}) на
+                    сумму {{ last_contract.sum }}
+                    Рублей</h4>
+                <span>Действительная сумма договора: {{ contract_price }} Рублей</span>
+            </div>
+            {% if check_lists_with_price %}
+                <strong>Счета:</strong><br>
+                {% set counter = namespace(value=1) %}
+                {% for price, check in check_lists_with_price %}
+                    {% set color = namespace(value='') %}
+                    {% if check.sum < price %}
+                        {% set color.value = '#ff7675' %}
                     {% else %}
-                        <strong>Дата от: </strong>{{ check.date_check.date().strftime('%d.%m.%Y') }}
+                        {% if check.sum == price %}
+                            {% set color.value = '#05c46b' %}
+                        {% else %}
+                            {% set color.value = '#f6b93b' %}
+                        {% endif %}
                     {% endif %}
-                    {% if check.sum == 0 %}
-                        <strong>Сумма счёта: </strong>Не указана
-                    {% else %}
-                        <strong>Сумма счёта: </strong>{{ check.sum }} Рублей
-                    {% endif %}
-
-                    <a href="/active_contract/{{ check.id }}/more" class="#">Подробнее</a>
-                    {% if check.active %}
-                        <a href="/active_contract/{{ check.id }}/close_check" style="color: darkred !important;">Закрыть счёт</a>
-                    {% else %}
-                        <a href="/active_contract/{{ check.id }}/reopen_check">Переоткрыть счёт</a>
-                    {% endif %}
+                    <div class="checks">
+                        <div class="check_info">
+                            {{ loop.index }})
+                            {% if check.date_check == last_contract.date_contract %}
+                                <strong>Дата от: </strong>Не указана
+                            {% else %}
+                                <strong>Дата от: </strong>{{ check.date_check.date().strftime('%d.%m.%Y') }}
+                            {% endif %}
+                            {% if check.sum == 0 %}
+                            <strong>Сумма счёта: </strong>Не указана
+                            {% else %}
+                            <strong>Сумма счёта: </strong>{{ check.sum }} (<span style="color: {{ color.value }}">{{ price }} сейчас</span>) рублей
+                            {% endif %}
+                        </div>
+                        <div class="check_action_links">
+                            <a href="/active_contract/{{ check.id }}/more" class="#">Подробнее</a>
+                            {% if check.active %}
+                                <a href="/active_contract/{{ check.id }}/close_check"
+                                   style="color: darkred !important;">Закрыть счёт</a>
+                            {% else %}
+                                <a href="/active_contract/{{ check.id }}/reopen_check">Переоткрыть счёт</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% set counter.value = counter.value + 1 %}
+                {% endfor %}
+            {% else %}
+                <strong>Счетов нету</strong><br>
+            {% endif %}
+            {% if not all_checks_active or not check_lists_with_price %}
+                <div class="contract_action_links">
+                    <a href="/active_contract/{{ last_contract.id }}/new_check">Создать счёт</a><br>
+                    <a href="/active_contract/{{ last_contract.id }}/close_contract" style="color: darkred !important;">Закрыть
+                        договор</a>
                 </div>
-                {% set counter.value = counter.value + 1 %}
-            {% endfor %}
-            {% if not all_checks_active %}
-                <a href="/active_contract/{{ last_contract.id }}/new_check">Создать счёт</a><br>
-                <a href="/active_contract/{{ last_contract.id }}/close_contract" style="color: darkred !important;">Закрыть договор</a>
             {% endif %}
         </div>
     {% else %}

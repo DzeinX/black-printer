@@ -100,6 +100,11 @@ class ModelController(metaclass=MetaSingleton):
         _, model = self._get_model(model_name)
         model.query.delete()
 
+    @staticmethod
+    def delete_entry(model_entry: ModelInterface):
+        db.session.delete(model_entry)
+        db.session.commit()
+
     def get_all_entries(self, model_name: str) -> list:
         _, model = self._get_model(model_name)
         return list(model.query.all())

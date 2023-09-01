@@ -12,20 +12,40 @@
 
 {% block body %}
     <h1>Новый счёт для {{ contract.name }}</h1>
-    {% for msg in get_flashed_messages() %}
-        <div class="msg">
-            <h4>{{ msg }}</h4>
-        </div>
-    {% endfor %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <div class="align-center">
         <form method="POST" action="/active_contract/{{ contract.id }}/new_check">
-            <div class="form" id="items">
-                <label for="sum_check">Сумма счёта:</label><br>
-                <input type="number" name="sum" id="sum_check" class="enter"><br>
-                <label for="date_check">Дата счёта</label>
-                <input type="date" name="date_check" class="enter" id="date_check">
-                <input type="submit" value="Добавить" class="add_btn">
-            </div>
+            <table style="border: none; margin-top: 20px; margin-bottom: 10px">
+                <tr>
+                    <th style="border: none; width: 50%; padding: 10px 10px 0 0; background: inherit; text-align: left">
+                        <label for="sum_check">Сумма счёта</label>
+                    </th>
+                    <th style="border: none; width: 50%; padding: 10px 0 0 0; background: inherit; text-align: left">
+                        <label for="date_check">Дата счёта</label>
+                    </th>
+                </tr>
+                <tr>
+                    <td style="border: none; padding: 10px 10px 0 0">
+                        <input type="number"
+                               name="sum"
+                               class="enter"
+                               id="sum_check"
+                               placeholder="Введите сумму" required>
+                    </td>
+                    <td style="border: none; padding: 10px 0 0 0">
+                        <input type="date"
+                               name="date_check"
+                               class="enter"
+                               id="date_check"
+                               placeholder="Введите дату" required>
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" value="Добавить" class="add_btn">
         </form>
     </div>
 {% endblock %}

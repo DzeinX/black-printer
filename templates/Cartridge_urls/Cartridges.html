@@ -49,11 +49,11 @@
     <div class="align-center">
         <form method="POST">
             <div class="form" id="items">
-                {% for msg in get_flashed_messages() %}
-                    <div class="msg">
-                        {{ msg }}
-                    </div>
-                {% endfor %}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endwith %}
                 <table style="border: none" id="table">
                     <colgroup>
                         <col span="1" style="width: calc(50% - 48px)">
@@ -221,7 +221,7 @@
                 {% endif %}
                 {% if (cartridge.efficiency != 0) %}
                     <tr style="color: {{ color.value }}">
-                        <td class="1">
+                        <td class="1" style="text-align: center; color: black">
                             {{ counter.value }}
                         </td>
                         <td class="2">

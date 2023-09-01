@@ -8,6 +8,11 @@
 
 {% block body %}
     <h1>Принтер:</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <div class="align-center" style="background-color: gray">
         <form method="POST">
             <div class="form">

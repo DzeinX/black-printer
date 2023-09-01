@@ -39,7 +39,7 @@ class PrinterURLs:
             all_works_printers = request.form.getlist('works')
 
             if len(all_works_printers) == 0:
-                flash('Нельзя удалить все модели')
+                flash('Нельзя удалить все модели', 'warning')
                 return redirect(url_for('printer_urls.add_works_printers'))
 
             model_controller.delete_all_entries_in_model(model_name="AllWorksPrinters")
@@ -55,12 +55,12 @@ class PrinterURLs:
                                                         work=work)
                         model_controller.add_in_session(model)
             except Exception as e:
-                flash(f'Не удалось сохранить изменения. Ошибка: {e}')
+                flash(f'Не удалось сохранить изменения. Ошибка: {e}','error')
                 return redirect(url_for('main_urls.main_page'))
 
             return try_to_commit(redirect_to='printer_urls.add_works_printers')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -115,7 +115,7 @@ class PrinterURLs:
 
             return try_to_commit(redirect_to='printer_urls.printers')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -182,7 +182,7 @@ class PrinterURLs:
             # запрос в таблицу printer выведет строки, в которых инвентарник совпадает с инвентарником введенным юзером
             if len(check_num_inv_printer) != 0:
                 # если строка/и с введенным пользователем инвентарником будут найдены сообщаем об этом пользователю
-                flash('Принтер с таким инвентарным номером уже существует!')
+                flash('Принтер с таким инвентарным номером уже существует', 'warning')
                 return redirect(request.referrer)
 
             location_now = request.form['location'].strip()
@@ -219,7 +219,7 @@ class PrinterURLs:
 
             return try_to_commit(redirect_to='printer_urls.printers')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -240,7 +240,7 @@ class PrinterURLs:
                                    printer=printer,
                                    StatusSettings=StatusSettings)
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -277,10 +277,10 @@ class PrinterURLs:
                 return try_to_commit(redirect_to='printer_urls.printers')
 
             except Exception as e:
-                flash(f'Ошибка удаления картриджа. Ошибка: {e}')
+                flash(f'Ошибка удаления картриджа. Ошибка: {e}', 'error')
                 return redirect(url_for('main_urls.main_page'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -318,10 +318,10 @@ class PrinterURLs:
                 return try_to_commit(redirect_to='printer_urls.deleted_printers')
 
             except Exception as e:
-                flash(f'Ошибка удаления картриджа. Ошибка: {e}')
+                flash(f'Ошибка удаления картриджа. Ошибка: {e}', 'error')
                 return redirect(url_for('main_urls.main_page'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -336,7 +336,7 @@ class PrinterURLs:
             return render_template('Printer_urls/DeletedPrinters.html',
                                    printers=printers)
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -369,7 +369,7 @@ class PrinterURLs:
             id_form = request.form['id_form'].strip()
 
             if len(printer_num) == 0:
-                flash('Не выбрана ни одна модель')
+                flash('Не выбрана ни одна модель', 'warning')
                 return redirect(url_for('printer_urls.brought_a_printer'))
 
             if id_form == "1":
@@ -398,7 +398,7 @@ class PrinterURLs:
                     if request_redirect is not None:
                         return request_redirect
 
-                return try_to_commit(redirect_to='printer_urls.brought_a_printer')
+                return try_to_commit(redirect_to='printer_urls.printers')
 
             if id_form == "2":
                 for number in printer_num:
@@ -427,12 +427,12 @@ class PrinterURLs:
                     if request_redirect is not None:
                         return request_redirect
 
-                return try_to_commit(redirect_to='printer_urls.brought_a_printer')
+                return try_to_commit(redirect_to='printer_urls.printers')
 
-            flash(f'Не верная идентификация формы!')
+            flash(f'Не верная идентификация формы!', 'error')
             return redirect(url_for('main_urls.main_page'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -461,7 +461,7 @@ class PrinterURLs:
             user = current_user.username
 
             if len(printer_num) == 0:
-                flash('Не выбрана ни одна модель')
+                flash('Не выбрана ни одна модель', 'warning')
                 return redirect(url_for('printer_urls.repairing'))
 
             if id_form == "1":
@@ -491,7 +491,7 @@ class PrinterURLs:
                     if request_redirect is not None:
                         return request_redirect
 
-                return try_to_commit(redirect_to='printer_urls.repairing')
+                return try_to_commit(redirect_to='printer_urls.printers')
 
             if id_form == "2":
                 for number in printer_num:
@@ -520,12 +520,12 @@ class PrinterURLs:
                     if request_redirect is not None:
                         return request_redirect
 
-                return try_to_commit(redirect_to='printer_urls.repairing')
+                return try_to_commit(redirect_to='printer_urls.printers')
 
-            flash(f'Не верная идентификация формы!')
+            flash(f'Не верная идентификация формы!', 'error')
             return redirect(url_for('main_urls.main_page'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -554,7 +554,7 @@ class PrinterURLs:
             user = current_user.username
 
             if len(printer_num) == 0:
-                flash('Не выбрана ни одна модель')
+                flash('Не выбрана ни одна модель', 'warning')
                 return redirect(url_for('printer_urls.reception_from_a_repairing'))
 
             if id_form == "1":
@@ -588,7 +588,7 @@ class PrinterURLs:
                     model_controller.update(model_entry=printer,
                                             work_done=new_work_done)
 
-                return try_to_commit(redirect_to='printer_urls.reception_from_a_repairing')
+                return try_to_commit(redirect_to='printer_urls.printers')
 
             if id_form == "2":
                 for number in printer_num:
@@ -621,12 +621,12 @@ class PrinterURLs:
                     model_controller.update(model_entry=printer,
                                             work_done=new_work_done)
 
-                return try_to_commit(redirect_to='printer_urls.reception_from_a_repairing')
+                return try_to_commit(redirect_to='printer_urls.printers')
 
-            flash(f'Не верная идентификация формы!')
+            flash(f'Не верная идентификация формы!', 'error')
             return redirect(url_for('main_urls.main_page'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -659,7 +659,7 @@ class PrinterURLs:
             user = current_user.username
 
             if len(printer_num) == 0:
-                flash('Не выбрана ни одна модель')
+                flash('Не выбрана ни одна модель', 'warning')
                 return redirect(url_for('printer_urls.issuance_printers'))
 
             if id_form == "1":
@@ -693,7 +693,7 @@ class PrinterURLs:
                     if request_redirect is not None:
                         return request_redirect
 
-                return try_to_commit(redirect_to='printer_urls.issuance_printers')
+                return try_to_commit(redirect_to='printer_urls.printers')
 
             if id_form == "2":
                 action_history = StatusSettings.Printer.in_division
@@ -727,10 +727,10 @@ class PrinterURLs:
                     if request_redirect is not None:
                         return request_redirect
 
-                return try_to_commit(redirect_to='printer_urls.issuance_printers')
+                return try_to_commit(redirect_to='printer_urls.printers')
 
-            flash(f'Не верная идентификация формы!')
+            flash(f'Не верная идентификация формы!', 'error')
             return redirect(url_for('main_urls.main_page'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))

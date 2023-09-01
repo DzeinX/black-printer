@@ -12,7 +12,7 @@
             let id = "d" + items
             let newRow = table.insertRow()
             newRow.setAttribute('id', id)
-             let tdFirst = document.createElement("td")
+            let tdFirst = document.createElement("td")
             tdFirst.setAttribute('style', 'border: none; padding: 10px 20px 0 0')
             let tdSecond = document.createElement("td")
             tdSecond.setAttribute('style', 'border: none; padding: 10px 10px 0 0')
@@ -48,9 +48,11 @@
     <div class="align-center">
         <form method="POST">
             <div class="form" id="items">
-                {% for message in get_flashed_messages() %}
-                    <p class="msg"><strong>{{ message }}</strong></p>
-                {% endfor %}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endwith %}
                 {% set counter = namespace(value=1) %}
                 <table style="border: none" id="table">
                     <colgroup>
@@ -72,7 +74,8 @@
                                        class="enter">
                             </td>
                             <td style="border: none; padding: 10px 0 0 0">
-                                <input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d{{ loop.index }}');" id="r{{ loop.index }}">
+                                <input type="button" value="✕" class="delete_btn"
+                                       onclick="RemoveItem('d{{ loop.index }}');" id="r{{ loop.index }}">
                             </td>
                             {% set counter.value = counter.value + 1 %}
                         </tr>

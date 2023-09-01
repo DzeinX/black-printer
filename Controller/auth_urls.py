@@ -11,10 +11,11 @@ from Model.ModelController import ModelController
 from Config import IsBoss
 from Settings.Blueprint import AuthBlueprint
 from flask_login import login_user
-from Authentication.AuthManager import AuthManager, LDAPManager
+from Authentication.AuthManager import AuthManager, LDAPManagerAUP, LDAPManagerEDU
 
 login_manager = AuthManager().get_manager()
-ldap_manager = LDAPManager().get_manager()
+ldap_manager_aup = LDAPManagerAUP().get_manager()
+ldap_manager_edu = LDAPManagerEDU().get_manager()
 
 blueprint = AuthBlueprint()
 auth_urls = blueprint.get_url()
@@ -35,7 +36,8 @@ def load_user(pk):
                                             id=pk)
 
 
-@ldap_manager.save_user
+@ldap_manager_aup.save_user
+@ldap_manager_edu.save_user
 def save_user(username, is_boss):
     """
     Сохраняет пользователя в локальной базе данных (без пароля, только логин и привилегии).
@@ -67,8 +69,10 @@ class AuthURLs:
             username = request.form.get('login')
             password = request.form.get('password')
 
-            new_user = ldap_manager.authenticate(username=username, password=password)
-            if new_user.status != AuthenticationResponseStatus.fail:
+            response_aup_status = ldap_manager_aup.authenticate(username=username, password=password).status
+            response_edu_status = ldap_manager_edu.authenticate(username=username, password=password).status
+            if response_aup_status != AuthenticationResponseStatus.fail or \
+               response_edu_status != AuthenticationResponseStatus.fail:
                 user = model_controller.filter_by_model(model_name='User',
                                                         mode='first',
                                                         username=username)
@@ -80,6 +84,7 @@ class AuthURLs:
                     else:
                         user = save_user(username, False)
                     login_user(user)
+                    flash("Добро пожаловать", 'success')
                     return redirect(url_for('main_urls.main_page'))
 
                 # Пользователь уже входил, проверка на доступность привилегий (если он Босс)
@@ -87,6 +92,7 @@ class AuthURLs:
                     user = model_controller.update(model_entry=user,
                                                    is_boss=True)
                     login_user(user)
+                    flash("Добро пожаловать", 'success')
                     return redirect(url_for('main_urls.main_page'))
 
                 # Пользователь уже входил, проверка на доступность привилегий (если он не Босс)
@@ -94,12 +100,13 @@ class AuthURLs:
                     user = model_controller.update(model_entry=user,
                                                    is_boss=False)
                     login_user(user)
+                    flash("Добро пожаловать", 'success')
                     return redirect(url_for('main_urls.main_page'))
 
-            flash("Не верный логин или пароль")
+            flash("Не верный логин или пароль", 'warning')
             return redirect(url_for('auth_urls.login_page'))
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
@@ -114,7 +121,7 @@ class AuthURLs:
         try:
             logout_user()
         except Exception as e:
-            flash(f'Не удалось выйти из учётной записи. Ошибка: {e}')
+            flash(f'Не удалось выйти из учётной записи. Ошибка: {e}', 'error')
             return redirect(url_for('main_urls.main_page'))
         return redirect(url_for('auth_urls.login_page'))
 
@@ -146,7 +153,7 @@ class AuthURLs:
 
             return try_to_commit(redirect_to='auth_urls.profile')
 
-        flash(f'Не определён метод запроса!')
+        flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod

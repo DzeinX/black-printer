@@ -53,7 +53,8 @@ body a {
 }
 
 .nav-link:hover > *,
-.nav-item:hover > * {
+.nav-item:hover > *,
+.nav-link:hover {
     color: #a5b1c2;
 }
 
@@ -304,16 +305,6 @@ td a {
     font-weight: 900;
 }
 
-.msg {
-    background: var(--white);
-    border-radius: 4px;
-    color: darkred;
-    border: darkred solid 1px;
-    padding: 10px;
-    text-align: center;
-    margin: 10px auto;
-}
-
 .ctr .radios {
     margin: 10px 0;
 }
@@ -435,4 +426,149 @@ td .select2 {
 
 .footer__elements.organization .left {
     text-align: end;
+}
+.active_checks,
+.closed_checks,
+.closed_contract,
+.active_contract {
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    padding: 10px;
+    transition: 0.3s;
+}
+.closed_checks:hover,
+.closed_contract:hover {
+    background-color: #eeeeee;
+    cursor: pointer;
+}
+.closed_checks,
+.closed_contract {
+    background-color: #ddd;
+}
+.contract_title,
+.contract_title {
+    display: block;
+    text-align: center;
+    text-decoration: underline;
+    margin: 20px 0 10px 0;
+}
+.contract_title a {
+    color: inherit;
+    transition: 0.2s;
+}
+.contract_title a:hover {
+    opacity: 0.75;
+}
+.active_contract .active_contract_title h4,
+.closed_contract details summary,
+.active_contract details summary {
+    font-weight: 600;
+    font-size: 1.2em;
+}
+.closed_contract details .contract_body,
+.active_contract details .contract_body {
+    margin-top: 10px;
+}
+
+.active_contract .active_contract_title {
+    margin-bottom: 20px;
+}
+.active_contract .active_contract_title span {
+    font-weight: 200;
+    font-size: 0.8em;
+}
+.contract_action_links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+.check_action_links {
+    display: flex;
+    justify-content: end;
+}
+.check_action_links a {
+    margin-left: 20px;
+}
+.checks {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.container_add_btn {
+    display: flex;
+    justify-content: center;
+    align-items: start;
+}
+.container_add_btn .row_add_btn {
+    width: 30px;
+    height: 26px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 13px;
+    border: 1px solid black;
+    color: black;
+    transition: 0.3s;
+    font-size: 1.4em;
+    background-color: white;
+    border-top: none;
+}
+.container_add_btn .row_add_btn:hover {
+    color: white;
+    background-color: darkgreen;
+    border: 1px solid darkgreen;
+    border-top: none;
+}
+.btn_container {
+    display: flex;
+    justify-content: left;
+    margin-bottom: 70px;
+}
+.btn_container {
+    margin-right: 10px;
+}
+th {
+    cursor: default;
+}
+tr {
+    transition: 0.3s;
+}
+#mytable tr:hover {
+    cursor: pointer;
+    background-color: #f1f1f1;
+}
+td.highlight,
+.closed_checks.highlight {
+    background-color: lightgreen;
+}
+td {
+    transition: 0.3s;
+}
+.total {
+    text-align: right;
+    font-size: 1.2em;
+    font-weight: 500;
+    margin-bottom: 50px;
+}
+
+.warning,
+.success,
+.error {
+    background: var(--white);
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+    margin: 10px auto;
+}
+.error {
+    color: darkred;
+    border: darkred solid 1px;
+}
+.success {
+    color: green;
+    border: green solid 1px;
+}
+.warning {
+    color: goldenrod;
+    border: goldenrod solid 1px;
 }
