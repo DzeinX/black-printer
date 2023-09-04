@@ -934,6 +934,7 @@ class MainURLs:
         if request.method == "GET":
             check = model_controller.get_model_by_id(model_name="CheckLists",
                                                      pk=check_id)
+            check_price = get_check_price(check)
 
             list_of_contracts = model_controller.get_all_entries(model_name="ListsOfContracts")
             if len(list_of_contracts) > 0:
@@ -964,7 +965,8 @@ class MainURLs:
             return render_template('Main_urls/CheckMore.html',
                                    work_list_data=work_list_data,
                                    check=check,
-                                   last_contract=last_contract)
+                                   last_contract=last_contract,
+                                   check_price=check_price)
 
         flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
