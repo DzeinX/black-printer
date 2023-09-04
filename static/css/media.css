@@ -1,0 +1,25 @@
+@media screen and (max-width: 1200px) {
+    .navigation ul .side {
+        grid-template-rows: repeat(2, 1fr) !important;
+        grid-template-columns: auto auto auto !important;
+    }
+
+    .navigation {
+        height: 120px;
+    }
+
+    #main-page {
+        background-image: url("../images/print-outline.svg");
+        display: block;
+        width: 68px;
+        height: 68px;
+    }
+
+    #main-page::after {
+        content: "";
+    }
+
+    .main_div {
+        margin: 140px auto;
+    }
+}

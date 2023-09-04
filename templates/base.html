@@ -2,13 +2,16 @@
 <html lang="ru">
 <head>
     <link rel="stylesheet" href="{% block CSS %}{% endblock %}">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icons8-печать-50.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/print-outline.svg') }}">
 
     {# Base CSS loads #}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/Base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/media.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
 
     {#  Link jQuery  #}
     <script src="{{ url_for('static', filename='assets/jQuery/jquery-3.6.4.js') }}"></script>
+
 
     {#  Link Select2  #}
     <script src="{{ url_for('static', filename='assets/select2-develop/dist/js/select2.js') }}"></script>
@@ -40,17 +43,21 @@
         <ul>
             <div class="main">
                 <li class="navigation-item main-item">
-                    <a href="/" class="nav-link">Главная</a>
+                    <a href="/" class="nav-link" id="main-page"></a>
                 </li>
             </div>
-            <div class="side">
+            <div class="side" {% if not current_user.is_boss %}style="grid-template-columns: auto auto auto auto auto;"{% endif %}>
                 {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        <a href="/printers" class="nav-link">
+                        <a href="#" class="nav-link">
+                            <i class="fa-solid fa-circle-chevron-down"></i>
                             <div class="label">Принтеры</div>
-                            <i class="fa-solid fa-angle-down"></i>
                         </a>
                         <ul class="submenu">
+                            <li class="nav-item">
+                                <a href="/printers" class="nav-link">Принтеры</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
+                            </li>
                             <li class="nav-item">
                                 <a href="/brought_a_printer" class="nav-link">Принесённые принтеры</a>
                                 <hr style="margin-top: 10px; border-color: #2e86de">
@@ -73,11 +80,15 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a href="/cartridges" class="nav-link">
+                        <a href="#" class="nav-link">
+                            <i class="fa-solid fa-circle-chevron-down"></i>
                             <div class="label">Картриджи</div>
-                            <i class="fa-solid fa-angle-down"></i>
                         </a>
                         <ul class="submenu">
+                            <li class="nav-item">
+                                <a href="/cartridges" class="nav-link">Картриджи</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
+                            </li>
                             <li class="nav-item">
                                 <a href="/brought_a_cartridge" class="nav-link">Принесённые картриджи</a>
                                 <hr style="margin-top: 10px; border-color: #2e86de">
@@ -100,57 +111,83 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link">
-                            <div class="label">Администрирование</div>
-                            <i class="fa-solid fa-angle-down"></i>
+                        {% if current_user.is_boss %}
+                            <a href="#" class="nav-link">
+                                <i class="fa-solid fa-circle-chevron-down"></i>
+                                <div class="label">Администрирование</div>
+                            </a>
+                            <ul class="submenu">
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">Администрирование</a>
+                                    <hr style="margin-top: 10px; border-color: #2e86de">
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/add_models" class="nav-link">Модели</a>
+                                    {% if current_user.is_boss %}
+                                        <hr style="margin-top: 10px; border-color: #2e86de">
+                                    {% endif %}
+                                </li>
+                                {% if current_user.is_boss %}
+                                    <li class="nav-item">
+                                        <a href="/add_works_cartridges" class="nav-link">Тип работ картриджей</a>
+                                        <hr style="margin-top: 10px; border-color: #2e86de">
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/add_works_printers" class="nav-link">Тип работ принтеров</a>
+                                        <hr style="margin-top: 10px; border-color: #2e86de">
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/buildings" class="nav-link">Корпусы</a>
+                                        <hr style="margin-top: 10px; border-color: #2e86de">
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/divisions" class="nav-link">Подразделения</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        {% else %}
+                            <a href="/add_models" class="nav-link">Модели</a>
+                        {% endif %}
+                    </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a href="/all_history" class="nav-link">Вся история</a>
+                </li>
+                {% if current_user.is_boss %}
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa-solid fa-circle-chevron-down"></i>
+                            <div class="label">Экономика</div>
                         </a>
                         <ul class="submenu">
                             <li class="nav-item">
-                                <a href="/add_models" class="nav-link">Модели</a>
-                                {% if current_user.is_boss %}
-                                    <hr style="margin-top: 10px; border-color: #2e86de">
-                                {% endif %}
+                                <a href="#" class="nav-link">Экономика</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
-                            {% if current_user.is_boss %}
-                                <li class="nav-item">
-                                    <a href="/add_works_cartridges" class="nav-link">Тип работ картриждей</a>
-                                    <hr style="margin-top: 10px; border-color: #2e86de">
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/add_works_printers" class="nav-link">Тип работ принтеров</a>
-                                    <hr style="margin-top: 10px; border-color: #2e86de">
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/buildings" class="nav-link">Корпусы</a>
-                                    <hr style="margin-top: 10px; border-color: #2e86de">
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/divisions" class="nav-link">Подразделения</a>
-                                </li>
-                            {% endif %}
+                            <li class="nav-item">
+                                <a href="/progress_report" class="nav-link">Отчёт</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
+                            </li>
+                            <li class="nav-item">
+                                <a href="/list_of_completed_works" class="nav-link">Выполненные работы</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
+                            </li>
+                            <li class="nav-item">
+                                <a href="/active_contract" class="nav-link">Активный договор</a>
+                            </li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a href="/all_history" class="nav-link">Вся история</a>
-                    </li>
-                    {% if current_user.is_boss %}
-                        <li class="nav-item">
-                            <a href="/progress_report" class="nav-link">Отчёт</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/list_of_completed_works" class="nav-link">Выполненные работы</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/active_contract" class="nav-link">Активный договор</a>
-                        </li>
-                    {% endif %}
                 {% endif %}
                 <li class="nav-item">
                     <a href="{{ url_for('auth_urls.profile') }}" class="nav-link">
+                        <i class="fa-solid fa-circle-chevron-down"></i>
                         <div class="label">Профиль</div>
-                        <i class="fa-solid fa-angle-down"></i>
                     </a>
                     <ul class="submenu">
+                        <li class="nav-item">
+                                <a href="{{ url_for('auth_urls.profile') }}" class="nav-link">Профиль</a>
+                                <hr style="margin-top: 10px; border-color: #2e86de">
+                            </li>
                         {% if current_user.is_authenticated %}
                             <li class="nav-item">
                                 <a href="/logout" class="nav-link">Выход</a>
@@ -173,33 +210,52 @@
 </div>
 
 <footer>
-    <div class="footer-main">
-        <div class="footer">
-            <div class="footer-top">
-                <div class="footer__elements">
-                    <div><strong>Контактная информация:</strong></div>
-                    <div>Почта: ******@vogu35.ru</div>
-                    <div>Номер телефона: (****) **-**-**</div>
+{#    <div class="footer-main">#}
+{#        <div class="footer">#}
+{#            <div class="footer-top">#}
+{#                <div class="footer__elements">#}
+{#                    <div><strong>Контактная информация:</strong></div>#}
+{#                    <div>Почта: ******@vogu35.ru</div>#}
+{#                    <div>Номер телефона: (****) **-**-**</div>#}
+{#                </div>#}
+{#                <div class="footer__elements organization">#}
+{#                    <div class="left">#}
+{#                        <div>#}
+{#                            Сайт разработан отделом<br>#}
+{#                            <strong>Информационно-коммуникационных ресурсов и технологий ВоГУ</strong>#}
+{#                        </div>#}
+{#                        <div>тел. 72-02-92</div>#}
+{#                    </div>#}
+{#                    <div class="right">#}
+{#                        <div class="image">#}
+{#                            <img src="{{ url_for('static', filename='images/ИКР&Т.png') }}" alt="ИКР&Т">#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#            <div class="footer-bottom">#}
+{#                <div class="footer-bottom__element">#}
+{##}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+    <div class="footer__right">
+        <div class="title">
+            <h5>Об авторе сайта</h5>
+        </div>
+        <div class="auther">
+            <div class="about-auther">
+                <div class="auther__full-name">
+                    <i class="fa-regular fa-copyright"></i> Vadim Pronin
                 </div>
-                <div class="footer__elements organization">
-                    <div class="left">
-                        <div>
-                            Сайт разработан отделом<br>
-                            <strong>Информационно-коммуникационных ресурсов и технологий ВоГУ</strong>
-                        </div>
-                        <div>тел. 72-02-92</div>
-                    </div>
-                    <div class="right">
-                        <div class="image">
-                            <img src="{{ url_for('static', filename='images/ИКР&Т.png') }}" alt="ИКР&Т">
-                        </div>
-                    </div>
+                <div class="auther__mail">
+                    <a href="mailto:ProVad2017@yandex.ru">ProVad2017@yandex.ru</a>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <div class="footer-bottom__element">
-
-                </div>
+            <div class="auther__social-networks">
+                <a href="https://vk.com/proninvad" target="_ blank"><i class="fa-brands fa-vk"></i></a>
+                <a href="https://github.com/DzeinX" target="_ blank"><i class="fa-brands fa-square-github"></i></a>
             </div>
         </div>
     </div>

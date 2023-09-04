@@ -2,6 +2,7 @@
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    list-style: none;
 }
 
 .all_page {
@@ -58,8 +59,12 @@ body a {
     color: #a5b1c2;
 }
 
-.nav-link i {
-    margin-left: 10px;
+#main-page::after {
+    content: "Главная";
+}
+
+.nav-link .svg-inline--fa {
+    margin-right: 0.5em;
 }
 
 .main-item {
@@ -67,16 +72,12 @@ body a {
     z-index: 101;
 }
 
-.navigation ul .side > li {
-    margin-left: 20px;
-}
-
 .navigation ul {
     display: flex;
     justify-content: space-around;
     align-items: center;
     width: 100%;
-    height: 60px;
+    height: 100%;
 }
 
 .navigation ul .main {
@@ -91,11 +92,14 @@ body a {
 
 a .label {
     line-height: 24px;
+    width: auto;
 }
 
 .navigation ul .side {
-    display: flex;
-    justify-content: space-around;
+    display: grid;
+    gap: 20px;
+    grid-template-rows: repeat(1, 1fr);
+    grid-template-columns: auto auto auto auto auto auto;
     width: 85%;
 }
 
@@ -104,29 +108,35 @@ header {
 }
 
 .navigation .submenu {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     display: none;
     position: absolute;
-    top: 20px;
-    left: -20px;
-    width: 200px;
-    height: 100%;
-    z-index: 99;
-    transition: 0.5s ease-in-out;
+    top: -14px;
+    left: -3px;
+    z-index: 104;
+    height: auto;
+    min-width: 100%;
+    width: 250px;
+    overflow: hidden;
 }
 
 .submenu li {
     background: var(--main_color);
     position: relative;
-    z-index: 100;
-    padding: 5px 20px;
+    z-index: 105;
+    padding: 5px 30px;
 }
 
 .submenu li:first-child {
-    padding-top: 20px;
+    padding-top: 15px;
 }
 
 .submenu li:last-child {
-    padding-bottom: 20px;
+    padding-bottom: 15px;
+}
+
+.submenu .nav-item .nav-link {
+    z-index: 105;
 }
 
 .navigation ul li:hover .submenu {
@@ -427,6 +437,7 @@ td .select2 {
 .footer__elements.organization .left {
     text-align: end;
 }
+
 .active_checks,
 .closed_checks,
 .closed_contract,
@@ -436,15 +447,18 @@ td .select2 {
     padding: 10px;
     transition: 0.3s;
 }
+
 .closed_checks:hover,
 .closed_contract:hover {
     background-color: #eeeeee;
     cursor: pointer;
 }
+
 .closed_checks,
 .closed_contract {
     background-color: #ddd;
 }
+
 .contract_title,
 .contract_title {
     display: block;
@@ -452,19 +466,23 @@ td .select2 {
     text-decoration: underline;
     margin: 20px 0 10px 0;
 }
+
 .contract_title a {
     color: inherit;
     transition: 0.2s;
 }
+
 .contract_title a:hover {
     opacity: 0.75;
 }
+
 .active_contract .active_contract_title h4,
 .closed_contract details summary,
 .active_contract details summary {
     font-weight: 600;
     font-size: 1.2em;
 }
+
 .closed_contract details .contract_body,
 .active_contract details .contract_body {
     margin-top: 10px;
@@ -473,22 +491,27 @@ td .select2 {
 .active_contract .active_contract_title {
     margin-bottom: 20px;
 }
+
 .active_contract .active_contract_title span {
     font-weight: 200;
     font-size: 0.8em;
 }
+
 .contract_action_links {
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
 }
+
 .check_action_links {
     display: flex;
     justify-content: end;
 }
+
 .check_action_links a {
     margin-left: 20px;
 }
+
 .checks {
     display: flex;
     justify-content: space-between;
@@ -501,6 +524,7 @@ td .select2 {
     justify-content: center;
     align-items: start;
 }
+
 .container_add_btn .row_add_btn {
     width: 30px;
     height: 26px;
@@ -513,37 +537,46 @@ td .select2 {
     background-color: white;
     border-top: none;
 }
+
 .container_add_btn .row_add_btn:hover {
     color: white;
     background-color: darkgreen;
     border: 1px solid darkgreen;
     border-top: none;
 }
+
 .btn_container {
     display: flex;
     justify-content: left;
     margin-bottom: 70px;
 }
+
 .btn_container {
     margin-right: 10px;
 }
+
 th {
     cursor: default;
 }
+
 tr {
     transition: 0.3s;
 }
+
 #mytable tr:hover {
     cursor: pointer;
     background-color: #f1f1f1;
 }
+
 td.highlight,
 .closed_checks.highlight {
     background-color: lightgreen;
 }
+
 td {
     transition: 0.3s;
 }
+
 .total {
     text-align: right;
     font-size: 1.2em;
@@ -560,14 +593,17 @@ td {
     text-align: center;
     margin: 10px auto;
 }
+
 .error {
     color: darkred;
     border: darkred solid 1px;
 }
+
 .success {
     color: green;
     border: green solid 1px;
 }
+
 .warning {
     color: goldenrod;
     border: goldenrod solid 1px;
