@@ -7,6 +7,7 @@ Create Date: 2023-08-04 20:02:24.928342
 """
 from alembic import op
 import sqlalchemy as sa
+from script2 import setup
 
 
 # revision identifiers, used by Alembic.
@@ -23,6 +24,8 @@ def upgrade():
 
     with op.batch_alter_table('WorkList', schema=None) as batch_op:
         batch_op.add_column(sa.Column('name', sa.String(length=100), nullable=True, server_default="ИП0000"))
+
+    setup()
 
     # ### end Alembic commands ###
 
