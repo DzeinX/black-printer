@@ -21,5 +21,14 @@
 
     .main_div {
         margin: 140px auto;
+        width: 90%;
     }
+
+    .navigation .submenu {
+        top: -26px;
+    }
+
+    .submenu li:first-child {
+    padding-top: 27px;
+}
 }

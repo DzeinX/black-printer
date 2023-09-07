@@ -4,14 +4,15 @@ from flask import request
 from flask import flash
 from flask_login import login_required, logout_user, current_user
 from flask_ldap3_login import AuthenticationResponseStatus
+from threading import Thread
 
 from Controller.SupportFunctions import try_to_commit
 
-from Model.ModelController import ModelController
+from Model.ModelController import get_current_model_controller
 from Config import IsBoss
 from Settings.Blueprint import AuthBlueprint
 from flask_login import login_user
-from Authentication.AuthManager import AuthManager, LDAPManagerAUP, LDAPManagerEDU
+from Authentication.AuthManager import AuthManager, LDAPManagerAUP, LDAPManager, LDAPManagerEDU
 
 login_manager = AuthManager().get_manager()
 ldap_manager_aup = LDAPManagerAUP().get_manager()
@@ -21,7 +22,7 @@ blueprint = AuthBlueprint()
 auth_urls = blueprint.get_url()
 
 # Управление базой данных
-model_controller = ModelController()
+model_controller = get_current_model_controller()
 
 
 @login_manager.user_loader
@@ -53,6 +54,11 @@ def save_user(username, is_boss):
     return user
 
 
+def search_in_ldap(ldap_manager, username: str, password: str, pull_result: list) -> None:
+    response_status = ldap_manager.authenticate(username=username, password=password).status
+    pull_result.append(False if response_status == AuthenticationResponseStatus.fail else True)
+
+
 class AuthURLs:
     @staticmethod
     @auth_urls.route('/login', methods=['GET', 'POST'])
@@ -69,10 +75,21 @@ class AuthURLs:
             username = request.form.get('login')
             password = request.form.get('password')
 
-            response_aup_status = ldap_manager_aup.authenticate(username=username, password=password).status
-            response_edu_status = ldap_manager_edu.authenticate(username=username, password=password).status
-            if response_aup_status != AuthenticationResponseStatus.fail or \
-               response_edu_status != AuthenticationResponseStatus.fail:
+            results = []
+            threads = []
+            ldap_managers = LDAPManager.__subclasses__()
+            for ldap_manager in ldap_managers:
+                manager = ldap_manager().get_manager()
+                thread = Thread(target=search_in_ldap, args=(manager, username, password, results))
+                threads.append(thread)
+
+            for thread in threads:
+                thread.start()
+
+            for thread in threads:
+                thread.join()
+
+            if True in results:
                 user = model_controller.filter_by_model(model_name='User',
                                                         mode='first',
                                                         username=username)

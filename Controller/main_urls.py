@@ -1,5 +1,3 @@
-import json
-
 from flask import render_template, url_for
 from flask import request
 from flask import redirect
@@ -21,7 +19,7 @@ from Controller.CreateCharts import create_chart
 from Controller.CreateCharts import created_deleted_chart
 from Controller.CreateCharts import refill_cycle_chart
 
-from Model.ModelController import ModelController
+from Model.ModelController import get_current_model_controller
 from Settings.StatusSettings import StatusSettings
 from Settings.Blueprint import MainBlueprint
 
@@ -29,27 +27,10 @@ blueprint = MainBlueprint()
 main_urls = blueprint.get_url()
 
 # Управление базой данных
-model_controller = ModelController()
+model_controller = get_current_model_controller()
 
 
 class MainURLs:
-    @staticmethod
-    @main_urls.route('/get-charts-api/', defaults={'col_amount': 6})
-    @main_urls.route('/get-charts-api/cols=<int:col_amount>')
-    def get_charts_api(col_amount=6):
-        # TODO: Создать API ключи. Отдельная таблица в БД с зашифрованными ключами.
-        #  Генерирует только босс. Нужен для стороннего доступа к графикам
-        pie_chart_data = create_chart()
-        c_d_chat = created_deleted_chart(col_amount)
-        r_c_chart = refill_cycle_chart(col_amount)
-        charts = {
-            "pie_chart_data": pie_chart_data,
-            "created_deleted_chart": c_d_chat,
-            "refill_cycle_chart": r_c_chart
-        }
-        json_charts = json.dumps(charts)
-        return json.loads(json_charts)
-
     @staticmethod
     @main_urls.route('/', defaults={'is_show_charts': 0})
     @main_urls.route('/show=<int:is_show_charts>/cols=<int:col_amount>')
@@ -63,8 +44,6 @@ class MainURLs:
                 pie_chart_data = [0, 0, 0]
                 c_d_chat = [0, 0, 0]
                 r_c_chart = [0, 0]
-
-            print(c_d_chat)
 
             return render_template("Main_urls/main.html",
                                    pie_chart_data=pie_chart_data,

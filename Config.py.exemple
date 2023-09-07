@@ -1,0 +1,20 @@
+class LDAPSettings:
+    AUP_LDAP_HOST = 'some.domain.name'
+    AUP_LDAP_BASE_DN = 'dc=domain,dc=name'
+    AUP_LDAP_USER_RDN_ATTR = ''
+    AUP_LDAP_USER_LOGIN_ATTR = ''
+    AUP_LDAP_BIND_USER_DN = 'user_who_can_read@domain'
+    AUP_LDAP_BIND_USER_PASSWORD = 'user_password'
+    AUP_LDAP_ALWAYS_SEARCH_BIND = bool_var
+    AUP_LDAP_USER_SEARCH_SCOPE = ''
+
+
+class AppSettings:
+    SECRET_KEY = 'app_secret_key'
+    SQLALCHEMY_DATABASE_URI = 'db_uri'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
+class IsBoss:
+    # Сюда вписать логин управляющего
+    BOSS_LOGIN = ['']

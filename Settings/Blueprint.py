@@ -40,3 +40,11 @@ class PrinterBlueprint(BlueprintInterface, metaclass=MetaSingleton):
 
     def get_url(self):
         return self.printer_urls
+
+
+class ApiBlueprint(BlueprintInterface, metaclass=MetaSingleton):
+    def __init__(self):
+        self.api_urls = Blueprint('api_urls', "api_urls")
+
+    def get_url(self):
+        return self.api_urls

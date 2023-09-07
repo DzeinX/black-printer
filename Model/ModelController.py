@@ -1,12 +1,66 @@
 from sqlalchemy import desc
-
+from abc import ABCMeta, abstractmethod
 from Settings.Singleton import MetaSingleton
 from Model.models import ModelInterface
 from Model.models import db
 from sqlalchemy.sql import text
 
 
-class ModelController(metaclass=MetaSingleton):
+# НОВЫЕ МОДЕЛИ БД ПИСАТЬ ПОСЛЕ ПОСЛЕДНЕГО КЛАССА В ЭТОМ ФАЙЛЕ
+class ModelControllerInterface:
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def create(self, model_name: str, **params): pass
+
+    @abstractmethod
+    def update(self, model_entry: ModelInterface, **params): pass
+
+    @abstractmethod
+    def get_model_by_id(self, model_name: str, pk: int): pass
+
+    @abstractmethod
+    def filter_by_model(self, model_name: str, mode: str, **filters): pass
+
+    @abstractmethod
+    def filter_two_or(self, model_name: str, row: str, *filters): pass
+
+    @abstractmethod
+    def filter_by_model_with_paginate(self, model_name: str, page: int, per_page: int, **filters): pass
+
+    @abstractmethod
+    def filter_two_or_with_paginate(self, model_name: str, page: int, per_page: int, row: str, *filters): pass
+
+    @abstractmethod
+    def delete_all_entries_in_model(self, model_name: str): pass
+
+    @staticmethod
+    @abstractmethod
+    def delete_entry(model_entry: ModelInterface): pass
+
+    @abstractmethod
+    def get_all_entries(self, model_name: str): pass
+
+    @abstractmethod
+    def get_all_entries_with_order(self, model_name: str): pass
+
+    @abstractmethod
+    def get_all_entries_with_paginate(self, model_name: str, page: int, per_page: int): pass
+
+    @staticmethod
+    @abstractmethod
+    def add_in_session(model_entry: ModelInterface): pass
+
+    @staticmethod
+    @abstractmethod
+    def commit_session(): pass
+
+
+def get_current_model_controller():
+    return ModelControllerInterface.__subclasses__()[-1]()
+
+
+class ModelController(ModelControllerInterface, metaclass=MetaSingleton):
     def __init__(self):
         self.models = dict()
         subclasses = ModelInterface.__subclasses__()
@@ -61,11 +115,13 @@ class ModelController(metaclass=MetaSingleton):
             _, model = self._get_model(model_name)
             if self._is_model_none(model):
                 return None
-            filter_args = text(f'({self._get_model_name(model)}.{row} == "{filters[0]}") | ({self._get_model_name(model)}.{row} == "{filters[1]}")')
+            filter_args = text(
+                f'({self._get_model_name(model)}.{row} == "{filters[0]}") | ({self._get_model_name(model)}.{row} == "{filters[1]}")')
             return model.query.filter(filter_args).order_by(desc(model.date))
         return None
 
-    def filter_by_model_with_paginate(self, model_name: str, page: int, per_page: int, **filters) -> ModelInterface or None:
+    def filter_by_model_with_paginate(self, model_name: str, page: int, per_page: int,
+                                      **filters) -> ModelInterface or None:
         """
         :param model_name:
         :param page:
@@ -79,7 +135,8 @@ class ModelController(metaclass=MetaSingleton):
         filter_args = [text(f'{self._get_model_name(model)}.{row} == "{k}"') for row, k in filters.items()]
         return model.query.filter(*filter_args).order_by(desc(model.date)).paginate(page, per_page, error_out=False)
 
-    def filter_two_or_with_paginate(self, model_name: str, page: int, per_page: int, row: str, *filters) -> ModelInterface or None:
+    def filter_two_or_with_paginate(self, model_name: str, page: int, per_page: int, row: str,
+                                    *filters) -> ModelInterface or None:
         """
         :param model_name:
         :param page:
@@ -92,7 +149,8 @@ class ModelController(metaclass=MetaSingleton):
             _, model = self._get_model(model_name)
             if self._is_model_none(model):
                 return None
-            filter_args = text(f'({self._get_model_name(model)}.{row} == "{filters[0]}") | ({self._get_model_name(model)}.{row} == "{filters[1]}")')
+            filter_args = text(
+                f'({self._get_model_name(model)}.{row} == "{filters[0]}") | ({self._get_model_name(model)}.{row} == "{filters[1]}")')
             return model.query.filter(filter_args).order_by(desc(model.date)).paginate(page, per_page, error_out=False)
         return None
 
@@ -147,3 +205,6 @@ class ModelController(metaclass=MetaSingleton):
         if model is None:
             return True
         return False
+
+
+# НОВЫЕ МОДЕЛИ БД ПИСАТЬ ПОСЛЕ ЭТОЙ НАДПИСИ

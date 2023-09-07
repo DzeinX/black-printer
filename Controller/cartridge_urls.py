@@ -9,7 +9,7 @@ from datetime import datetime
 
 from Controller.SupportFunctions import prevent_valid, try_to_commit, save_in_history
 from Settings.StatusSettings import StatusSettings
-from Model.ModelController import ModelController
+from Model.ModelController import get_current_model_controller
 
 from Settings.Blueprint import CartridgeBlueprint
 
@@ -17,7 +17,7 @@ blueprint = CartridgeBlueprint()
 cartridge_urls = blueprint.get_url()
 
 # Управление базой данных
-model_controller = ModelController()
+model_controller = get_current_model_controller()
 
 
 class CartridgeURLs:

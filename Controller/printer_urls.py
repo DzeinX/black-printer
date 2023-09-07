@@ -6,8 +6,8 @@ from datetime import datetime
 from flask import flash
 from flask_login import login_required
 
-from Controller.SupportFunctions import prevent_valid, try_to_commit, save_in_history
-from Model.ModelController import ModelController
+from Controller.SupportFunctions import try_to_commit, save_in_history
+from Model.ModelController import get_current_model_controller
 from Settings.StatusSettings import StatusSettings
 from flask_login import current_user
 
@@ -17,7 +17,7 @@ blueprint = PrinterBlueprint()
 printer_urls = blueprint.get_url()
 
 # Управление базой данных
-model_controller = ModelController()
+model_controller = get_current_model_controller()
 
 
 class PrinterURLs:

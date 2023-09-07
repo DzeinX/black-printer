@@ -7,6 +7,7 @@ from Controller.printer_urls import *
 from Controller.cartridge_urls import *
 from Controller.auth_urls import *
 from Controller.main_urls import *
+from Controller.api_urls import *
 
 from Settings.Blueprint import BlueprintInterface
 
@@ -36,38 +37,46 @@ class APP:
         self.app.config['SECRET_KEY'] = AppSettings.SECRET_KEY
         self.app.config['SQLALCHEMY_DATABASE_URI'] = AppSettings.SQLALCHEMY_DATABASE_URI
         self.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = AppSettings.SQLALCHEMY_TRACK_MODIFICATIONS
-        self.app.config['LDAP_HOST'] = LDAPSettings.AUP.LDAP_HOST
-        self.app.config['LDAP_BASE_DN'] = LDAPSettings.AUP.LDAP_BASE_DN
-        self.app.config['LDAP_ALWAYS_SEARCH_BIND'] = LDAPSettings.AUP.LDAP_ALWAYS_SEARCH_BIND
-        self.app.config['LDAP_USER_SEARCH_SCOPE'] = LDAPSettings.AUP.LDAP_USER_SEARCH_SCOPE
-        self.app.config['LDAP_USER_RDN_ATTR'] = LDAPSettings.AUP.LDAP_USER_RDN_ATTR
-        self.app.config['LDAP_USER_LOGIN_ATTR'] = LDAPSettings.AUP.LDAP_USER_LOGIN_ATTR
-        self.app.config['LDAP_BIND_USER_DN'] = LDAPSettings.AUP.LDAP_BIND_USER_DN
-        self.app.config['LDAP_BIND_USER_PASSWORD'] = LDAPSettings.AUP.LDAP_BIND_USER_PASSWORD
+        self.app.config['LDAP_HOST'] = LDAPSettings.AUP_LDAP_HOST
+        self.app.config['LDAP_BASE_DN'] = LDAPSettings.AUP_LDAP_BASE_DN
+        self.app.config['LDAP_ALWAYS_SEARCH_BIND'] = LDAPSettings.AUP_LDAP_ALWAYS_SEARCH_BIND
+        self.app.config['LDAP_USER_SEARCH_SCOPE'] = LDAPSettings.AUP_LDAP_USER_SEARCH_SCOPE
+        self.app.config['LDAP_USER_RDN_ATTR'] = LDAPSettings.AUP_LDAP_USER_RDN_ATTR
+        self.app.config['LDAP_USER_LOGIN_ATTR'] = LDAPSettings.AUP_LDAP_USER_LOGIN_ATTR
+        self.app.config['LDAP_BIND_USER_DN'] = LDAPSettings.AUP_LDAP_BIND_USER_DN
+        self.app.config['LDAP_BIND_USER_PASSWORD'] = LDAPSettings.AUP_LDAP_BIND_USER_PASSWORD
 
     def get_config_edu(self):
         self.app.config['SECRET_KEY'] = AppSettings.SECRET_KEY
         self.app.config['SQLALCHEMY_DATABASE_URI'] = AppSettings.SQLALCHEMY_DATABASE_URI
         self.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = AppSettings.SQLALCHEMY_TRACK_MODIFICATIONS
-        self.app.config['LDAP_HOST'] = LDAPSettings.EDU.LDAP_HOST
-        self.app.config['LDAP_BASE_DN'] = LDAPSettings.EDU.LDAP_BASE_DN
-        self.app.config['LDAP_ALWAYS_SEARCH_BIND'] = LDAPSettings.EDU.LDAP_ALWAYS_SEARCH_BIND
-        self.app.config['LDAP_USER_SEARCH_SCOPE'] = LDAPSettings.EDU.LDAP_USER_SEARCH_SCOPE
-        self.app.config['LDAP_USER_RDN_ATTR'] = LDAPSettings.EDU.LDAP_USER_RDN_ATTR
-        self.app.config['LDAP_USER_LOGIN_ATTR'] = LDAPSettings.EDU.LDAP_USER_LOGIN_ATTR
-        self.app.config['LDAP_BIND_USER_DN'] = LDAPSettings.EDU.LDAP_BIND_USER_DN
-        self.app.config['LDAP_BIND_USER_PASSWORD'] = LDAPSettings.EDU.LDAP_BIND_USER_PASSWORD
+        self.app.config['LDAP_HOST'] = LDAPSettings.EDU_LDAP_HOST
+        self.app.config['LDAP_BASE_DN'] = LDAPSettings.EDU_LDAP_BASE_DN
+        self.app.config['LDAP_ALWAYS_SEARCH_BIND'] = LDAPSettings.EDU_LDAP_ALWAYS_SEARCH_BIND
+        self.app.config['LDAP_USER_SEARCH_SCOPE'] = LDAPSettings.EDU_LDAP_USER_SEARCH_SCOPE
+        self.app.config['LDAP_USER_RDN_ATTR'] = LDAPSettings.EDU_LDAP_USER_RDN_ATTR
+        self.app.config['LDAP_USER_LOGIN_ATTR'] = LDAPSettings.EDU_LDAP_USER_LOGIN_ATTR
+        self.app.config['LDAP_BIND_USER_DN'] = LDAPSettings.EDU_LDAP_BIND_USER_DN
+        self.app.config['LDAP_BIND_USER_PASSWORD'] = LDAPSettings.EDU_LDAP_BIND_USER_PASSWORD
+
+    # НОВЫЕ КОНФИГИ ПИСАТЬ ТУТ
 
     def init_auth(self):
         subclasses = AuthInterface.__subclasses__()
-        domains = ['aup', 'edu']
+        methods = list(dir(self))[30:]
+        configs = []
+        for method in methods:
+            if "get_config" in method:
+                configs.append(method)
+
         for index, subclass in enumerate(subclasses):
             manager = subclass()
-            if domains[index - 1] == 'aup':
-                self.get_config_aup()
-            else:
-                self.get_config_edu()
-            manager.get_manager().init_app(self.app)
+            for config in configs:
+                if manager.domain.upper() in config.upper():
+                    getattr(self, config)()
+                    manager.get_manager().init_app(self.app)
+                if manager.domain == "":
+                    manager.get_manager().init_app(self.app)
 
     def check_rest_key_db(self):
         with self.app.app_context():
