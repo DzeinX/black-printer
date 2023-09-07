@@ -109,8 +109,9 @@ header {
 
 .navigation .submenu {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    display: none;
+    visibility: hidden;
     position: absolute;
+    display: block;
     top: -18px;
     left: -3px;
     z-index: 104;
@@ -118,6 +119,8 @@ header {
     min-width: 100%;
     width: 250px;
     overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 
 .submenu li {
@@ -139,8 +142,9 @@ header {
     z-index: 105;
 }
 
-.navigation ul li:hover .submenu {
-    display: block;
+.navigation ul .side .nav-item:hover .submenu {
+    visibility: visible;
+    opacity: 1;
 }
 
 .topmenu > li:last-child {

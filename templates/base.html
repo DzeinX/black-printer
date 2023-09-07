@@ -46,8 +46,7 @@
                     <a href="/" class="nav-link" id="main-page"></a>
                 </li>
             </div>
-            <div class="side"
-                 {% if not current_user.is_boss %}style="grid-template-columns: auto auto auto auto auto;"{% endif %}>
+            <div class="side" {% if not current_user.is_boss %}style="grid-template-columns: auto auto auto auto auto;"{% endif %}>
                 {% if current_user.is_authenticated %}
                     <li class="nav-item">
                         <a href="#" class="nav-link">
