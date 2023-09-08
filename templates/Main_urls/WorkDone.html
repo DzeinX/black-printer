@@ -3,7 +3,6 @@
 {% block title %}Активный договор{% endblock %}
 
 {% block script %}
-    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script>
 
@@ -66,7 +65,7 @@
                     {% set counter.value = counter.value + 1 %}
                 {% endfor %}
             {% else %}
-                <strong>Счетов нету</strong><br>
+                <strong>Счетов нет</strong><br>
             {% endif %}
             {% if not all_checks_active or not check_lists_with_price %}
                 <div class="contract_action_links">

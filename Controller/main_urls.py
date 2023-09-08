@@ -517,7 +517,7 @@ class MainURLs:
                     is_belong = True if work.check_lists_id == check.id else False
                     is_belong_counter_true = is_belong_counter_true + 1 if is_belong else is_belong_counter_true
 
-                    work_list_data.append([is_belong, work, wlc, wlp, get_work_done_price(work)])
+                    work_list_data.append([is_belong, work, wlc, wlp, round(get_work_done_price(work))])
 
             is_all_belong = False
             if is_belong_counter_true == is_access:

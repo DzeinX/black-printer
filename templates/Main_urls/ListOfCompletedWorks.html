@@ -5,7 +5,7 @@
 {% block script %}
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/SearchInput.js') }}"></script>
     <script>
         let rows_counter = 1;
         let numberPattern = /\d+/g;
@@ -248,7 +248,7 @@
     <div class="sch_bar">
         <div class="ctr">
             <label for="search_locw"><strong>Поиск по проделанным работам:</strong></label><br>
-            <input type="text" placeholder="Начните вводить" id="search_locw" class="enter"><br>
+            <input type="text" placeholder="Начните вводить" id="search_input" class="enter"><br>
         </div>
     </div>
     <form method="post" id="main_form">
@@ -259,10 +259,10 @@
     {% if active_check_id != None %}
         <a href="/active_contract/{{ active_check_id }}/more">Перейти к активному счёту</a>
     {% endif %}
-    <div id="items">
+    <div id="search_container">
         {% for work, wlc, wlp, full_price in work_list_data %}
             <div id="d{{ loop.index }}" style="margin-top: 25px;" class="dtls">
-                <h4>Проделанные работы {{ work.name }} {{ work.number }}
+                <h4 class="search-item-name">Проделанные работы {{ work.name }} {{ work.number }}
                     ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
                 Общая сумма: {{ full_price }} рублей<br>
                 <table>

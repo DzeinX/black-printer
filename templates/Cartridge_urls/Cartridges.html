@@ -5,7 +5,7 @@
 {% block script %}
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/TableSearchForAll.js') }}"></script>
 
     <script>
         let items = 1;
@@ -123,55 +123,6 @@
         </div>
     {% endif %}
     {% if cartridges_info|length > 0 %}
-        <div class="sch_bar">
-            <table style="border: none">
-                <colgroup>
-                    <col span="1" style="width: 40%;">
-                    <col span="1" style="width: 60%;">
-                </colgroup>
-                <tbody>
-                <tr>
-                    <td class="ctr" style="border: none; padding: 50px 0 0 0">
-                        <strong>Поиск по таблице:</strong>
-                    </td>
-                    <td class="ctr" style="border: none; padding: 50px 0 0 20px">
-                        <strong>Поиск по статусу:</strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="ctr" style="border: none; padding: 10px 0 0 0">
-                        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-                    </td>
-                    <td class="ctr" style="border: none; padding: 10px 0 0 20px">
-                        <div class="radios">
-                            <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.in_reserve }}">
-                                <label>{{ StatusSettings.Cartridge.in_reserve }}</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="status"
-                                       value="{{ StatusSettings.Cartridge.accepted_for_refuel }}">
-                                <label>{{ StatusSettings.Cartridge.accepted_for_refuel }}</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.in_refueling }}">
-                                <label>{{ StatusSettings.Cartridge.in_refueling }}</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.in_division }}">
-                                <label>{{ StatusSettings.Cartridge.in_division }}</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.Cartridge.restored }}">
-                                <label>{{ StatusSettings.Cartridge.restored }}</label>
-                            </span>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <input type="button" id="btn_off" value="Снять выделение" class="btn_clr">
-        </div>
         {% if current_user.buildings_id|length != 0 %}
             {% if is_show_own %}
                 <a href="{{ url_for('cartridge_urls.cartridges', is_show_own=0) }}">Показать все</a>
@@ -197,16 +148,27 @@
                 <th>Локация</th>
                 <th>Действия</th>
             </tr>
-            <tr style="background: lightblue">
+            <tr id="search-table" style="background: lightblue">
                 <th><i class="fa-solid fa-magnifying-glass"></i></th>
-                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
-                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
-                <th></th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch2" class="enter">
+                </th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch3" class="enter">
+                </th>
+                <th class="search-table-item">
+                    <select type="text" id="sch2_s" class="select enter" onchange="sortTable();">
+                        <option></option>
+                        <option>{{ StatusSettings.Cartridge.in_reserve }}</option>
+                        <option>{{ StatusSettings.Cartridge.accepted_for_refuel }}</option>
+                        <option>{{ StatusSettings.Cartridge.in_refueling }}</option>
+                        <option>{{ StatusSettings.Cartridge.in_division }}</option>
+                        <option>{{ StatusSettings.Cartridge.restored }}</option>
+                    </select>
+                </th>
                 <th></th>
                 <th></th>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="searched-fields">
             {% set counter = namespace(value=1) %}
             {% for cartridge, location, status, printer in cartridges_info %}
                 {% set color = namespace(value='') %}
@@ -224,15 +186,15 @@
                         <td class="1" style="text-align: center; color: black">
                             {{ counter.value }}
                         </td>
-                        <td class="2">
+                        <td class="sorted-field">
                             {{ cartridge.number }}
                         </td>
-                        <td class="3">
+                        <td class="sorted-field">
                             {% for model in cartridge.cartridge_models %}
-                                {{ loop.index }}) {{ model.model }}<br>
+                                {{ loop.index }}) {{ model.model }}
                             {% endfor %}
                         </td>
-                        <td class="4">
+                        <td class="sorted-field">
                             {{ status }}
                         </td>
                         <td class="5">

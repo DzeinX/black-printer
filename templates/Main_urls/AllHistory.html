@@ -6,7 +6,7 @@
 {% block script %}
     <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/TableSearchForAll.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -147,12 +147,6 @@
             <div class="{{ category }}">{{ message }}</div>
         {% endfor %}
     {% endwith %}
-    <div class="sch_bar" style="margin: 20px 0">
-        <div class="ctr">
-            <label for="search"><strong>Поиск по таблице:</strong></label><br>
-            <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-        </div>
-    </div>
     {% if is_show_paginate == 1 %}
         <div style="display: flex; justify-content: space-between">
             {% if all_history.has_prev %}
@@ -193,8 +187,8 @@
         </tr>
         <tr style="background: lightblue">
             <th><i class="fa-solid fa-magnifying-glass"></i></th>
-            <th>
-                <select type="text" id="sch2_s" class="select">
+            <th class="search-table-item">
+                <select type="text" id="sch2_s" class="select enter" onchange="sortTable();">
                     <option></option>
                     <option>Создан</option>
                     <option>Пополнен</option>
@@ -211,8 +205,8 @@
                     <option>В ремонте</option>
                 </select>
             </th>
-            <th>
-                <select type="text" id="sch3_s" class="select">
+            <th class="search-table-item">
+                <select type="text" id="sch3_s" class="select enter" onchange="sortTable();">
                     <option></option>
                     {% if current_user.is_boss %}
                         <option>{{ StatusSettings.Types.work_list }}</option>
@@ -223,33 +217,51 @@
                     <option>{{ StatusSettings.Types.printer }}</option>
                 </select>
             </th>
-            <th><input type="text" placeholder="Начните вводить" id="sch4" class="enter"></th>
-            <th><input type="text" placeholder="Начните вводить" id="sch5" class="enter"></th>
-            <th><input type="text" placeholder="Начните вводить" id="sch6" class="enter"></th>
-            <th><input type="text" placeholder="Начните вводить" id="sch7" class="enter"></th>
+            <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch4" class="enter"></th>
+            <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch5" class="enter"></th>
+            <th class="search-table-item">
+                <select name="user-search"
+                        class="select enter"
+                        onchange="sortTable();">
+                    <option selected></option>
+                    {% for user in users %}
+                        <option value="{{ user.username }}">{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+            </th>
+            <th class="search-table-item">
+                <select name="status-search"
+                        class="select enter"
+                        onchange="sortTable();">
+                    <option selected></option>
+                    {% for _, status in statuses.items() %}
+                        <option value="{{ status }}">{{ status }}</option>
+                    {% endfor %}
+                </select>
+            </th>
         </tr>
         </thead>
-        <tbody>
+        <tbody id="searched-fields">
         {% if is_show_paginate == 1 %}
             {% for history in all_history.items %}
                 <tr>
                     <td class="1">{{ loop.index }}</td>
-                    <td class="2">
+                    <td class="sorted-field">
                         {{ history.action }}
                     </td>
-                    <td class="3">
+                    <td class="sorted-field">
                         {{ history.type }}
                     </td>
-                    <td class="4">
+                    <td class="sorted-field">
                         {{ history.name }}
                     </td>
-                    <td class="5">
+                    <td class="sorted-field">
                         {{ history.date.date().strftime("%d.%m.%Y") }} {{ history.date.time().strftime("%H:%M") }}
                     </td>
-                    <td class="6">
+                    <td class="sorted-field">
                         {{ history.user }}
                     </td>
-                    <td class="7">
+                    <td class="sorted-field">
                         {% if history.status != None %}
                             {{ history.status }}
                         {% else %}
@@ -262,22 +274,22 @@
             {% for history in all_history %}
                 <tr>
                     <td class="1">{{ loop.index }}</td>
-                    <td class="2">
+                    <td class="sorted-field">
                         {{ history.action }}
                     </td>
-                    <td class="3">
+                    <td class="sorted-field">
                         {{ history.type }}
                     </td>
-                    <td class="4">
+                    <td class="sorted-field">
                         {{ history.name }}
                     </td>
-                    <td class="5">
+                    <td class="sorted-field">
                         {{ history.date.date().strftime("%d.%m.%Y") }} {{ history.date.time().strftime("%H:%M") }}
                     </td>
-                    <td class="6">
+                    <td class="sorted-field">
                         {{ history.user }}
                     </td>
-                    <td class="7">
+                    <td class="sorted-field">
                         {% if history.status != None %}
                             {{ history.status }}
                         {% else %}

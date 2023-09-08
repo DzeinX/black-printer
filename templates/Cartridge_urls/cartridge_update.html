@@ -3,7 +3,6 @@
 {% block title %}Изменить картридж{% endblock %}
 
 {% block script %}
-    <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script>
         let items = {{ counter_models }};

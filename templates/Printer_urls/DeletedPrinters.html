@@ -3,16 +3,17 @@
 {% block title %}Удалённые принтеры{% endblock %}
 
 {% block script %}
-    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/TableSearchForAll.js') }}"></script>
 {% endblock %}
 
 {% block body %}
     <h1>Удалённые принтеры</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     {% if printers|length > 0 %}
-        <div class="sch_bar">
-            <label for="search"><strong>Поиск по таблице:</strong></label><br>
-            <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-        </div>
         <table id="mytable">
             <colgroup>
                 <col span="1" style="width: 5%;">
@@ -29,22 +30,24 @@
             </tr>
             <tr style="background: lightblue">
                 <th><i class="fa-solid fa-magnifying-glass"></i></th>
-                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
-                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch2" class="enter">
+                </th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch3" class="enter">
+                </th>
                 <th></th>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="searched-fields">
             {% set counter = namespace(value=1) %}
             {% for printer in printers %}
                 <tr>
                     <td class="1">
                         {{ counter.value }}
                     </td>
-                    <td class="2">
+                    <td class="sorted-field">
                         {{ printer.name }}
                     </td>
-                    <td class="3">
+                    <td class="sorted-field">
                         {{ printer.num_inventory }}
                     </td>
                     <td class="5">

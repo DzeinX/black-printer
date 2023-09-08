@@ -7,7 +7,7 @@
 {% block script %}
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/TableSearchForAll.js') }}"></script>
     <script>
         let items = 1;
 
@@ -121,10 +121,6 @@
         </form>
     </div>
     <form method="POST">
-        <div class="sch_bar">
-            <label for="search"><strong>Поиск по таблице:</strong></label><br>
-            <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-        </div>
         <input type="submit" value="Отправить" class="add_btn">
         <table style="width: 100%; margin-top: 10px" id="mytable">
             <colgroup>
@@ -142,12 +138,12 @@
             </tr>
             <tr style="background: lightblue; cursor: default">
                 <th><i class="fa-solid fa-magnifying-glass"></i></th>
-                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
-                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
                 <th></th>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="searched-fields">
             {% set counter = namespace(value=1) %}
             {% for cartridge, status, is_refills_left, limit in cartridges_info %}
                 {% if status == StatusSettings.Cartridge.accepted_for_refuel %}
@@ -168,10 +164,10 @@
                                 <input type="checkbox" id="cb{{ loop.index }}" name="cartridge_number" value="{{ cartridge.number }}" style="opacity: 0; position: absolute">
                             </label>
                         </td>
-                        <td class="2">
+                        <td class="sorted-field">
                             {{ cartridge.number }}
                         </td>
-                        <td class="3">
+                        <td class="sorted-field">
                             {% for model in cartridge.cartridge_models %}
                                 {{ loop.index }}) {{ model.model }}<br>
                             {% endfor %}

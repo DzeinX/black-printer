@@ -3,7 +3,7 @@
 {% block title %}Принтеры{% endblock %}
 
 {% block script %}
-    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/TableSearchForAll.js') }}"></script>
     <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
 {% endblock %}
 
@@ -89,55 +89,6 @@
         </div>
     {% endif %}
     {% if printers_data|length > 0 %}
-        <div class="sch_bar">
-            <table style="border: none">
-                <colgroup>
-                    <col span="1" style="width: 40%;">
-                    <col span="1" style="width: 60%;">
-                </colgroup>
-                <tbody>
-                <tr>
-                    <td class="ctr" style="border: none; padding: 50px 0 0 0">
-                        <strong>Поиск по таблице:</strong>
-                    </td>
-                    <td class="ctr" style="border: none; padding: 50px 0 0 20px">
-                        <strong>Поиск по статусу:</strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="ctr" style="border: none; padding: 10px 0 0 0">
-                        <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-                    </td>
-                    <td class="ctr" style="border: none; padding: 10px 0 0 20px">
-                        <div class="radios">
-                            <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.Printer.in_reserve }}">
-                                <label>{{ StatusSettings.Printer.in_reserve }}</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="status"
-                                       value="{{ StatusSettings.Printer.accepted_for_repair }}">
-                                <label>{{ StatusSettings.Printer.accepted_for_repair }}</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.Printer.in_repair }}">
-                                <label>{{ StatusSettings.Printer.in_repair }}</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.Printer.in_division }}">
-                                <label>{{ StatusSettings.Printer.in_division }}</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="status" value="{{ StatusSettings.Printer.restored }}">
-                                <label>{{ StatusSettings.Printer.restored }}</label>
-                            </span>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <input type="button" id="btn_off" value="Снять выделение" class="btn_clr">
-        </div>
         {% if current_user.buildings_id|length != 0 %}
             {% if is_show_own %}
                 <a href="{{ url_for('printer_urls.printers', is_show_own=0) }}">Показать все</a>
@@ -165,27 +116,36 @@
             </tr>
             <tr style="background: lightblue">
                 <th><i class="fa-solid fa-magnifying-glass"></i></th>
-                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
-                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
-                <th></th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th class="search-table-item">
+                    <select type="text" id="sch2_s" class="select enter" onchange="sortTable();">
+                        <option></option>
+                        <option>{{ StatusSettings.Printer.in_reserve }}</option>
+                        <option>{{ StatusSettings.Printer.accepted_for_repair }}</option>
+                        <option>{{ StatusSettings.Printer.in_repair }}</option>
+                        <option>{{ StatusSettings.Printer.in_division }}</option>
+                        <option>{{ StatusSettings.Printer.restored }}</option>
+                    </select>
+                </th>
                 <th></th>
                 <th></th>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="searched-fields">
             {% for printer, status in printers_data %}
                 {% if (printer.efficiency != 0) %}
                     <tr>
                         <td class="1" style="text-align: center; color: black">
                             {{ loop.index }}
                         </td>
-                        <td class="2">
+                        <td class="sorted-field">
                             {{ printer.name }}
                         </td>
-                        <td class="3">
+                        <td class="sorted-field">
                             {{ printer.num_inventory }}
                         </td>
-                        <td class="4">
+                        <td class="sorted-field">
                             {{ status }}
                         </td>
                         <td class="5">

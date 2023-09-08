@@ -186,10 +186,12 @@ class CartridgeURLs:
                           reverse=True)
             cartridge = model_controller.get_model_by_id(model_name='Cartridges',
                                                          pk=pk)
+            users = model_controller.get_all_entries(model_name="User")
             return render_template("Cartridge_urls/CartridgeStatuses.html",
                                    statuses=statuses,
                                    cartridge=cartridge,
-                                   StatusSettings=StatusSettings)
+                                   StatusSettings=StatusSettings,
+                                   users=users)
 
         flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
@@ -364,6 +366,9 @@ class CartridgeURLs:
         if request.method == "GET":
             cartridge = model_controller.get_model_by_id(model_name='Cartridges',
                                                          pk=pk)
+            if not cartridge.efficiency:
+                flash("Картридж и так находится в утиле", "error")
+                return redirect(url_for('main_urls.main_page'))
             try:
                 action_history = StatusSettings.Cartridge.deleted
                 type_history = StatusSettings.Types.cartridge
@@ -403,6 +408,9 @@ class CartridgeURLs:
         if request.method == "GET":
             cartridge = model_controller.get_model_by_id(model_name='Cartridges',
                                                          pk=pk)
+            if cartridge.efficiency:
+                flash("Картридж не был утилизирован", "error")
+                return redirect(url_for('main_urls.main_page'))
             try:
                 action_history = StatusSettings.Cartridge.restored
                 type_history = StatusSettings.Types.cartridge
@@ -428,7 +436,7 @@ class CartridgeURLs:
                 model_controller.update(model_entry=cartridge,
                                         efficiency=1)
 
-                return try_to_commit(redirect_to='cartridge_urls.cartridges')
+                return try_to_commit(redirect_to='cartridge_urls.deleted_cartridges')
             except Exception as e:
                 flash(f'Ошибка восстановления картриджа. Ошибка: {e}', 'error')
                 return redirect(url_for('main_urls.main_page'))

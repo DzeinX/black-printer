@@ -235,10 +235,12 @@ class PrinterURLs:
 
             printer = model_controller.get_model_by_id(model_name="Printer",
                                                        pk=pk)
+            users = model_controller.get_all_entries(model_name="User")
             return render_template("Printer_urls/PrinterStatuses.html",
                                    statuses=statuses,
                                    printer=printer,
-                                   StatusSettings=StatusSettings)
+                                   StatusSettings=StatusSettings,
+                                   users=users)
 
         flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
@@ -250,6 +252,9 @@ class PrinterURLs:
         if request.method == "GET":
             printer = model_controller.get_model_by_id(model_name="Printer",
                                                        pk=pk)
+            if not printer.efficiency:
+                flash("Принтер и так находится в утиле", "error")
+                return redirect(url_for('main_urls.main_page'))
             try:
                 action_history = StatusSettings.Printer.deleted
                 type_history = StatusSettings.Types.printer
@@ -290,6 +295,9 @@ class PrinterURLs:
         if request.method == "GET":
             printer = model_controller.get_model_by_id(model_name="Printer",
                                                        pk=pk)
+            if printer.efficiency:
+                flash("Принтер не был утилизирован", "error")
+                return redirect(url_for('main_urls.main_page'))
             try:
                 action_history = StatusSettings.Printer.restored
                 type_history = StatusSettings.Types.printer

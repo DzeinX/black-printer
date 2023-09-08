@@ -7,7 +7,7 @@
 {% block script %}
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/TableSearchForAll.js') }}"></script>
     <script>
         let items = 1;
 
@@ -140,10 +140,6 @@
     </div>
     <form method="POST" id="2">
         <input type="hidden" name="id_form" value="2">
-        <div class="sch_bar">
-            <label for="search"><strong>Поиск по таблице:</strong></label><br>
-            <input type="text" placeholder="Начните вводить" id="search" class="enter"><br>
-        </div>
         <input type="submit" value="Выдать" class="add_btn">
         <table style="width: 100%; margin-top: 10px" id="mytable">
             <colgroup>
@@ -161,12 +157,15 @@
             </tr>
             <tr style="background: lightblue">
                 <th><i class="fa-solid fa-magnifying-glass"></i></th>
-                <th><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
-                <th><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
-                <th><input type="text" placeholder="Начните вводить" id="sch4" class="enter"></th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch2" class="enter">
+                </th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch3" class="enter">
+                </th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch4" class="enter">
+                </th>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="searched-fields">
             {% set counter = namespace(value=1) %}
             {% for printer, last_history in printers_data %}
                 {% if last_history.status == StatusSettings.Printer.in_reserve %}
@@ -174,17 +173,19 @@
                         <td class="1" style="text-align: center">
                             {{ counter.value }}
                             <label>
-                                <input type="checkbox" id="cb{{ loop.index }}" name="num_inventory" value="{{ printer.num_inventory }}" style="opacity: 0; position: absolute">
+                                <input type="checkbox" id="cb{{ loop.index }}" name="num_inventory"
+                                       value="{{ printer.num_inventory }}" style="opacity: 0; position: absolute">
                             </label>
                         </td>
-                        <td class="2">
+                        <td class="sorted-field">
                             {{ printer.name }}
                         </td>
-                        <td class="3">
+                        <td class="sorted-field">
                             {{ printer.num_inventory }}
                         </td>
-                        {% if last_history.location != None %}
-                            <td class="4">
+
+                        <td class="sorted-field">
+                            {% if last_history.location != None %}
                                 Подразделение: {{ last_history.location }}<br>
                                 Корпус: {{ last_history.learning_campus }}<br>
                                 Кабинет: {{ last_history.cabinet }}<br>
@@ -197,9 +198,7 @@
                                 <input type="hidden"
                                        name="cabinet{{ printer.num_inventory }}"
                                        value="{{ last_history.cabinet }}">
-                            </td>
-                        {% else %}
-                            <td class="4">
+                            {% else %}
                                 Подразделение: {{ printer.location_now }}<br>
                                 Корпус: {{ printer.learning_campus_now }}<br>
                                 Кабинет: {{ printer.cabinet_now }}<br>
@@ -212,8 +211,8 @@
                                 <input type="hidden"
                                        name="cabinet{{ printer.num_inventory }}"
                                        value="{{ printer.cabinet_now }}">
-                            </td>
-                        {% endif %}
+                            {% endif %}
+                        </td>
                     </tr>
                     {% set counter.value = counter.value + 1 %}
                 {% endif %}

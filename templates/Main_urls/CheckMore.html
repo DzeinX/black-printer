@@ -5,7 +5,7 @@
 {% block script %}
     <script src="{{ url_for('static', filename='js/RemoveItem.js') }}"></script>
     <script src="{{ url_for('static', filename='js/SelectInput.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/TableSearch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/SearchInput.js') }}"></script>
     <script>
         const numberPattern = /\d+/g;
 
@@ -27,18 +27,11 @@
             <div class="{{ category }}">{{ message }}</div>
         {% endfor %}
     {% endwith %}
-    <a href={{ request.referrer }}>Назад</a><br>
-    <div class="sch_bar">
-        <div class="ctr">
-            <label for="search_locw"><strong>Поиск по проделанным работам:</strong></label><br>
-            <input type="text" placeholder="Начните вводить" id="search_locw" class="enter"><br>
-        </div>
-    </div>
     {% for is_belong, work, wlc, wlp, full_price in work_list_data %}
         {% if is_belong %}
             <div id="d{{ loop.index }}" class="dtls active_checks" style="margin-bottom: 10px">
                 <h4>{{ work.name }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
-                Общая сумма: {{ full_price }}<br>
+                Общая сумма: {{ full_price }} рублей<br>
                 <table style="margin-bottom: 10px">
                     <thead>
                     <tr>
@@ -112,17 +105,25 @@
         <strong>Текущая сумма счёта: </strong>{{ check_price }} рублей.
     </div>
     {% if check.active == 1 and last_contract.active == 1 %}
+        <div class="sch_bar">
+            <div class="ctr">
+                <label for="search_locw"><strong>Поиск по проделанным работам:</strong></label><br>
+                <input type="text" placeholder="Начните вводить" id="search_input" class="enter"><br>
+            </div>
+        </div>
         <form method="POST">
-            <div id="items">
-                {% if work_list_data|length > 4 and not is_all_belong %}
-                    <input type="submit" value="Добавить" class="add_field">
-                {% endif %}
+            {% if work_list_data|length > 4 and not is_all_belong %}
+                <input type="submit" value="Добавить" class="add_field">
+            {% endif %}
+            <div id="search_container">
                 {% for is_belong, work, wlc, wlp, full_price in work_list_data %}
                     {% if not is_belong %}
-                        <div id="d{{ loop.index }}" class="dtls closed_checks" style="margin-bottom: 10px" onclick="HighlightWorkList(this)">
-                            <input type="checkbox" id="cb{{ loop.index }}" value="{{ work.id }}" name="works" style="opacity: 0; position: absolute">
-                            <h4>{{ work.name }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
-                            Общая сумма: {{ full_price }}<br>
+                        <div id="d{{ loop.index }}" class="dtls closed_checks" style="margin-bottom: 10px"
+                             onclick="HighlightWorkList(this)">
+                            <input type="checkbox" id="cb{{ loop.index }}" value="{{ work.id }}" name="works"
+                                   style="opacity: 0; position: absolute">
+                            <h4 class="search-item-name">{{ work.name }} ({{ work.date_work.date().strftime('%d.%m.%Y') }}):</h4>
+                            Общая сумма: {{ full_price }} рублей<br>
                             <table style="margin-bottom: 10px">
                                 <thead>
                                 <tr>
