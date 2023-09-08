@@ -477,12 +477,24 @@ class CartridgeURLs:
                 # add info
                 cartridges_info.append([cartridge, status, printer, all_history])
 
+            printers_info = []
+            for printer in printers:
+                printers_info.append({
+                    "id": str(printer.id),
+                    "location_now": printer.location_now,
+                    "learning_campus_now": printer.learning_campus_now,
+                    "cabinet_now": printer.cabinet_now,
+                    "name": printer.name,
+                    "num_inventory": printer.num_inventory
+                })
+
             return render_template('Cartridge_urls/BroughtACartridge.html',
                                    cartridges_info=cartridges_info,
                                    printers=printers,
                                    buildings=buildings,
                                    divisions=divisions,
-                                   StatusSettings=StatusSettings)
+                                   StatusSettings=StatusSettings,
+                                   printers_info=printers_info)
 
         if request.method == "POST":
             cartridge_number = request.form.getlist('cartridge_number')
@@ -775,12 +787,24 @@ class CartridgeURLs:
                 # add info
                 cartridges_info.append([cartridge, status, printer, sorted_all_history])
 
+            printers_info = []
+            for printer in printers:
+                printers_info.append({
+                    "id": str(printer.id),
+                    "location_now": printer.location_now,
+                    "learning_campus_now": printer.learning_campus_now,
+                    "cabinet_now": printer.cabinet_now,
+                    "name": printer.name,
+                    "num_inventory": printer.num_inventory
+                })
+
             return render_template('Cartridge_urls/IssuanceCartridges.html',
                                    cartridges_info=cartridges_info,
                                    printers=printers,
                                    buildings=buildings,
                                    divisions=divisions,
-                                   StatusSettings=StatusSettings)
+                                   StatusSettings=StatusSettings,
+                                   printers_info=printers_info)
 
         if request.method == "POST":
             cartridge_number = request.form.getlist('cartridge_number')

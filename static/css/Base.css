@@ -612,3 +612,9 @@ td {
     color: goldenrod;
     border: goldenrod solid 1px;
 }
+
+.little-helper {
+    font-size: 0.65em;
+    color: darkred;
+    margin-top: 3px;
+}

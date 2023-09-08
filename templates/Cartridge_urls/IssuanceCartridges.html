@@ -60,6 +60,101 @@
             checkbox.checked = !checkbox.checked;
         }
     </script>
+    <script>
+        const printerInput = document.getElementById("printer");
+        const locationPrinter = document.getElementById("location_printer");
+        const learningCampus = document.getElementById("learning_campus");
+        const cabinet = document.getElementById("cabinet");
+
+        const printers_info = {{ printers_info|tojson }};
+
+        function updateForPrinter() {
+            let printerId = -1
+
+            for (let key in printers_info) {
+                let {cabinet_now, id, learning_campus_now, location_now, name, num_inv} = printers_info[key];
+                if (id === printerInput.value) {
+                    printerId = id;
+
+                    let loc = Array.from(locationPrinter.options).find(item => {
+                        item.removeAttribute("selected");
+                        return item.text === location_now;
+                    });
+                    if (loc) {
+                        loc.setAttribute("selected", '')
+                    } else {
+                        locationPrinter.value = null;
+                    }
+
+                    let lerc = Array.from(learningCampus.options).find(item => {
+                        item.removeAttribute("selected");
+                        return item.text === learning_campus_now;
+                    });
+                    if (lerc) {
+                        lerc.setAttribute("selected", '')
+                    } else {
+                        learningCampus.value = null;
+                    }
+                    cabinet.value = cabinet_now;
+                }
+            }
+
+            $('select').select2({
+                placeholder: "Выберите",
+                allowClear: true
+            });
+
+            checkFills(printerId)
+        }
+
+        function updateFor() {
+            printerInput.innerHTML = '';
+            for (let key in printers_info) {
+                const {cabinet_now, id, learning_campus_now, location_now, name, num_inventory} = printers_info[key];
+
+                if (cabinet_now === cabinet.value && learning_campus_now === learningCampus.value && location_now === locationPrinter.value) {
+                    let option = document.createElement("option");
+                    option.setAttribute("value", id);
+                    option.text = `${name} / ${num_inventory}`;
+
+                    printerInput.appendChild(option);
+                }
+
+                if (locationPrinter.value === "" || learningCampus.value === "" || cabinet.value === "") {
+                    printerInput.innerHTML = `
+                        {% for printer in printers %}
+                            <option value="{{ printer.id }}">{{ printer.name }}
+                                / {{ printer.num_inventory }}</option>
+                        {% endfor %}
+                    `
+                }
+            }
+            $('select').select2({
+                placeholder: "Выберите",
+                allowClear: true
+            });
+        }
+
+        function checkFills(printerId) {
+            const messageContainer = document.getElementById("message-container");
+            messageContainer.innerHTML = "";
+            if ((!locationPrinter.value || !learningCampus.value || !cabinet.value) && printerId !== -1) {
+                let messageField = document.createElement("div");
+                messageField.setAttribute("class", "warning");
+                messageField.innerHTML = `
+                    <span>
+                        У данного принтера не корректно заполнено одно или несколько полей (Подразделение, учебный корпус, кабинет). Во избежание проблем рекомендуем
+                    </span>
+                    <a href="/printer/${printerId}/update">изменить принтер</a>.
+                `
+
+                messageContainer.appendChild(messageField);
+            }
+        }
+    </script>
+    <script defer>
+        updateForPrinter()
+    </script>
 {% endblock %}
 
 
@@ -68,11 +163,13 @@
     <div class="align-center">
         <form method="POST" id="1">
             <div class="form" id="items">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% for category, message in messages %}
-                        <div class="{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endwith %}
+                <div id="message-container">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% for category, message in messages %}
+                            <div class="{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endwith %}
+                </div>
                 <table style="border: none" id="table">
                     <colgroup>
                         <col span="1" style="width: calc(50% - 48px);">
@@ -86,7 +183,8 @@
                             <select name="printer_id"
                                     id="printer"
                                     class="enter"
-                                    required>
+                                    required
+                                    onchange="updateForPrinter();">
                                 {% for printer in printers %}
                                     <option value="{{ printer.id }}">{{ printer.name }}/{{ printer.num_inventory }}</option>
                                 {% endfor %}
@@ -98,8 +196,9 @@
                         <td style="border: none; padding: 10px 0 0 0" rowspan="3">
                             <label for="location" style="margin: 10px 0 0 0">Подразделение: </label><br>
                             <select name="location"
-                                    id="location"
-                                    class="select" required>
+                                    id="location_printer"
+                                    class="select" required
+                                    onchange="updateFor();">
                                 {% for d in divisions %}
                                     <option>{{ d.division }}</option>
                                 {% endfor %}
@@ -108,7 +207,8 @@
                             <label for="learning_campus" style="margin: 10px 0 0 0">Учебный корпус: </label><br>
                             <select name="learning_campus"
                                     id="learning_campus"
-                                    class="select" required>
+                                    class="select" required
+                                    onchange="updateFor();">
                                 {% for b in buildings %}
                                     <option>{{ b.building }}</option>
                                 {% endfor %}
@@ -120,7 +220,8 @@
                                    id="cabinet"
                                    class="enter"
                                    placeholder="Введите кабинет"
-                                   required>
+                                   required
+                                   onchange="updateFor();">
                         </td>
                     </tr>
                     <tr id="d1">

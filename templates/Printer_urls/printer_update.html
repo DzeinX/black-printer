@@ -24,7 +24,7 @@
                     </colgroup>
                     <tbody>
                     <tr>
-                        <td style="border: none; padding: 10px 10px 0 0">
+                        <td valign="top" style="border: none; padding: 10px 10px 0 0">
                             <label for="name">Имя принтера: </label>
                             <input type="text"
                                    name="name"
@@ -33,7 +33,7 @@
                                    value="{{ printer.name }}"
                                    placeholder="Введите имя" required><br>
                         </td>
-                        <td style="border: none; padding: 10px 10px 0 0">
+                        <td valign="top" style="border: none; padding: 10px 10px 0 0">
                             <label for="learning_campus">Учебный корпус: </label>
                             <select name="learning_campus"
                                     id="learning_campus"
@@ -47,7 +47,7 @@
                                 {% endfor %}
                             </select>
                         </td>
-                        <td style="border: none; padding: 10px 0 0 0">
+                        <td valign="top" style="border: none; padding: 10px 0 0 0">
                             <label for="cabinet">Кабинет: </label>
                             <input type="text"
                                    name="cabinet"
@@ -58,7 +58,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="border: none; padding: 10px 10px 0 0">
+                        <td valign="top" style="border: none; padding: 10px 10px 0 0">
                             <label for="num_inventory">Номер инвентаря: </label>
                             <input type="text"
                                    name="num_inventory"
@@ -67,10 +67,10 @@
                                    value="{{ printer.num_inventory }}"
                                    placeholder="Введите номер" required><br>
                         </td>
-                        <td style="border: none; padding: 10px 10px 0 0">
+                        <td valign="top" style="border: none; padding: 10px 10px 0 0">
                             <label for="location">Подразделение: </label>
                             <select name="location"
-                                    id="location"
+                                    id="location_printer"
                                     class="select" required>
                                 {% for d in divisions %}
                                     {% if d.division == printer.location_now %}
@@ -91,4 +91,43 @@
             </div>
         </form>
     </div>
+    <script defer>
+        const learningCampusNow = '{{ printer.learning_campus_now }}';
+        const locationNow = '{{ printer.location_now }}';
+        const cabinetNow = '{{ printer.cabinet_now }}';
+        const locationPrinter = document.getElementById("location_printer");
+        const learningCampus = document.getElementById("learning_campus");
+        const cabinet = document.getElementById("cabinet");
+
+        if (locationPrinter.value !== locationNow) {
+            locationPrinter.value = '';
+
+            let messageLocationNow = document.createElement("div");
+            messageLocationNow.setAttribute("class", "little-helper");
+            messageLocationNow.innerHTML = `Было - ${locationNow}`;
+            locationPrinter.parentNode.appendChild(messageLocationNow);
+        }
+        if (learningCampus.value !== learningCampusNow) {
+            learningCampus.value = '';
+
+            let messageLearningCampusNow = document.createElement("div");
+            messageLearningCampusNow.setAttribute("class", "little-helper");
+            messageLearningCampusNow.innerHTML = `Было - ${learningCampusNow}`;
+            learningCampus.parentNode.appendChild(messageLearningCampusNow);
+        }
+        if (cabinet.value === "None") {
+            cabinet.value = '';
+
+            let messageCabinet = document.createElement("div");
+            messageCabinet.setAttribute("class", "little-helper");
+            messageCabinet.innerHTML = `Было - ${cabinetNow}`;
+            console.log(messageCabinet.parentNode)
+            cabinet.parentNode.appendChild(messageCabinet);
+        }
+
+        $('select').select2({
+            placeholder: "Выберите",
+            allowClear: true
+        });
+    </script>
 {% endblock %}
