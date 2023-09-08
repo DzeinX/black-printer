@@ -377,7 +377,6 @@ class CartridgeURLs:
                 last_all_history = model_controller.filter_by_model(model_name='AllHistory',
                                                                     mode='all',
                                                                     cartridge_id=cartridge.id)[-1]
-
                 request_redirect = save_in_history(action=action_history,
                                                    type=type_history,
                                                    name=name_history,
@@ -418,7 +417,7 @@ class CartridgeURLs:
                 user = current_user.username
                 last_all_history = model_controller.filter_by_model(model_name='AllHistory',
                                                                     mode='all',
-                                                                    cartridge_id=cartridge.id)[-1]
+                                                                    cartridge_id=cartridge.id)[-2]
 
                 request_redirect = save_in_history(action=action_history,
                                                    type=type_history,

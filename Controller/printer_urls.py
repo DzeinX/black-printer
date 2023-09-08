@@ -306,7 +306,7 @@ class PrinterURLs:
 
                 last_all_history = model_controller.filter_by_model(model_name='AllHistory',
                                                                     mode='all',
-                                                                    printer_id=printer.id)[-1]
+                                                                    printer_id=printer.id)[-2]
                 request_redirect = save_in_history(action=action_history,
                                                    type=type_history,
                                                    name=name_history,
