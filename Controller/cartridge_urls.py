@@ -638,7 +638,7 @@ class CartridgeURLs:
                 #  но с предупреждением
                 if cartridge.refills > 4:
                     flash(f"Картридж №{cartridge.number} был заправлен более 4 раз. Его следует утилизировать.", 'warning')
-                    return redirect(url_for('cartridge_url.refueling'))
+                    return redirect(url_for('cartridge_urls.refueling'))
 
             for number in cartridge_number:
                 number = number.strip()
@@ -704,7 +704,7 @@ class CartridgeURLs:
 
             if len(cartridge_number) == 0:
                 flash('Не выбрана ни одна модель', 'warning')
-                return redirect(url_for('cartridge_url.reception_from_a_refuelling'))
+                return redirect(url_for('cartridge_urls.reception_from_a_refuelling'))
 
             for number in cartridge_number:
                 number = number.strip()
