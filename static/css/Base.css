@@ -619,3 +619,32 @@ td {
     color: darkred;
     margin-top: 3px;
 }
+
+.file-recognize {
+    border: 1px solid gray;
+    border-radius: 4px;
+    padding: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: repeating-linear-gradient(-60deg, #eee 0, #eee 1px, transparent 1px, transparent 5px);
+}
+
+.file-recognize .file-choice {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+}
+
+.file-recognize label {
+    margin-right: 20px;
+    color: rgba(0, 0, 0, 1);
+    transition: 0.3s;
+}
+.file-recognize label:hover {
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.7);
+}
+.file-recognize .add_btn {
+    margin: 0;
+}

@@ -8,6 +8,7 @@
         function initSelect() {
             $('select').select2();
         }
+
         let rows_counter = {{ entries_cartridges_data|length + entries_printers_data|length + 1 }};
         let numberPattern = /\d+/g;
 
@@ -148,14 +149,20 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Изменение списка работ ({{ work.date_work.date().strftime('%d.%m.%Y') }})</h1>
+    {% if is_recognize %}
+        <h1>Результат распознавания</h1>
+    {% else %}
+        <h1>Изменение списка работ ({{ work.date_work.date().strftime('%d.%m.%Y') }})</h1>
+    {% endif %}
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, message in messages %}
             <div class="{{ category }}">{{ message }}</div>
         {% endfor %}
     {% endwith %}
     <div class="align-center">
-        <form method="POST">
+        <a href="{{ request.referrer }}">Отменить</a>
+        <form method="POST" {% if is_recognize %}
+              action="{{ url_for("main_urls.list_of_completed_works") }}" {% endif %}>
             <table id="new_work_done">
                 <thead>
                 <tr>
@@ -169,7 +176,7 @@
                 </thead>
                 <tbody>
                 {% set counter = namespace(value=1) %}
-                {% for price, work, cartridge, id in entries_cartridges_data %}
+                {% for price, action, cartridge, id in entries_cartridges_data %}
                     <tr id="row_{{ counter.value }}">
                         <td>
                             {{ counter.value }}
@@ -184,44 +191,73 @@
                             </select>
                         </td>
                         <td>
-                            <select name="object"
-                                    class="select"
-                                    id="object_{{ counter.value }}">
-                                {% for c in cartridges %}
-                                    {% if cartridge.id == c.id %}
-                                        <option value="{{ c.id }}" selected>
-                                            {{ c.number }}
-                                            {% for model in c.cartridge_models %}
-                                                / {{ model.model }}
-                                            {% endfor %}
-                                        </option>
-                                    {% else %}
+                            {% if cartridge != None %}
+                                <select name="object"
+                                        class="select"
+                                        id="object_{{ counter.value }}">
+                                    {% for c in cartridges %}
+                                        {% if cartridge.id == c.id %}
+                                            <option value="{{ c.id }}" selected>
+                                                {{ c.number }}
+                                                {% for model in c.cartridge_models %}
+                                                    / {{ model.model }}
+                                                {% endfor %}
+                                            </option>
+                                        {% else %}
+                                            <option value="{{ c.id }}">
+                                                {{ c.number }}
+                                                {% for model in c.cartridge_models %}
+                                                    / {{ model.model }}
+                                                {% endfor %}
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <select name="object"
+                                        class="select"
+                                        id="object_{{ counter.value }}" required>
+                                    <option selected disabled></option>
+                                    {% for c in cartridges %}
                                         <option value="{{ c.id }}">
                                             {{ c.number }}
                                             {% for model in c.cartridge_models %}
                                                 / {{ model.model }}
                                             {% endfor %}
                                         </option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
                         </td>
                         <td>
-                            <select name="work"
-                                    class="select"
-                                    id="work_{{ counter.value }}">
-                                {% for w in all_works_cartridges %}
-                                    {% if work == w.work %}
-                                        <option value="{{ w.id }}" selected>
-                                            {{ w.work }}
-                                        </option>
-                                    {% else %}
+                            {% if action != None %}
+                                <select name="work"
+                                        class="select"
+                                        id="work_{{ counter.value }}">
+                                    {% for w in all_works_cartridges %}
+                                        {% if action.id == w.id %}
+                                            <option value="{{ w.id }}" selected>
+                                                {{ w.work }}
+                                            </option>
+                                        {% else %}
+                                            <option value="{{ w.id }}">
+                                                {{ w.work }}
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <select name="work"
+                                        class="select"
+                                        id="work_{{ counter.value }}" required>
+                                    <option selected disabled></option>
+                                    {% for w in all_works_cartridges %}
                                         <option value="{{ w.id }}">
                                             {{ w.work }}
                                         </option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
                         </td>
                         <td>
                             <input type="number" name="price" value="{{ price }}" class="enter">
@@ -230,14 +266,21 @@
                             <td></td>
                         {% else %}
                             <td>
-                                <input type="button" value="✕" class="delete_btn" onclick="DeleteRow(this)"
-                                       id="delete_{{ counter.value }}">
+                                {% if not is_recognize %}
+                                    <input type="button" value="✕" class="delete_btn" onclick="DeleteRow(this)"
+                                           id="delete_{{ counter.value }}">
+                                {% endif %}
                             </td>
                         {% endif %}
                     </tr>
+                    <tr>
+                        <td colspan="6" class="little-helper" style="text-align: center">
+                            {{ cartridge_hints[counter.value - 1] }}
+                        </td>
+                    </tr>
                     {% set counter.value = counter.value + 1 %}
                 {% endfor %}
-                {% for price, work, printer, id in entries_printers_data %}
+                {% for price, action, printer, id in entries_printers_data %}
                     <tr id="row_{{ counter.value }}">
                         <td>
                             {{ counter.value }}
@@ -252,38 +295,64 @@
                             </select>
                         </td>
                         <td>
-                            <select name="object"
-                                    class="select"
-                                    id="object_{{ counter.value }}">
-                                {% for p in printers %}
-                                    {% if printer.id == p.id %}
-                                        <option value="{{ p.id }}" selected>
-                                            {{ p.name }} / {{ p.num_inventory }}
-                                        </option>
-                                    {% else %}
+                            {% if printer != None %}
+                                <select name="object"
+                                        class="select"
+                                        id="object_{{ counter.value }}">
+                                    {% for p in printers %}
+                                        {% if printer.id == p.id %}
+                                            <option value="{{ p.id }}" selected>
+                                                {{ p.name }} / {{ p.num_inventory }}
+                                            </option>
+                                        {% else %}
+                                            <option value="{{ p.id }}">
+                                                {{ p.name }} / {{ p.num_inventory }}
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <select name="object"
+                                        class="select"
+                                        id="object_{{ counter.value }}" required>
+                                    <option selected disabled></option>
+                                    {% for p in printers %}
                                         <option value="{{ p.id }}">
                                             {{ p.name }} / {{ p.num_inventory }}
                                         </option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
                         </td>
                         <td>
-                            <select name="work"
-                                    class="select"
-                                    id="work_{{ counter.value }}">
-                                {% for w in all_works_printers %}
-                                    {% if work.id == w.id %}
-                                        <option value="{{ w.id }}" selected>
-                                            {{ w.work }}
-                                        </option>
-                                    {% else %}
+                            {% if action != None %}
+                                <select name="work"
+                                        class="select"
+                                        id="work_{{ counter.value }}">
+                                    {% for w in all_works_printers %}
+                                        {% if action.id == w.id %}
+                                            <option value="{{ w.id }}" selected>
+                                                {{ w.work }}
+                                            </option>
+                                        {% else %}
+                                            <option value="{{ w.id }}">
+                                                {{ w.work }}
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <select name="work"
+                                        class="select"
+                                        id="work_{{ counter.value }}">
+                                    <option selected disabled></option>
+                                    {% for w in all_works_printers %}
                                         <option value="{{ w.id }}">
                                             {{ w.work }}
                                         </option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
                         </td>
                         <td>
                             <input type="number" name="price" value="{{ price }}" class="enter">
@@ -292,10 +361,17 @@
                             <td></td>
                         {% else %}
                             <td>
-                                <input type="button" value="✕" class="delete_btn" onclick="DeleteRow(this)"
-                                       id="delete_{{ counter.value }}">
+                                {% if not is_recognize %}
+                                    <input type="button" value="✕" class="delete_btn" onclick="DeleteRow(this)"
+                                           id="delete_{{ counter.value }}">
+                                {% endif %}
                             </td>
                         {% endif %}
+                    </tr>
+                    <tr>
+                        <td colspan="6" class="little-helper" style="text-align: center">
+                            {{ printer_hints[counter.value - 1] }}
+                        </td>
                     </tr>
                     {% set counter.value = counter.value + 1 %}
                 {% endfor %}
@@ -316,19 +392,19 @@
                 <tr>
                     <td style="border: none; padding: 10px 10px 0 0">
                         <input type="date"
-                           name="date_work"
-                           class="enter"
-                           id="date_work"
-                           value="{{ work.date_work.date() }}"
-                           placeholder="Введите дату" required>
+                               name="date_work"
+                               class="enter"
+                               id="date_work"
+                               value="{{ work.date_work.date() }}"
+                               placeholder="Введите дату" required>
                     </td>
                     <td style="border: none; padding: 10px 0 0 0">
                         <input type="text"
-                           name="name"
-                           class="enter"
-                           id="name"
-                           value="{{ work.name }}"
-                           placeholder="Введите имя" required>
+                               name="name"
+                               class="enter"
+                               id="name"
+                               value="{{ work.name }}"
+                               placeholder="Введите имя" required>
                     </td>
                 </tr>
             </table>

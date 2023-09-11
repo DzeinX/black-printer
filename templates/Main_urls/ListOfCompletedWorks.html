@@ -256,6 +256,12 @@
             <input type="button" id="add_work_done_table" value="Добавить" class="add_btn" onclick="AddForm()">
         </div>
     </form>
+    <form action="{{ url_for('main_urls.recognize_list_of_completed_works') }}" method="post" class="file-recognize"
+          enctype=multipart/form-data>
+        <input type="file" name="add_xlsx" id="file" accept=".xlsx" class="file-choice" required>
+        <label for="file"><i class="fa-solid fa-download"></i>Загрузить</label>
+        <input type="submit" value="Добавить .xlsx" class="add_btn">
+    </form>
     {% if active_check_id != None %}
         <a href="/active_contract/{{ active_check_id }}/more">Перейти к активному счёту</a>
     {% endif %}

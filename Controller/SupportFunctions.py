@@ -1,3 +1,4 @@
+import pandas as pd
 from flask import flash, redirect, request, url_for
 
 from Validate.ScanFunctions import TypeVar
@@ -98,6 +99,44 @@ def get_entries_for_work_list_printers(work_list_printers):
     return wlp
 
 
+def scan_list_of_completed_works(file, all_works_cartridges, all_works_printers):
+    entries_cartridges_data = []
+    entries_printers_data = []
+    printer_hints = []
+    cartridge_hints = []
+    refueling = None
+    for cartridge_works in all_works_cartridges:
+        if "заправка" in cartridge_works.work.lower():
+            refueling = cartridge_works.work
+            break
+
+    for item in range(21, len(file)):
+        column_data = []
+        for data in dict(file[file.index == item]):
+            text_in_cell = str(list(dict(file[file.index == item])[data])[0])
+            if text_in_cell != "nan":
+                column_data.append(text_in_cell)
+
+        for counter in range(int(column_data[2])):
+            if "принт" in column_data[1]:
+                entries_printers_data.append([int(column_data[4]),
+                                              None,
+                                              None,
+                                              None])
+                printer_hints.append(column_data[1])
+            else:
+                work_for_cartridge = None
+                if "заправка" in column_data[1].lower():
+                    work_for_cartridge = refueling
+
+                entries_cartridges_data.append([int(column_data[4]),
+                                                work_for_cartridge,
+                                                None,
+                                                None])
+                cartridge_hints.append(column_data[1])
+    return [entries_cartridges_data, cartridge_hints, entries_printers_data, printer_hints]
+
+
 def all_checks_is_active(contract) -> bool:
     for check in contract.check_lists_id:
         if not check.active:
@@ -139,3 +178,8 @@ def get_contract_price(contract) -> float:
                 for wp_p in wl_p.works_prices_printers_id:
                     check_price += wp_p.price
     return round(check_price)
+
+
+def check_extensions(file_name: str, extensions: list) -> bool:
+    file_extension = file_name.split('.')[-1].lower()
+    return True if file_extension in extensions else False

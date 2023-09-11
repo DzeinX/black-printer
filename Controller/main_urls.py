@@ -1,3 +1,8 @@
+import os
+import string
+from pathlib import Path
+
+import pandas as pd
 from flask import render_template, url_for
 from flask import request
 from flask import redirect
@@ -5,7 +10,9 @@ from flask import flash
 from flask_login import login_required, current_user
 from datetime import datetime
 
-from Controller.SupportFunctions import prevent_valid
+from werkzeug.utils import secure_filename
+
+from Controller.SupportFunctions import prevent_valid, check_extensions, scan_list_of_completed_works
 from Controller.SupportFunctions import try_to_commit
 from Controller.SupportFunctions import save_in_history
 from Controller.SupportFunctions import all_checks_is_active
@@ -709,6 +716,57 @@ class MainURLs:
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
+    @main_urls.route('/list_of_completed_works/recognize_list_of_completed_works', methods=['GET', 'POST'])
+    @login_required
+    def recognize_list_of_completed_works():
+        if request.method == "POST":
+            file = request.files['add_xlsx']
+
+            if not check_extensions(file_name=file.filename,
+                                    extensions=['xlsx']):
+                flash(f'Не правильный формат файла. Нужен формат .xlsx, а у вас .{file.filename.split(".")[-1]}',
+                      'error')
+                return redirect(url_for('main_urls.list_of_completed_works'))
+
+            filename = secure_filename(file.filename)
+
+            work = {
+                'date_work': datetime.strptime(file.filename.split("_")[0], "%d.%m.%Y"),
+                'name': file.filename.split("_")[1]
+            }
+
+            BASE_DIR = str(Path(__file__).resolve().parent.parent)
+            file.save(os.path.join(BASE_DIR + "/static/files", filename))
+
+            all_works_cartridges = model_controller.get_all_entries(model_name="AllWorksCartridges")
+            all_works_printers = model_controller.get_all_entries(model_name="AllWorksPrinters")
+
+            # Распознавание файла
+            file = pd.read_excel(BASE_DIR + '/static/files/' + f'{filename}')
+            e_c_data, c_hints, e_p_data, p_hints = scan_list_of_completed_works(file,
+                                                                                all_works_cartridges,
+                                                                                all_works_printers)
+
+            all_cartridges = model_controller.get_all_entries(model_name="Cartridges")
+            all_printers = model_controller.get_all_entries(model_name="Printer")
+
+            flash(f'Распознавание прошло успешно. Дополните результат', 'success')
+            return render_template('Main_urls/UpdateWork.html',
+                                   entries_cartridges_data=e_c_data,
+                                   entries_printers_data=e_p_data,
+                                   work=work,
+                                   cartridges=all_cartridges,
+                                   printers=all_printers,
+                                   all_works_cartridges=all_works_cartridges,
+                                   all_works_printers=all_works_printers,
+                                   is_recognize=True,
+                                   cartridge_hints=c_hints,
+                                   printer_hints=p_hints)
+
+        flash(f'Не определён метод запроса!', 'error')
+        return redirect(url_for('main_urls.main_page'))
+
+    @staticmethod
     @main_urls.route('/list_of_completed_works/<int:work_id>/update', methods=['GET', 'POST'])
     @login_required
     def update_work(work_id):
@@ -767,7 +825,10 @@ class MainURLs:
                                    cartridges=all_cartridges,
                                    printers=all_printers,
                                    all_works_cartridges=all_works_cartridges,
-                                   all_works_printers=all_works_printers)
+                                   all_works_printers=all_works_printers,
+                                   is_recognize=False,
+                                   cartridge_hints=[],
+                                   printer_hints=[])
 
         if request.method == "POST":
             work = model_controller.get_model_by_id(model_name="WorkList",
