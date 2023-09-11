@@ -114,7 +114,7 @@ def get_check_price(check) -> float:
         for wl_p in wl.work_list_printers_id:
             for wp_p in wl_p.works_prices_printers_id:
                 check_price += wp_p.price
-    return check_price
+    return round(check_price)
 
 
 def get_work_done_price(work_list) -> float:
@@ -125,7 +125,7 @@ def get_work_done_price(work_list) -> float:
     for wl_p in work_list.work_list_printers_id:
         for wp_p in wl_p.works_prices_printers_id:
             check_price += wp_p.price
-    return check_price
+    return round(check_price)
 
 
 def get_contract_price(contract) -> float:
@@ -138,4 +138,4 @@ def get_contract_price(contract) -> float:
             for wl_p in wl.work_list_printers_id:
                 for wp_p in wl_p.works_prices_printers_id:
                     check_price += wp_p.price
-    return check_price
+    return round(check_price)

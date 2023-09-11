@@ -13,7 +13,7 @@
             <div class="{{ category }}">{{ message }}</div>
         {% endfor %}
     {% endwith %}
-    {% if active_contract != None and contract_data %}
+    {% if active_contract != None or contract_data %}
         {% if active_contract != None %}
             <h2 class="contract_title">
                 <a href="/active_contract">Активный договор</a>
