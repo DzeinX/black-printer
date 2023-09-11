@@ -41,7 +41,7 @@ class MainURLs:
                 c_d_chat = created_deleted_chart(col_amount)
                 r_c_chart = refill_cycle_chart(col_amount)
             else:
-                pie_chart_data = [0, 0, 0]
+                pie_chart_data = [0, 0, 0, 0, 0]
                 c_d_chat = [0, 0, 0]
                 r_c_chart = [0, 0]
 

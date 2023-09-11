@@ -137,187 +137,195 @@
             </form>
         </div>
     {% endif %}
-    {% if is_show_paginate == 1 %}
-        <a href="{{ url_for('main_urls.all_history', is_show_paginate=0) }}">Показать всю историю</a>
-    {% else %}
-        <a href="{{ url_for('main_urls.all_history') }}">Разбить историю по страницам</a>
-    {% endif %}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <div class="{{ category }}">{{ message }}</div>
-        {% endfor %}
-    {% endwith %}
-    {% if is_show_paginate == 1 %}
-        <div style="display: flex; justify-content: space-between">
-            {% if all_history.has_prev %}
-                <a href="{{ url_for('main_urls.all_history', page=all_history.prev_num) }}">
-                    &lt;&lt; Предыдущая страница
-                </a>
-            {% else %}
-                &lt;&lt; Предыдущая страница
-            {% endif %}
-            <span>Страница {{ page }}</span>
-            {% if all_history.has_next %}
-                <a href="{{ url_for('main_urls.all_history', page=all_history.next_num) }}">
-                    Следующая страница &gt;&gt;
-                </a>
-            {% else %}
-                Следующая страница &gt;&gt;
-            {% endif %}
-        </div>
-    {% endif %}
-    <table style="margin-top: 15px; margin-bottom: 15px" id="mytable">
-        <colgroup>
-            <col span="1" style="width: 5%;">
-            <col span="1" style="width: 20%;">
-            <col span="1" style="width: 20%;">
-            <col span="1" style="width: 20%;">
-            <col span="1" style="width: 20%;">
-            <col span="1" style="width: 15%;">
-        </colgroup>
-        <thead>
-        <tr>
-            <th>№</th>
-            <th>Действие</th>
-            <th>Тип</th>
-            <th>Имя</th>
-            <th>Дата</th>
-            <th>Пользователь</th>
-            <th>Статус</th>
-        </tr>
-        <tr style="background: lightblue">
-            <th><i class="fa-solid fa-magnifying-glass"></i></th>
-            <th class="search-table-item">
-                <select type="text" id="sch2_s" class="select enter" onchange="sortTable();">
-                    <option></option>
-                    <option>Создан</option>
-                    <option>Пополнен</option>
-                    <option>Переоткрыт</option>
-                    <option>Закрыт</option>
-                    <option>Изменён</option>
-                    <option>Удалён</option>
-                    <option>Восстановлен</option>
-                    <option>Принят в заправку</option>
-                    <option>В заправке</option>
-                    <option>В резерве</option>
-                    <option>В подразделении</option>
-                    <option>Принят в ремонт</option>
-                    <option>В ремонте</option>
-                </select>
-            </th>
-            <th class="search-table-item">
-                <select type="text" id="sch3_s" class="select enter" onchange="sortTable();">
-                    <option></option>
-                    {% if current_user.is_boss %}
-                        <option>{{ StatusSettings.Types.work_list }}</option>
-                        <option>{{ StatusSettings.Types.check }}</option>
-                        <option>{{ StatusSettings.Types.contract }}</option>
-                    {% endif %}
-                    <option>{{ StatusSettings.Types.cartridge }}</option>
-                    <option>{{ StatusSettings.Types.printer }}</option>
-                </select>
-            </th>
-            <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch4" class="enter"></th>
-            <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch5" class="enter"></th>
-            <th class="search-table-item">
-                <select name="user-search"
-                        class="select enter"
-                        onchange="sortTable();">
-                    <option selected></option>
-                    {% for user in users %}
-                        <option value="{{ user.username }}">{{ user.username }}</option>
-                    {% endfor %}
-                </select>
-            </th>
-            <th class="search-table-item">
-                <select name="status-search"
-                        class="select enter"
-                        onchange="sortTable();">
-                    <option selected></option>
-                    {% for _, status in statuses.items() %}
-                        <option value="{{ status }}">{{ status }}</option>
-                    {% endfor %}
-                </select>
-            </th>
-        </tr>
-        </thead>
-        <tbody id="searched-fields">
+    {% if all_history.items|length > 0 %}
         {% if is_show_paginate == 1 %}
-            {% for history in all_history.items %}
-                <tr>
-                    <td class="1">{{ loop.index }}</td>
-                    <td class="sorted-field">
-                        {{ history.action }}
-                    </td>
-                    <td class="sorted-field">
-                        {{ history.type }}
-                    </td>
-                    <td class="sorted-field">
-                        {{ history.name }}
-                    </td>
-                    <td class="sorted-field">
-                        {{ history.date.date().strftime("%d.%m.%Y") }} {{ history.date.time().strftime("%H:%M") }}
-                    </td>
-                    <td class="sorted-field">
-                        {{ history.user }}
-                    </td>
-                    <td class="sorted-field">
-                        {% if history.status != None %}
-                            {{ history.status }}
-                        {% else %}
-                            Нету
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
+            <a href="{{ url_for('main_urls.all_history', is_show_paginate=0) }}">Показать всю историю</a>
         {% else %}
-            {% for history in all_history %}
-                <tr>
-                    <td class="1">{{ loop.index }}</td>
-                    <td class="sorted-field">
-                        {{ history.action }}
-                    </td>
-                    <td class="sorted-field">
-                        {{ history.type }}
-                    </td>
-                    <td class="sorted-field">
-                        {{ history.name }}
-                    </td>
-                    <td class="sorted-field">
-                        {{ history.date.date().strftime("%d.%m.%Y") }} {{ history.date.time().strftime("%H:%M") }}
-                    </td>
-                    <td class="sorted-field">
-                        {{ history.user }}
-                    </td>
-                    <td class="sorted-field">
-                        {% if history.status != None %}
-                            {{ history.status }}
-                        {% else %}
-                            Нету
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
+            <a href="{{ url_for('main_urls.all_history') }}">Разбить историю по страницам</a>
         {% endif %}
-        </tbody>
-    </table>
-    {% if is_show_paginate == 1 %}
-        <div style="display: flex; justify-content: space-between">
-            {% if all_history.has_prev %}
-                <a href="{{ url_for('main_urls.all_history', page=all_history.prev_num) }}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+        {% if is_show_paginate == 1 %}
+            <div style="display: flex; justify-content: space-between">
+                {% if all_history.has_prev %}
+                    <a href="{{ url_for('main_urls.all_history', page=all_history.prev_num) }}">
+                        &lt;&lt; Предыдущая страница
+                    </a>
+                {% else %}
                     &lt;&lt; Предыдущая страница
-                </a>
-            {% else %}
-                &lt;&lt; Предыдущая
-            {% endif %}
-            <span>Страница {{ page }}</span>
-            {% if all_history.has_next %}
-                <a href="{{ url_for('main_urls.all_history', page=all_history.next_num) }}">
+                {% endif %}
+                <span>Страница {{ page }}</span>
+                {% if all_history.has_next %}
+                    <a href="{{ url_for('main_urls.all_history', page=all_history.next_num) }}">
+                        Следующая страница &gt;&gt;
+                    </a>
+                {% else %}
                     Следующая страница &gt;&gt;
-                </a>
+                {% endif %}
+            </div>
+        {% endif %}
+        <table style="margin-top: 15px; margin-bottom: 15px" id="mytable">
+            <colgroup>
+                <col span="1" style="width: 5%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 15%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Действие</th>
+                <th>Тип</th>
+                <th>Имя</th>
+                <th>Дата</th>
+                <th>Пользователь</th>
+                <th>Статус</th>
+            </tr>
+            <tr style="background: lightblue">
+                <th><i class="fa-solid fa-magnifying-glass"></i></th>
+                <th class="search-table-item">
+                    <select type="text" id="sch2_s" class="select enter" onchange="sortTable();">
+                        <option></option>
+                        <option>Создан</option>
+                        <option>Пополнен</option>
+                        <option>Переоткрыт</option>
+                        <option>Закрыт</option>
+                        <option>Изменён</option>
+                        <option>Удалён</option>
+                        <option>Восстановлен</option>
+                        <option>Принят в заправку</option>
+                        <option>В заправке</option>
+                        <option>В резерве</option>
+                        <option>В подразделении</option>
+                        <option>Принят в ремонт</option>
+                        <option>В ремонте</option>
+                    </select>
+                </th>
+                <th class="search-table-item">
+                    <select type="text" id="sch3_s" class="select enter" onchange="sortTable();">
+                        <option></option>
+                        {% if current_user.is_boss %}
+                            <option>{{ StatusSettings.Types.work_list }}</option>
+                            <option>{{ StatusSettings.Types.check }}</option>
+                            <option>{{ StatusSettings.Types.contract }}</option>
+                        {% endif %}
+                        <option>{{ StatusSettings.Types.cartridge }}</option>
+                        <option>{{ StatusSettings.Types.printer }}</option>
+                    </select>
+                </th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch4" class="enter">
+                </th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch5" class="enter">
+                </th>
+                <th class="search-table-item">
+                    <select name="user-search"
+                            class="select enter"
+                            onchange="sortTable();">
+                        <option selected></option>
+                        {% for user in users %}
+                            <option value="{{ user.username }}">{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </th>
+                <th class="search-table-item">
+                    <select name="status-search"
+                            class="select enter"
+                            onchange="sortTable();">
+                        <option selected></option>
+                        {% for _, status in statuses.items() %}
+                            <option value="{{ status }}">{{ status }}</option>
+                        {% endfor %}
+                    </select>
+                </th>
+            </tr>
+            </thead>
+            <tbody id="searched-fields">
+            {% if is_show_paginate == 1 %}
+                {% for history in all_history.items %}
+                    <tr>
+                        <td class="1">{{ loop.index }}</td>
+                        <td class="sorted-field">
+                            {{ history.action }}
+                        </td>
+                        <td class="sorted-field">
+                            {{ history.type }}
+                        </td>
+                        <td class="sorted-field">
+                            {{ history.name }}
+                        </td>
+                        <td class="sorted-field">
+                            {{ history.date.date().strftime("%d.%m.%Y") }} {{ history.date.time().strftime("%H:%M") }}
+                        </td>
+                        <td class="sorted-field">
+                            {{ history.user }}
+                        </td>
+                        <td class="sorted-field">
+                            {% if history.status != None %}
+                                {{ history.status }}
+                            {% else %}
+                                Нету
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
             {% else %}
-                Следующая страница &gt;&gt;
+                {% for history in all_history %}
+                    <tr>
+                        <td class="1">{{ loop.index }}</td>
+                        <td class="sorted-field">
+                            {{ history.action }}
+                        </td>
+                        <td class="sorted-field">
+                            {{ history.type }}
+                        </td>
+                        <td class="sorted-field">
+                            {{ history.name }}
+                        </td>
+                        <td class="sorted-field">
+                            {{ history.date.date().strftime("%d.%m.%Y") }} {{ history.date.time().strftime("%H:%M") }}
+                        </td>
+                        <td class="sorted-field">
+                            {{ history.user }}
+                        </td>
+                        <td class="sorted-field">
+                            {% if history.status != None %}
+                                {{ history.status }}
+                            {% else %}
+                                Нету
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
             {% endif %}
-        </div>
+            </tbody>
+        </table>
+        {% if is_show_paginate == 1 %}
+            <div style="display: flex; justify-content: space-between">
+                {% if all_history.has_prev %}
+                    <a href="{{ url_for('main_urls.all_history', page=all_history.prev_num) }}">
+                        &lt;&lt; Предыдущая страница
+                    </a>
+                {% else %}
+                    &lt;&lt; Предыдущая
+                {% endif %}
+                <span>Страница {{ page }}</span>
+                {% if all_history.has_next %}
+                    <a href="{{ url_for('main_urls.all_history', page=all_history.next_num) }}">
+                        Следующая страница &gt;&gt;
+                    </a>
+                {% else %}
+                    Следующая страница &gt;&gt;
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <h2 style="text-align: center; color: #8395a7">
+            Истории пока что нет...
+        </h2>
     {% endif %}
 {% endblock %}

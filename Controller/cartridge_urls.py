@@ -218,7 +218,7 @@ class CartridgeURLs:
             del all_statuses['in_refueling']
 
             is_not_find = False
-            if cartridges is None:
+            if len(cartridges) == 0:
                 new_cartridge_number = 1
                 cartridges_info = None
             else:

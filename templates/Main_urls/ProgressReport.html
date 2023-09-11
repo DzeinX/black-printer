@@ -13,95 +13,100 @@
             <div class="{{ category }}">{{ message }}</div>
         {% endfor %}
     {% endwith %}
-
-    {% if active_contract != None %}
-        <h2 class="contract_title">
-            <a href="/active_contract">Активный договор</a>
-        </h2>
-        <div class="dtls active_contract">
-            <details>
-                <summary>
-                    {{ active_contract.name }} {{ active_contract.date_contract.date().strftime('%d.%m.%Y') }}
-                </summary>
-                <div class="contract_body">
-                    {% if active_contract_checks %}
-                        <strong>Счета:</strong><br>
-                        {% for check in active_contract_checks %}
-                            <div class="checks">
-                                <div class="check_info">
-                                    {{ loop.index }})
-                                    {% if check.date_check == active_contract.date_contract %}
-                                        <strong>Дата от: </strong>Не указана
-                                    {% else %}
-                                        <strong>Дата от: </strong>{{ check.date_check.date().strftime('%d.%m.%Y') }}
-                                    {% endif %}
-                                    {% if check.sum == 0 %}
-                                        <strong>Сумма счёта: </strong>Не указана
-                                    {% else %}
-                                        <strong>Сумма счёта: </strong>{{ check.sum }} Рублей
-                                    {% endif %}
-                                </div>
-                                <div class="check_action_links">
-                                    <a href="/active_contract/{{ check.id }}/more" class="#">Подробнее</a>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <strong>Счетов нет</strong>
-                    {% endif %}
-                </div>
-            </details>
-        </div>
-    {% endif %}
-
-    {% if contract_data %}
-        <h2 class="contract_title">Завершённые договоры</h2>
-        <div class="sch_bar">
-            <div class="ctr">
-                <label for="search"><strong>Поиск по договорам:</strong></label><br>
-                <input type="text" placeholder="Начните вводить" id="search_input" class="enter"><br>
-            </div>
-        </div>
-        <div id="search_container">
-            {% for contract, checks in contract_data %}
-                <div class="dtls closed_contract" style="margin-bottom: 10px">
-                    <details>
-                        <summary class="search-item-name">
-                            {{ contract.name }} {{ contract.date_contract.date().strftime('%d.%m.%Y') }}
-                        </summary>
-                        <div class="contract_body">
-                            {% if checks %}
-                                <strong>Счета:</strong><br>
-                                {% for check in checks %}
-                                    <div class="checks">
-                                        <div class="check_info">
-                                            {{ loop.index }})
-                                            {% if check.date_check == contract.date_contract %}
-                                                <strong>Дата от: </strong>Не указана
-                                            {% else %}
-                                                <strong>Дата от: </strong>
-                                                {{ check.date_check.date().strftime('%d.%m.%Y') }}
-                                            {% endif %}
-                                            {% if check.sum == 0 %}
-                                                <strong>Сумма счёта: </strong>Не указана
-                                            {% else %}
-                                                <strong>Сумма счёта: </strong>{{ check.sum }} Рублей
-                                            {% endif %}
-                                        </div>
-                                        <div class="check_action_links">
-                                            <a href="/progress_report/{{ check.id }}/{{ contract.id }}/more"
-                                               class="#">Подробнее</a>
-                                        </div>
+    {% if active_contract != None and contract_data %}
+        {% if active_contract != None %}
+            <h2 class="contract_title">
+                <a href="/active_contract">Активный договор</a>
+            </h2>
+            <div class="dtls active_contract">
+                <details>
+                    <summary>
+                        {{ active_contract.name }} {{ active_contract.date_contract.date().strftime('%d.%m.%Y') }}
+                    </summary>
+                    <div class="contract_body">
+                        {% if active_contract_checks %}
+                            <strong>Счета:</strong><br>
+                            {% for check in active_contract_checks %}
+                                <div class="checks">
+                                    <div class="check_info">
+                                        {{ loop.index }})
+                                        {% if check.date_check == active_contract.date_contract %}
+                                            <strong>Дата от: </strong>Не указана
+                                        {% else %}
+                                            <strong>Дата от: </strong>{{ check.date_check.date().strftime('%d.%m.%Y') }}
+                                        {% endif %}
+                                        {% if check.sum == 0 %}
+                                            <strong>Сумма счёта: </strong>Не указана
+                                        {% else %}
+                                            <strong>Сумма счёта: </strong>{{ check.sum }} Рублей
+                                        {% endif %}
                                     </div>
-                                {% endfor %}
-                            {% else %}
-                                <strong>Счетов нет</strong>
-                            {% endif %}
-                        </div>
-                    </details>
+                                    <div class="check_action_links">
+                                        <a href="/active_contract/{{ check.id }}/more" class="#">Подробнее</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <strong>Счетов нет</strong>
+                        {% endif %}
+                    </div>
+                </details>
+            </div>
+        {% endif %}
+
+        {% if contract_data %}
+            <h2 class="contract_title">Завершённые договоры</h2>
+            <div class="sch_bar">
+                <div class="ctr">
+                    <label for="search"><strong>Поиск по договорам:</strong></label><br>
+                    <input type="text" placeholder="Начните вводить" id="search_input" class="enter"><br>
                 </div>
-            {% endfor %}
-        </div>
+            </div>
+            <div id="search_container">
+                {% for contract, checks in contract_data %}
+                    <div class="dtls closed_contract" style="margin-bottom: 10px">
+                        <details>
+                            <summary class="search-item-name">
+                                {{ contract.name }} {{ contract.date_contract.date().strftime('%d.%m.%Y') }}
+                            </summary>
+                            <div class="contract_body">
+                                {% if checks %}
+                                    <strong>Счета:</strong><br>
+                                    {% for check in checks %}
+                                        <div class="checks">
+                                            <div class="check_info">
+                                                {{ loop.index }})
+                                                {% if check.date_check == contract.date_contract %}
+                                                    <strong>Дата от: </strong>Не указана
+                                                {% else %}
+                                                    <strong>Дата от: </strong>
+                                                    {{ check.date_check.date().strftime('%d.%m.%Y') }}
+                                                {% endif %}
+                                                {% if check.sum == 0 %}
+                                                    <strong>Сумма счёта: </strong>Не указана
+                                                {% else %}
+                                                    <strong>Сумма счёта: </strong>{{ check.sum }} Рублей
+                                                {% endif %}
+                                            </div>
+                                            <div class="check_action_links">
+                                                <a href="/progress_report/{{ check.id }}/{{ contract.id }}/more"
+                                                   class="#">Подробнее</a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <strong>Счетов нет</strong>
+                                {% endif %}
+                            </div>
+                        </details>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% else %}
+        <h2 style="text-align: center; color: #8395a7">
+            Отчётов пока что нет... Но вы можете его <a href="{{ url_for('main_urls.active_contract') }}">создать</a>.
+        </h2>
     {% endif %}
 
 {% endblock %}

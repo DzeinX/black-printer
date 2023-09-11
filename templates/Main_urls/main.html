@@ -11,23 +11,29 @@
     {% endwith %}
     {% if current_user.is_authenticated %}
         {% if is_show_charts %}
-            <a href="/">Скрыть статистику</a>
-            {% if pie_chart_data != [0, 0, 0, 0, 0] %}
-                <canvas id="pie_chart_data" width="75" height="40"></canvas>
+            {% if pie_chart_data != [0, 0, 0, 0, 0] and created_deleted_chart != [0, 0, 0] and refill_cycle_chart != [0, 0] %}
+                <a href="/">Скрыть статистику</a>
+                {% if pie_chart_data != [0, 0, 0, 0, 0] %}
+                    <canvas id="pie_chart_data" width="75" height="40"></canvas>
+                {% else %}
+                    <h3>Круговую диаграмму о цикле картриджей не построить, слишком мало данных</h3>
+                {% endif %}
+                {% if created_deleted_chart != [0, 0, 0] %}
+                    <canvas id="created_deleted_chart" width="75" height="40"></canvas>
+                {% else %}
+                    <h3>Столбчатую диаграмму по созданным и удалённым картриджам не построить, слишком мало данных</h3>
+                {% endif %}
+                {% if refill_cycle_chart != [0, 0] %}
+                    <canvas id="refill_cycle_chart" width="75" height="40"></canvas>
+                {% else %}
+                    <h3>Столбчатую диаграмму по циклам перезаправки не построить, слишком мало данных</h3>
+                {% endif %}
+                <a href="/">Скрыть статистику</a>
             {% else %}
-                <h3>Круговую диаграмму о цикле картриджей не построить, слишком мало данных</h3>
+                <h2 style="text-align: center; color: #8395a7">
+                    Графики не создать, слишком мало данных...
+                </h2>
             {% endif %}
-            {% if pie_chart_data != [0, 0, 0] %}
-                <canvas id="created_deleted_chart" width="75" height="40"></canvas>
-            {% else %}
-                <h3>Столбчатую диаграмму по созданным и удалённым картриджам не построить, слишком мало данных</h3>
-            {% endif %}
-            {% if pie_chart_data != [0, 0] %}
-                <canvas id="refill_cycle_chart" width="75" height="40"></canvas>
-            {% else %}
-                <h3>Столбчатую диаграмму по циклам перезаправки не построить, слишком мало данных</h3>
-            {% endif %}
-            <a href="/">Скрыть статистику</a>
         {% else %}
             <a href="{{ url_for('main_urls.main_page', is_show_charts=1, col_amount=6) }}">Показать статистику</a>
         {% endif %}
