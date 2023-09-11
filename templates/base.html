@@ -111,7 +111,7 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        {% if current_user.is_boss %}
+                        {% if current_user.is_boss or current_user.is_admin %}
                             <a href="#" class="nav-link">
                                 <i class="fa-solid fa-circle-chevron-down"></i>
                                 <div class="label">Администрирование</div>
@@ -123,11 +123,11 @@
                                 </li>
                                 <li class="nav-item">
                                     <a href="/add_models" class="nav-link">Модели</a>
-                                    {% if current_user.is_boss %}
+                                    {% if current_user.is_boss or current_user.is_admin %}
                                         <hr style="margin-top: 10px; border-color: #2e86de">
                                     {% endif %}
                                 </li>
-                                {% if current_user.is_boss %}
+                                {% if current_user.is_boss or current_user.is_admin %}
                                     <li class="nav-item">
                                         <a href="/add_works_cartridges" class="nav-link">Тип работ картриджей</a>
                                         <hr style="margin-top: 10px; border-color: #2e86de">

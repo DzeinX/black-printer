@@ -25,7 +25,7 @@ class CartridgeURLs:
     @cartridge_urls.route('/add_works_cartridges', methods=['GET', 'POST'])
     @login_required
     def add_works_cartridges():
-        if not current_user.is_boss:
+        if not current_user.is_boss and not current_user.is_admin:
             return redirect(url_for('main_urls.main_page'))
 
         if request.method == "GET":

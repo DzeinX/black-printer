@@ -58,7 +58,7 @@ class MainURLs:
     @main_urls.route('/divisions', methods=['GET', 'POST'])
     @login_required
     def add_divisions():
-        if not current_user.is_boss:
+        if not current_user.is_boss and not current_user.is_admin:
             return redirect(url_for('main_urls.main_page'))
 
         if request.method == "GET":
@@ -104,7 +104,7 @@ class MainURLs:
     @main_urls.route('/buildings', methods=['GET', 'POST'])
     @login_required
     def add_buildings():
-        if not current_user.is_boss:
+        if not current_user.is_boss and not current_user.is_admin:
             return redirect(url_for('main_urls.main_page'))
 
         if request.method == "GET":
@@ -441,7 +441,8 @@ class MainURLs:
                 return try_to_commit(redirect_to='main_urls.active_contract')
 
             else:
-                flash(f'Указанная сумма счёта не совпадает с действительной на {check.sum - check_price} рублей', 'warning')
+                flash(f'Указанная сумма счёта не совпадает с действительной на {check.sum - check_price} рублей',
+                      'warning')
                 return redirect(url_for('main_urls.active_contract'))
 
         flash(f'Не определён метод запроса!', 'error')

@@ -120,7 +120,7 @@ header {
     width: 250px;
     overflow: hidden;
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: 0.3s;
 }
 
 .submenu li {
