@@ -1,5 +1,4 @@
 import os
-import string
 from pathlib import Path
 
 import pandas as pd
@@ -642,6 +641,29 @@ class MainURLs:
                                                 date_work=date_work_list,
                                                 name=name,
                                                 date_create=datetime.now())
+
+            all_cartridges = model_controller.get_all_entries(model_name="Cartridges")
+            all_printers = model_controller.get_all_entries(model_name="Printer")
+
+            current_cartridges = []
+            for cartridge in all_cartridges:
+                if cartridge.work_done > 0:
+                    current_cartridges.append(cartridge.id)
+            current_printers = []
+            for printer in all_printers:
+                if printer.work_done > 0:
+                    current_printers.append(printer.id)
+
+            for index, category in enumerate(categories):
+                if category == "Картридж":
+                    if int(objects[index]) not in current_cartridges:
+                        flash(f'Картридж id={objects[index]} уже входит в выполенные работы','error')
+                        return redirect(url_for('main_urls.list_of_completed_works'))
+                if category == "Принтер":
+                    if int(objects[index]) not in current_printers:
+                        flash(f'Принтер id={objects[index]} уже входит в выполенные работы', 'error')
+                        return redirect(url_for('main_urls.list_of_completed_works'))
+
             exist_cartridges = []
             exist_printers = []
             for index, category in enumerate(categories):

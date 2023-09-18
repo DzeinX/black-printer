@@ -1,12 +1,13 @@
 from sqlalchemy import desc
-from abc import ABCMeta, abstractmethod
+
 from Settings.Singleton import MetaSingleton
-from Model.models import ModelInterface
 from Model.models import db
 from sqlalchemy.sql import text
 
+from abc import ABCMeta, abstractmethod
+from Model.models import ModelInterface
 
-# НОВЫЕ МОДЕЛИ БД ПИСАТЬ ПОСЛЕ ПОСЛЕДНЕГО КЛАССА В ЭТОМ ФАЙЛЕ
+
 class ModelControllerInterface:
     __metaclass__ = ABCMeta
 
@@ -60,6 +61,7 @@ def get_current_model_controller():
     return ModelControllerInterface.__subclasses__()[-1]()
 
 
+# НОВЫЕ МОДЕЛИ БД ПИСАТЬ ПОСЛЕ ПОСЛЕДНЕГО КЛАССА В ЭТОМ ФАЙЛЕ
 class ModelController(ModelControllerInterface, metaclass=MetaSingleton):
     def __init__(self):
         self.models = dict()

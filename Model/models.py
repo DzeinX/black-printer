@@ -3,7 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from abc import ABCMeta
 
 
+class ModelInterface:
+    __metaclass__ = ABCMeta
+    __sql_query_amount_rows__ = ...
+
+
 db = SQLAlchemy()
+
 
 association_table_1 = db.Table('association', db.Model.metadata,
                                db.Column('cartridges_id', db.Integer, db.ForeignKey('cartridges.id')),
@@ -14,9 +20,7 @@ association_table_2 = db.Table('association2', db.Model.metadata,
                                db.Column('building_id', db.Integer, db.ForeignKey('Buildings.id')))
 
 
-class ModelInterface:
-    __metaclass__ = ABCMeta
-    __sql_query_amount_rows__ = ...
+# model_controller = get_current_model_controller()
 
 
 class AllHistory(db.Model, ModelInterface):

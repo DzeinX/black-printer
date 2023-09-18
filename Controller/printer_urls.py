@@ -97,9 +97,16 @@ class PrinterURLs:
             type_history = StatusSettings.Types.printer
             name_history = printer.num_inventory
             user = current_user.username
-            last_all_history = model_controller.filter_by_model(model_name='AllHistory',
+            all_history = model_controller.filter_by_model(model_name='AllHistory',
                                                                 mode='all',
-                                                                printer_id=printer.id)[-1]
+                                                                printer_id=printer.id)
+            all_history.sort(key=lambda ah: ah.date,
+                             reverse=True)
+            last_all_history = all_history[-1]
+            for entry in all_history:
+                if entry.status is not None:
+                    last_all_history = entry
+                    break
             request_redirect = save_in_history(action=action_history,
                                                type=type_history,
                                                name=name_history,
