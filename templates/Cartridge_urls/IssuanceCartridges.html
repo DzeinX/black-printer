@@ -160,15 +160,16 @@
 
 {% block body %}
     <h1>Выдача в подразделение:</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <div class="align-center">
+        <div class="block-label">К одному принтеру</div>
         <form method="POST" id="1">
             <div class="form" id="items">
                 <div id="message-container"></div>
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% for category, message in messages %}
-                        <div class="{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endwith %}
                 <table style="border: none" id="table">
                     <colgroup>
                         <col span="1" style="width: calc(50% - 48px);">
@@ -178,14 +179,14 @@
                     <tbody>
                     <tr>
                         <td style="border: none; vertical-align: top; padding: 10px 10px 0 0" id="d1">
-                            <label for="printer">Имя/Инвентарный номер принтера: </label><br>
+                            <div>Имя || Инвентарный номер принтера: </div>
                             <select name="printer_id"
                                     id="printer"
                                     class="enter"
                                     required
                                     onchange="updateForPrinter();">
                                 {% for printer in printers %}
-                                    <option value="{{ printer.id }}">{{ printer.name }}/{{ printer.num_inventory }}</option>
+                                    <option value="{{ printer.id }}">{{ printer.name }} || {{ printer.num_inventory }}</option>
                                 {% endfor %}
                             </select><br>
                         </td>
@@ -193,7 +194,7 @@
 
                         </td>
                         <td style="border: none; padding: 10px 0 0 0" rowspan="3">
-                            <label for="location" style="margin: 10px 0 0 0">Подразделение: </label><br>
+                            <div>Подразделение: </div>
                             <select name="location"
                                     id="location_printer"
                                     class="select" required
@@ -203,7 +204,7 @@
                                 {% endfor %}
                             </select><br>
 
-                            <label for="learning_campus" style="margin: 10px 0 0 0">Учебный корпус: </label><br>
+                            <div style="padding-top: 10px">Учебный корпус: </div>
                             <select name="learning_campus"
                                     id="learning_campus"
                                     class="select" required
@@ -213,7 +214,7 @@
                                 {% endfor %}
                             </select><br>
 
-                            <label for="cabinet" style="margin: 10px 0 0 0">Кабинет: </label><br>
+                            <div style="padding-top: 10px">Кабинет: </div>
                             <input type="text"
                                    name="cabinet"
                                    id="cabinet"
@@ -225,7 +226,7 @@
                     </tr>
                     <tr id="d1">
                         <td style="border: none; padding: 10px 10px 0 0">
-                            <label for="1">Номер картриджа<strong>||</strong>Модели: </label><br>
+                            <label for="1">Номер картриджа<strong> || </strong>Модели: </label><br>
                             <select type="number"
                                     name="cartridge_number"
                                     id="1"

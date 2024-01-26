@@ -11,8 +11,14 @@
 
 {% block body %}
     <h1>История статусов</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     {% if current_user.is_boss or current_user.is_admin %}
         <div class="align-center">
+            <div class="block-label">Создать</div>
             <form method="POST" action="{{ url_for("main_urls.all_history") }}">
                 <div class="form">
                     <table style="border: none">
@@ -137,17 +143,12 @@
             </form>
         </div>
     {% endif %}
-    {% if all_history.items|length > 0 %}
+    {% if all_history.items|length > 0 or all_history|length > 0 %}
         {% if is_show_paginate == 1 %}
             <a href="{{ url_for('main_urls.all_history', is_show_paginate=0) }}">Показать всю историю</a>
         {% else %}
             <a href="{{ url_for('main_urls.all_history') }}">Разбить историю по страницам</a>
         {% endif %}
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% for category, message in messages %}
-                <div class="{{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endwith %}
         {% if is_show_paginate == 1 %}
             <div style="display: flex; justify-content: space-between">
                 {% if all_history.has_prev %}
@@ -191,31 +192,17 @@
                 <th class="search-table-item">
                     <select type="text" id="sch2_s" class="select enter" onchange="sortTable();">
                         <option></option>
-                        <option>Создан</option>
-                        <option>Пополнен</option>
-                        <option>Переоткрыт</option>
-                        <option>Закрыт</option>
-                        <option>Изменён</option>
-                        <option>Удалён</option>
-                        <option>Восстановлен</option>
-                        <option>Принят в заправку</option>
-                        <option>В заправке</option>
-                        <option>В резерве</option>
-                        <option>В подразделении</option>
-                        <option>Принят в ремонт</option>
-                        <option>В ремонте</option>
+                        {% for _, action in actions.items() %}
+                            <option value="{{ action }}">{{ action }}</option>
+                        {% endfor %}
                     </select>
                 </th>
                 <th class="search-table-item">
                     <select type="text" id="sch3_s" class="select enter" onchange="sortTable();">
                         <option></option>
-                        {% if current_user.is_boss %}
-                            <option>{{ StatusSettings.Types.work_list }}</option>
-                            <option>{{ StatusSettings.Types.check }}</option>
-                            <option>{{ StatusSettings.Types.contract }}</option>
-                        {% endif %}
-                        <option>{{ StatusSettings.Types.cartridge }}</option>
-                        <option>{{ StatusSettings.Types.printer }}</option>
+                        {% for _, type in entries_type.items() %}
+                            <option value="{{ type }}">{{ type }}</option>
+                        {% endfor %}
                     </select>
                 </th>
                 <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch4" class="enter">
@@ -326,6 +313,7 @@
     {% else %}
         <h2 style="text-align: center; color: #8395a7">
             Истории пока что нет...
+            {{ all_history.items }}
         </h2>
     {% endif %}
 {% endblock %}

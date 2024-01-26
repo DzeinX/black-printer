@@ -3,6 +3,7 @@
 {% block title %}Типы работ картриджей{% endblock %}
 
 {% block script %}
+    <script src="{{ url_for('static', filename='js/TableSearchForAll.js') }}"></script>
     <script>
         let items = {{ counter_works }};
 
@@ -13,11 +14,8 @@
             let newRow = table.insertRow()
             newRow.setAttribute('id', id)
             let tdFirst = document.createElement("td")
-            tdFirst.setAttribute('style', 'border: none; padding: 10px 20px 0 0')
             let tdSecond = document.createElement("td")
-            tdSecond.setAttribute('style', 'border: none; padding: 10px 10px 0 0')
             let tdThird = document.createElement("td")
-            tdThird.setAttribute('style', 'border: none; padding: 10px 0 0 0')
             tdFirst.innerHTML = `
                 <label for="${items}">${items} </label>`;
             tdSecond.innerHTML = `
@@ -45,49 +43,62 @@
 
 {% block body %}
     <h1>Типы работ:</h1>
-    <div class="align-center">
-        <form method="POST">
-            <div class="form" id="items">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% for category, message in messages %}
-                        <div class="{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endwith %}
-
-                {% set counter = namespace(value=1) %}
-                <table style="border: none" id="table">
-                    <colgroup>
-                        <col span="1" style="width: 5%;">
-                        <col span="1" style="width: calc(95% - 28px);">
-                        <col span="1" style="width: 28px;">
-                    </colgroup>
-                    <tbody>
-                    {% for work in all_works_cartridges %}
-                        <tr id="d{{ loop.index }}">
-                            <td style="border: none; padding: 10px 20px 0 0">
-                                <label for="{{ loop.index }}">{{ counter.value }} </label>
-                            </td>
-                            <td style="border: none; padding: 10px 10px 0 0">
-                                <input id="{{ loop.index }}"
-                                       type="text"
-                                       value="{{ work.work }}"
-                                       name="works"
-                                       class="enter">
-                            </td>
-                            <td style="border: none; padding: 10px 0 0 0">
-                                <input type="button" value="✕" class="delete_btn"
-                                       onclick="RemoveItem('d{{ loop.index }}');" id="r{{ loop.index }}">
-                            </td>
-                            {% set counter.value = counter.value + 1 %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add">
-                <input type="submit" value="Обновить" class="add_btn">
-            </div>
-        </form>
-    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+    <form method="POST">
+        <div class="form" id="items">
+            {% set counter = namespace(value=1) %}
+            <table id="table">
+                <colgroup>
+                    <col span="1" style="width: 5%;">
+                    <col span="1" style="width: calc(95% - 28px);">
+                    <col span="1" style="width: 28px;">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Тип работ</th>
+                    <th></th>
+                </tr>
+                <tr id="search-table">
+                    <th>
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </th>
+                    <th class="search-table-item">
+                        <input type="text" placeholder="Начните вводить" id="sch2" class="enter">
+                    </th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="searched-fields">
+                {% for work in all_works_cartridges %}
+                    <tr id="d{{ loop.index }}">
+                        <td>
+                            <label for="{{ loop.index }}">{{ counter.value }} </label>
+                        </td>
+                        <td>
+                            <input id="{{ loop.index }}"
+                                   type="text"
+                                   value="{{ work.work }}"
+                                   name="works"
+                                   class="enter">
+                        </td>
+                        <td>
+                            <input type="button" value="✕" class="delete_btn"
+                                   onclick="RemoveItem('d{{ loop.index }}');" id="r{{ loop.index }}">
+                        </td>
+                        {% set counter.value = counter.value + 1 %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add">
+            <input type="submit" value="Обновить" class="add_btn">
+        </div>
+    </form>
 
 {% endblock %}
 

@@ -4,7 +4,8 @@
 
 {% block body %}
     <h1>Вход</h1>
-    <div class="align-center" style="background-color: gray">
+    <div class="align-center">
+        <div class="block-label">Введите логин и пароль</div>
         <form method="POST">
             <div class="form" id="items">
                 {% with messages = get_flashed_messages(with_categories=true) %}

@@ -71,6 +71,7 @@
 {% block body %}
     <h1>Принять из ремонта:</h1>
     <div class="align-center">
+        <div class="block-label">Принять из ремонта</div>
         <form method="POST">
             <input type="hidden" name="id_form" value="1">
             <div class="form" id="items">
@@ -87,7 +88,7 @@
                     <tbody>
                     <tr>
                         <td style="border: none; padding: 10px 0 0 0">
-                            <label for="1">Номер инвентаря<strong>||</strong>Имя: </label><br>
+                            <div>Инвентарный номер<strong> || </strong>Имя: </div>
                             <select type="number"
                                     name="num_inventory"
                                     id="1"
@@ -130,7 +131,7 @@
             <tr>
                 <th>№</th>
                 <th>Имя принтера</th>
-                <th>Номер инвентаря</th>
+                <th>Инвентарный номер</th>
             </tr>
             <tr style="background: lightblue">
                 <th><i class="fa-solid fa-magnifying-glass"></i></th>

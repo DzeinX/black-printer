@@ -64,9 +64,9 @@ class CartridgeURLs:
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
-    @cartridge_urls.route('/add_models', methods=['GET', 'POST'])
+    @cartridge_urls.route('/add_models_cartridge', methods=['GET', 'POST'])
     @login_required
-    def add_models():
+    def add_models_cartridge():
         if request.method == "GET":
             list_models = model_controller.get_all_entries(model_name='ListModels')
             counter_models = len(list_models)
@@ -79,7 +79,7 @@ class CartridgeURLs:
 
             if len(list_models) == 0:
                 flash('Нельзя удалить все модели', 'warning')
-                return redirect('cartridge_urls.add_models')
+                return redirect(url_for('cartridge_urls.add_models_cartridge'))
 
             model_controller.delete_all_entries_in_model(model_name="ListModels")
             try:
@@ -96,7 +96,7 @@ class CartridgeURLs:
                 flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
                 return redirect(url_for('main_urls.main_page'))
 
-            return try_to_commit(redirect_to='cartridge_urls.add_models')
+            return try_to_commit(redirect_to='cartridge_urls.add_models_cartridge')
 
         flash(f'Не определён метод запроса!', 'error')
         return redirect(url_for('main_urls.main_page'))
@@ -154,10 +154,10 @@ class CartridgeURLs:
             name_history = cartridge.number
             user = current_user.username
             all_history = model_controller.filter_by_model(model_name='AllHistory',
-                                                                mode='all',
-                                                                cartridge_id=cartridge.id)
+                                                           mode='all',
+                                                           cartridge_id=cartridge.id)
             all_history.sort(key=lambda ah: ah.date,
-                                  reverse=True)
+                             reverse=True)
             last_all_history = all_history[-1]
             for entry in all_history:
                 if entry.status is not None:
@@ -643,8 +643,9 @@ class CartridgeURLs:
 
                 # TODO: Добавить возможность заправить картридж даже если он уже был заправлен более 4 раз,
                 #  но с предупреждением
-                if cartridge.refills > 4:
-                    flash(f"Картридж №{cartridge.number} был заправлен более 4 раз. Его следует утилизировать.", 'warning')
+                if cartridge.refills > 3:
+                    flash(f"Картридж №{cartridge.number} был заправлен более 4 раз. Его следует утилизировать.",
+                          'warning')
                     return redirect(url_for('cartridge_urls.refueling'))
 
             for number in cartridge_number:

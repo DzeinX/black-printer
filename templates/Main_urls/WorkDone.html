@@ -47,9 +47,10 @@
                                 <strong>Дата от: </strong>{{ check.date_check.date().strftime('%d.%m.%Y') }}
                             {% endif %}
                             {% if check.sum == 0 %}
-                            <strong>Сумма счёта: </strong>Не указана
+                                <strong>Сумма счёта: </strong>Не указана
                             {% else %}
-                            <strong>Сумма счёта: </strong>{{ check.sum }} (<span style="color: {{ color.value }}">{{ price }} сейчас</span>) рублей
+                                <strong>Сумма счёта: </strong>{{ check.sum }} (
+                                <span style="color: {{ color.value }}">{{ price }} сейчас</span>) рублей
                             {% endif %}
                         </div>
                         <div class="check_action_links">
@@ -76,21 +77,37 @@
             {% endif %}
         </div>
     {% else %}
-        <div class="align-center" style="background-color: gray">
+        <div class="align-center">
+            <div class="block-label">Создать</div>
             <form method="POST" action="/active_contract">
                 <div class="form" id="items">
-                    <label>Введите номер договора:<br><input type="text"
-                                                             name="name"
-                                                             class="enter"
-                                                             placeholder="Введите номер" required></label>
-                    <label>Введите сумму договора:<br><input type="number"
-                                                             name="sum_contract"
-                                                             class="enter"
-                                                             placeholder="Введите сумму" required></label>
-                    <label>Введите дату договора:<br><input type="date"
-                                                            name="date_contract"
-                                                            class="enter"
-                                                            placeholder="Введите дату" required></label>
+                    <div>
+                        <div style="padding-top: 10px">
+                            Введите номер договора:
+                        </div>
+                        <input type="text"
+                               name="name"
+                               class="enter"
+                               placeholder="Введите номер" required>
+                    </div>
+                    <div>
+                        <div style="padding-top: 10px">
+                            Введите сумму договора:
+                        </div>
+                        <input type="number"
+                               name="sum_contract"
+                               class="enter"
+                               placeholder="Введите сумму" required>
+                    </div>
+                    <div>
+                        <div style="padding-top: 10px">
+                            Введите дату договора:
+                        </div>
+                        <input type="date"
+                               name="date_contract"
+                               class="enter"
+                               placeholder="Введите дату" required>
+                    </div>
                     <input type="submit" value="Создать" class="add_btn">
                 </div>
             </form>

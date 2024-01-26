@@ -15,6 +15,7 @@
         {% endfor %}
     {% endwith %}
     <div class="align-center">
+        <div class="block-label">Создать</div>
         <form method="POST">
             <div class="form">
                 <table style="border: none">
@@ -26,12 +27,14 @@
                     <tbody>
                     <tr>
                         <td style="border: none; padding: 10px 20px 0 0">
-                            <label for="name">Имя принтера: </label>
-                            <input type="text"
-                                   name="name"
-                                   id="name"
-                                   class="enter"
-                                   placeholder="Введите имя" required>
+                            <label for="name">Модель принтера: </label>
+                            <select name="name"
+                                    id="name"
+                                    class="select" required>
+                                {% for m in models %}
+                                    <option>{{ m.model }}</option>
+                                {% endfor %}
+                            </select>
                         </td>
                         <td style="border: none; padding: 10px 20px 0 0">
                             <label for="learning_campus">Учебный корпус: </label>
@@ -83,7 +86,7 @@
         </form>
     </div>
     {% if current_user.buildings_id|length == 0 %}
-        <div style="display: flex; justify-content: center; border: goldenrod 2px solid; color: goldenrod; padding: 10px">
+        <div style="display: flex; justify-content: center; border: goldenrod 1px solid; border-radius: 4px; color: goldenrod; padding: 10px; font-weight: 100">
             У вас не заполнены здания, за которые вы ответственны. Чтобы было удобнее работать
             <a href="{{ url_for('auth_urls.profile') }}">, заполните их</a>.
         </div>
@@ -109,7 +112,7 @@
             <tr>
                 <th>№</th>
                 <th>Имя принтера</th>
-                <th>Номер инвентаря</th>
+                <th>Инвентарный номер</th>
                 <th>Статус</th>
                 <th>Локация</th>
                 <th>Действие</th>

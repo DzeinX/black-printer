@@ -13,7 +13,8 @@
             <div class="{{ category }}">{{ message }}</div>
         {% endfor %}
     {% endwith %}
-    <div class="align-center" style="background-color: gray">
+    <div class="align-center">
+        <div class="block-label">Изменение</div>
         <form method="POST">
             <div class="form">
                 <table style="border: none">
@@ -25,13 +26,18 @@
                     <tbody>
                     <tr>
                         <td valign="top" style="border: none; padding: 10px 10px 0 0">
-                            <label for="name">Имя принтера: </label>
-                            <input type="text"
-                                   name="name"
-                                   id="name"
-                                   class="enter"
-                                   value="{{ printer.name }}"
-                                   placeholder="Введите имя" required><br>
+                            <label for="name">Модель принтера: </label>
+                            <select name="name"
+                                    id="name"
+                                    class="select" required>
+                                {% for m in models %}
+                                    {% if m.model == printer.name %}
+                                        <option selected>{{ m.model }}</option>
+                                    {% else %}
+                                        <option>{{ m.model }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
                         </td>
                         <td valign="top" style="border: none; padding: 10px 10px 0 0">
                             <label for="learning_campus">Учебный корпус: </label>
@@ -95,9 +101,11 @@
         const learningCampusNow = '{{ printer.learning_campus_now }}';
         const locationNow = '{{ printer.location_now }}';
         const cabinetNow = '{{ printer.cabinet_now }}';
+        const nameModel = '{{ printer.name }}';
         const locationPrinter = document.getElementById("location_printer");
         const learningCampus = document.getElementById("learning_campus");
         const cabinet = document.getElementById("cabinet");
+        const name = document.getElementById("name");
 
         if (locationPrinter.value !== locationNow) {
             locationPrinter.value = '';
@@ -121,8 +129,15 @@
             let messageCabinet = document.createElement("div");
             messageCabinet.setAttribute("class", "little-helper");
             messageCabinet.innerHTML = `Было - ${cabinetNow}`;
-            console.log(messageCabinet.parentNode)
             cabinet.parentNode.appendChild(messageCabinet);
+        }
+        if (name.value !== nameModel) {
+            name.value = '';
+
+            let messageCabinet = document.createElement("div");
+            messageCabinet.setAttribute("class", "little-helper");
+            messageCabinet.innerHTML = `Было - ${nameModel}`;
+            name.parentNode.appendChild(messageCabinet);
         }
 
         $('select').select2({

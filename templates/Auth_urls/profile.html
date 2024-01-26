@@ -63,14 +63,15 @@
 
 {% block body %}
     <h1>Профиль {{ current_user.username }}:</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <div class="align-center">
+        <div class="block-label">Ответственность за</div>
         <form method="POST">
             <div class="form" id="items">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% for category, message in messages %}
-                        <div class="{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endwith %}
                 {% set counter = namespace(value=1) %}
                 <table style="border: none" id="table">
                     <colgroup>

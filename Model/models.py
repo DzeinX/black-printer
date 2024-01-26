@@ -116,6 +116,16 @@ class ListModels(db.Model, ModelInterface):
         return '<ListModels %r>' % self.id
 
 
+class ListModelsPrinter(db.Model, ModelInterface):
+    __tablename__ = "ListModelsPrinter"
+    __sql_query_amount_rows__ = 1
+    id = db.Column(db.Integer, primary_key=True)
+    model = db.Column(db.String(15), unique=True)
+
+    def __repr__(self):
+        return '<ListModelsPrinter %r>' % self.id
+
+
 class Refueling(db.Model, ModelInterface):
     __tablename__ = "Refueling"
     __sql_query_amount_rows__ = 2

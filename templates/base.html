@@ -59,7 +59,7 @@
                                 <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
                             <li class="nav-item">
-                                <a href="/brought_a_printer" class="nav-link">Принесённые принтеры</a>
+                                <a href="/brought_a_printer" class="nav-link">Принять принтеры</a>
                                 <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
                             <li class="nav-item">
@@ -90,7 +90,7 @@
                                 <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
                             <li class="nav-item">
-                                <a href="/brought_a_cartridge" class="nav-link">Принесённые картриджи</a>
+                                <a href="/brought_a_cartridge" class="nav-link">Принять картриджи</a>
                                 <hr style="margin-top: 10px; border-color: #2e86de">
                             </li>
                             <li class="nav-item">
@@ -122,7 +122,13 @@
                                     <hr style="margin-top: 10px; border-color: #2e86de">
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/add_models" class="nav-link">Модели</a>
+                                    <a href="/add_models_cartridge" class="nav-link">Модели картриджей</a>
+                                    {% if current_user.is_boss or current_user.is_admin %}
+                                        <hr style="margin-top: 10px; border-color: #2e86de">
+                                    {% endif %}
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/add_models_printer" class="nav-link">Модели принтеров</a>
                                     {% if current_user.is_boss or current_user.is_admin %}
                                         <hr style="margin-top: 10px; border-color: #2e86de">
                                     {% endif %}

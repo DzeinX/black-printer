@@ -50,77 +50,80 @@
             <div class="{{ category }}">{{ message }}</div>
         {% endfor %}
     {% endwith %}
-    <form method="POST" id="form">
-        <div class=form id="items">
-            <table style="border: none" id="table">
-                <colgroup>
-                    <col span="1" style="width: calc(50% - 48px);">
-                    <col span="1" style="width: 48px;">
-                    <col span="1" style="width: 50%;">
-                </colgroup>
-                <tbody>
-                <tr>
-                    <td style="border: none; padding: 10px 10px 0 0">
-                        <label for="1">Модели: </label>
-                    </td>
-                    <td style="border: none; padding: 10px 20px 0 0">
-
-                    </td>
-                    <td style="border: none; padding: 10px 0 0 0">
-                        <label for="number">Номер: </label>
-                    </td>
-                </tr>
-                {% for model in cartridge.cartridge_models %}
+    <div class="align-center">
+        <div class="block-label">Изменение</div>
+        <form method="POST" id="form">
+            <div class=form id="items">
+                <table style="border: none" id="table">
+                    <colgroup>
+                        <col span="1" style="width: calc(50% - 48px);">
+                        <col span="1" style="width: 48px;">
+                        <col span="1" style="width: 50%;">
+                    </colgroup>
+                    <tbody>
                     <tr>
-                        <td style="border: none; padding: 10px 10px 0 0" id="d{{ loop.index }}">
-                            {% if loop.index == 1 %}
-                                <select name="model"
-                                        class="select" required>
-                                    {% for el in list_models %}
-                                        {% if model.model == el.model %}
-                                            <option selected>{{ el.model }}</option>
-                                        {% else %}
-                                            <option>{{ el.model }}</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                            {% else %}
-                                <select name="model"
-                                        class="select" required>
-                                    {% for el in list_models %}
-                                        {% if model.model == el.model %}
-                                            <option selected>{{ el.model }}</option>
-                                        {% else %}
-                                            <option>{{ el.model }}</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                            {% endif %}
+                        <td style="border: none; padding: 10px 10px 0 0">
+                            <label for="1">Модели: </label>
                         </td>
                         <td style="border: none; padding: 10px 20px 0 0">
-                            {% if loop.index != 1 %}
-                                <input type="button" value="✕" class="delete_btn"
-                                       onclick="RemoveItem('d{{ loop.index }}');" id="r{{ loop.index }}">
-                            {% endif %}
+
                         </td>
-                        {% if loop.index == 1 %}
-                            <td style="border: none;  vertical-align: top; padding: 10px 0 0 0">
-                                <input type="number"
-                                       name="number"
-                                       id="number"
-                                       class="enter"
-                                       placeholder="Введите номер"
-                                       value="{{ cartridge.number }}">
-                            </td>
-                        {% endif %}
+                        <td style="border: none; padding: 10px 0 0 0">
+                            <label for="number">Номер: </label>
+                        </td>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            <div class="btns">
-                <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
+                    {% for model in cartridge.cartridge_models %}
+                        <tr>
+                            <td style="border: none; padding: 10px 10px 0 0" id="d{{ loop.index }}">
+                                {% if loop.index == 1 %}
+                                    <select name="model"
+                                            class="select" required>
+                                        {% for el in list_models %}
+                                            {% if model.model == el.model %}
+                                                <option selected>{{ el.model }}</option>
+                                            {% else %}
+                                                <option>{{ el.model }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                {% else %}
+                                    <select name="model"
+                                            class="select" required>
+                                        {% for el in list_models %}
+                                            {% if model.model == el.model %}
+                                                <option selected>{{ el.model }}</option>
+                                            {% else %}
+                                                <option>{{ el.model }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            </td>
+                            <td style="border: none; padding: 10px 20px 0 0">
+                                {% if loop.index != 1 %}
+                                    <input type="button" value="✕" class="delete_btn"
+                                           onclick="RemoveItem('d{{ loop.index }}');" id="r{{ loop.index }}">
+                                {% endif %}
+                            </td>
+                            {% if loop.index == 1 %}
+                                <td style="border: none;  vertical-align: top; padding: 10px 0 0 0">
+                                    <input type="number"
+                                           name="number"
+                                           id="number"
+                                           class="enter"
+                                           placeholder="Введите номер"
+                                           value="{{ cartridge.number }}">
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <div class="btns">
+                    <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"><br>
+                </div>
+                <input type="submit" value="Обновить" class="add_btn">
             </div>
-            <input type="submit" value="Обновить" class="add_btn">
-        </div>
-    </form>
+        </form>
+    </div>
 {% endblock %}

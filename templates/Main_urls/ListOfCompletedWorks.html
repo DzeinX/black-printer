@@ -245,23 +245,29 @@
             <div class="{{ category }}">{{ message }}</div>
         {% endfor %}
     {% endwith %}
+    <div class="align-center">
+        <div class="block-label">Создать</div>
+        <form method="post" id="main_form">
+            <div id="btn_container" class="btn_container">
+                <input type="button" id="add_work_done_table" value="Добавить" class="add_btn" onclick="AddForm()">
+            </div>
+        </form>
+    </div>
+    <div class="align-center">
+        <div class="block-label">Распознать документ</div>
+        <form action="{{ url_for('main_urls.recognize_list_of_completed_works') }}" method="post" class="file-recognize"
+              enctype=multipart/form-data>
+            <input type="file" name="add_xlsx" id="file" accept=".xlsx" class="file-choice" required>
+            <label for="file"><i class="fa-solid fa-download"></i>Загрузить</label>
+            <input type="submit" value="Добавить .xlsx" class="add_btn">
+        </form>
+    </div>
     <div class="sch_bar">
         <div class="ctr">
             <label for="search_locw"><strong>Поиск по проделанным работам:</strong></label><br>
             <input type="text" placeholder="Начните вводить" id="search_input" class="enter"><br>
         </div>
     </div>
-    <form method="post" id="main_form">
-        <div id="btn_container" class="btn_container">
-            <input type="button" id="add_work_done_table" value="Добавить" class="add_btn" onclick="AddForm()">
-        </div>
-    </form>
-    <form action="{{ url_for('main_urls.recognize_list_of_completed_works') }}" method="post" class="file-recognize"
-          enctype=multipart/form-data>
-        <input type="file" name="add_xlsx" id="file" accept=".xlsx" class="file-choice" required>
-        <label for="file"><i class="fa-solid fa-download"></i>Загрузить</label>
-        <input type="submit" value="Добавить .xlsx" class="add_btn">
-    </form>
     {% if active_check_id != None %}
         <a href="/active_contract/{{ active_check_id }}/more">Перейти к активному счёту</a>
     {% endif %}

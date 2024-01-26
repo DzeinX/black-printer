@@ -166,6 +166,14 @@ class MainURLs:
                                                                                  per_page=per_page)
                 else:
                     all_history = model_controller.get_all_entries_with_order(model_name="AllHistory")
+
+                statuses_list = [
+                    dict(StatusSettings.Cartridge.__dict__),
+                    dict(StatusSettings.Printer.__dict__),
+                    dict(StatusSettings.Contract.__dict__),
+                    dict(StatusSettings.Check.__dict__),
+                    dict(StatusSettings.WorkList.__dict__),
+                ]
             else:
                 if is_show_paginate:
                     all_history = model_controller.filter_two_or_with_paginate("AllHistory",
@@ -180,47 +188,49 @@ class MainURLs:
                                                                  StatusSettings.Types.cartridge,
                                                                  StatusSettings.Types.printer)
 
+                statuses_list = [
+                    dict(StatusSettings.Cartridge.__dict__),
+                    dict(StatusSettings.Printer.__dict__),
+                ]
+
             buildings = []
             locations = []
             actions = {}
             statuses = {}
             users = []
             entries_type = {}
-            if current_user.is_boss or current_user.is_admin:
-                buildings = model_controller.get_all_entries(model_name="Buildings")
-                locations = model_controller.get_all_entries(model_name="Division")
-                users = model_controller.get_all_entries(model_name="User")
-                entries_type = dict(StatusSettings.Types.__dict__)
-                del entries_type['__module__']
-                del entries_type['__dict__']
-                del entries_type['__weakref__']
-                del entries_type['__doc__']
+            buildings = model_controller.get_all_entries(model_name="Buildings")
+            locations = model_controller.get_all_entries(model_name="Division")
+            users = model_controller.get_all_entries(model_name="User")
+            entries_type = dict(StatusSettings.Types.__dict__)
+            if not current_user.is_boss:
+                del entries_type['work_list']
+                del entries_type['check']
+                del entries_type['contract']
+            del entries_type['__module__']
+            del entries_type['__dict__']
+            del entries_type['__weakref__']
+            del entries_type['__doc__']
 
-                statuses_list = [
-                    dict(StatusSettings.Cartridge.__dict__),
-                    dict(StatusSettings.Printer.__dict__),
-                    dict(StatusSettings.Contract.__dict__),
-                    dict(StatusSettings.Check.__dict__),
-                    dict(StatusSettings.WorkList.__dict__),
-                ]
-                for status_list in statuses_list:
-                    del status_list['__module__']
-                    del status_list['__dict__']
-                    del status_list['__weakref__']
-                    del status_list['__doc__']
+            for status_list in statuses_list:
+                del status_list['__module__']
+                del status_list['__dict__']
+                del status_list['__weakref__']
+                del status_list['__doc__']
 
-                    for name, value in status_list.items():
-                        if name not in actions:
-                            actions[name] = value
+                for name, value in status_list.items():
+                    if name not in actions:
+                        actions[name] = value
 
-                for i in range(0, 2):
-                    del statuses_list[i]['restored']
-                    del statuses_list[i]['deleted']
-                    del statuses_list[i]['updated']
+            for i in range(0, 2):
+                del statuses_list[i]['restored']
+                del statuses_list[i]['deleted']
+                del statuses_list[i]['updated']
 
-                    for name, value in statuses_list[i].items():
-                        if name not in statuses:
-                            statuses[name] = value
+                for name, value in statuses_list[i].items():
+                    if name not in statuses:
+                        statuses[name] = value
+            print(actions)
 
             return render_template("Main_urls/AllHistory.html",
                                    all_history=all_history,
@@ -657,7 +667,7 @@ class MainURLs:
             for index, category in enumerate(categories):
                 if category == "Картридж":
                     if int(objects[index]) not in current_cartridges:
-                        flash(f'Картридж id={objects[index]} уже входит в выполенные работы','error')
+                        flash(f'Картридж id={objects[index]} уже входит в выполенные работы', 'error')
                         return redirect(url_for('main_urls.list_of_completed_works'))
                 if category == "Принтер":
                     if int(objects[index]) not in current_printers:

@@ -119,7 +119,7 @@ class ModelController(ModelControllerInterface, metaclass=MetaSingleton):
                 return None
             filter_args = text(
                 f'({self._get_model_name(model)}.{row} == "{filters[0]}") | ({self._get_model_name(model)}.{row} == "{filters[1]}")')
-            return model.query.filter(filter_args).order_by(desc(model.date))
+            return model.query.filter(filter_args).order_by(desc(model.date)).all()
         return None
 
     def filter_by_model_with_paginate(self, model_name: str, page: int, per_page: int,
@@ -171,7 +171,7 @@ class ModelController(ModelControllerInterface, metaclass=MetaSingleton):
 
     def get_all_entries_with_order(self, model_name: str) -> list:
         _, model = self._get_model(model_name)
-        return model.query.order_by(desc(model.date))
+        return model.query.order_by(desc(model.date)).all()
 
     def get_all_entries_with_paginate(self, model_name: str, page: int, per_page: int) -> list:
         _, model = self._get_model(model_name)

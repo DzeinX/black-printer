@@ -64,6 +64,44 @@ class PrinterURLs:
         return redirect(url_for('main_urls.main_page'))
 
     @staticmethod
+    @printer_urls.route('/add_models_printer', methods=['GET', 'POST'])
+    @login_required
+    def add_models_printer():
+        if request.method == "GET":
+            list_models = model_controller.get_all_entries(model_name='ListModelsPrinter')
+            counter_models = len(list_models)
+            return render_template("Printer_urls/AddModels.html",
+                                   list_models=list_models,
+                                   counter_models=counter_models)
+
+        if request.method == "POST":
+            list_models = request.form.getlist('model')
+
+            if len(list_models) == 0:
+                flash('Нельзя удалить все модели', 'warning')
+                return redirect(url_for('printer_urls.add_models_printer'))
+
+            model_controller.delete_all_entries_in_model(model_name="ListModelsPrinter")
+            try:
+                for model in list_models:
+                    model = model.strip()
+                    is_not_available = model_controller.filter_by_model(model_name='ListModelsPrinter',
+                                                                        mode='first',
+                                                                        model=model) is None
+                    if model != '' and not model.isspace() and is_not_available:
+                        model = model_controller.create(model_name='ListModelsPrinter',
+                                                        model=model)
+                        model_controller.add_in_session(model_entry=model)
+            except Exception as e:
+                flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
+                return redirect(url_for('main_urls.main_page'))
+
+            return try_to_commit(redirect_to='printer_urls.add_models_printer')
+
+        flash(f'Не определён метод запроса!', 'error')
+        return redirect(url_for('main_urls.main_page'))
+
+    @staticmethod
     @printer_urls.route('/printer/<int:pk>/update', methods=['GET', 'POST'])
     @login_required
     def update_printer(pk):
@@ -72,10 +110,12 @@ class PrinterURLs:
                                                        pk=pk)
             divisions = model_controller.get_all_entries(model_name='Division')
             buildings = model_controller.get_all_entries(model_name='Buildings')
+            models = model_controller.get_all_entries(model_name='ListModelsPrinter')
             return render_template("Printer_urls/printer_update.html",
                                    printer=printer,
                                    divisions=divisions,
-                                   buildings=buildings)
+                                   buildings=buildings,
+                                   models=models)
 
         if request.method == "POST":
             printer = model_controller.get_model_by_id(model_name='Printer',
@@ -171,13 +211,15 @@ class PrinterURLs:
 
             buildings = model_controller.get_all_entries(model_name="Buildings")
             divisions = model_controller.get_all_entries(model_name="Division")
+            models = model_controller.get_all_entries(model_name="ListModelsPrinter")
             return render_template("Printer_urls/Printers.html",
                                    printers_data=printers_data,
                                    buildings=buildings,
                                    divisions=divisions,
                                    StatusSettings=StatusSettings,
                                    is_show_own=is_show_own,
-                                   is_not_find=is_not_find)
+                                   is_not_find=is_not_find,
+                                   models=models)
 
         if request.method == 'POST':
             name = request.form['name'].strip()
