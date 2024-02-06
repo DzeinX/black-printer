@@ -25,7 +25,8 @@
                     <input id="${items}"
                            type="text"
                            class="enter"
-                           name="building">
+                           name="buildings">
+                    <input type="hidden" name="buildings_id" value="${-items}">
                 </td>`;
             tdThird.innerHTML = `
                 <td>
@@ -47,13 +48,21 @@
 
 {% block body %}
     <h1>Корпусы:</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <form method="POST">
         <div class="form" id="items">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% for category, message in messages %}
-                    <div class="{{ category }}">{{ message }}</div>
+            <div class="was_data">
+                {% for building in building_list %}
+                    <div class="model">
+                        <input type="hidden" name="was_building_name" value="{{ building.building }}">
+                        <input type="hidden" name="was_building_id" value="{{ building.id }}">
+                    </div>
                 {% endfor %}
-            {% endwith %}
+            </div>
             {% set counter = namespace(value=1) %}
             <table id="table">
                 <colgroup>
@@ -87,8 +96,9 @@
                             <input id="{{ loop.index }}"
                                    type="text"
                                    value="{{ b.building }}"
-                                   name="building"
+                                   name="buildings"
                                    class="enter">
+                            <input type="hidden" name="buildings_id" value="{{ b.id }}">
                         </td>
                         <td>
                             <input type="button" value="✕" class="delete_btn"

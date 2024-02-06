@@ -25,7 +25,8 @@
                     <input id="${items}"
                            type="text"
                            class="enter"
-                           name="division">
+                           name="divisions">
+                    <input type="hidden" name="divisions_id" value="${-items}">
                 </td>`;
             tdThird.innerHTML = `
                 <td>
@@ -47,13 +48,21 @@
 
 {% block body %}
     <h1>Подразделения:</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <form method="POST">
         <div class="form" id="items">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% for category, message in messages %}
-                    <div class="{{ category }}">{{ message }}</div>
+            <div class="was_data">
+                {% for d in division_list %}
+                    <div class="model">
+                        <input type="hidden" name="was_division_name" value="{{ d.division }}">
+                        <input type="hidden" name="was_division_id" value="{{ d.id }}">
+                    </div>
                 {% endfor %}
-            {% endwith %}
+            </div>
             {% set counter = namespace(value=1) %}
             <table id="table">
                 <colgroup>
@@ -87,8 +96,9 @@
                             <input id="{{ loop.index }}"
                                    type="text"
                                    value="{{ d.division }}"
-                                   name="division"
+                                   name="divisions"
                                    class="enter">
+                            <input type="hidden" name="divisions_id" value="{{ d.id }}">
                         </td>
                         <td>
                             <input type="button" value="✕" class="delete_btn"

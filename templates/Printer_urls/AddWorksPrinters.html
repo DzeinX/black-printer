@@ -23,7 +23,7 @@
                        type="text"
                        value=""
                        class="enter"
-                       name="works">`;
+                       name="works"><input type="hidden" name="works_id" value="${-items}">`;
             tdThird.innerHTML = `
                 <input type="button" value="✕" class="delete_btn" onclick="RemoveItem('d${items}');" id="r${items}">`;
 
@@ -43,13 +43,21 @@
 
 {% block body %}
     <h1>Типы работ:</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <form method="POST">
         <div class="form" id="items">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% for category, message in messages %}
-                    <div class="{{ category }}">{{ message }}</div>
+            <div class="was_data">
+                {% for work in all_works_printers %}
+                    <div class="model">
+                        <input type="hidden" name="was_work_name" value="{{ work.work }}">
+                        <input type="hidden" name="was_work_id" value="{{ work.id }}">
+                    </div>
                 {% endfor %}
-            {% endwith %}
+            </div>
             {% set counter = namespace(value=1) %}
             <table id="table">
                 <colgroup>
@@ -85,6 +93,7 @@
                                    value="{{ work.work }}"
                                    name="works"
                                    class="enter">
+                            <input type="hidden" name="works_id" value="{{ work.id }}">
                         </td>
                         <td>
                             <input type="button" value="✕" class="delete_btn"

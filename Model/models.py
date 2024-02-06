@@ -68,7 +68,6 @@ class Printer(db.Model, ModelInterface):
     __tablename__ = "printer"
     __sql_query_amount_rows__ = 8
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
     num_inventory = db.Column(db.String(50), nullable=False, unique=True)
     date_added = db.Column(db.DateTime, nullable=False)
     location_now = db.Column(db.String(50), nullable=False)
@@ -79,6 +78,7 @@ class Printer(db.Model, ModelInterface):
 
     all_history_id = db.relationship("AllHistory")
     repair_id = db.relationship("Repair")
+    name = db.Column(db.Integer, db.ForeignKey("ListModelsPrinter.id"))
     reception_from_a_repair_id = db.relationship("ReceptionFromARepairing")
     work_done_printers_id = db.relationship("WorkListsPrinters")
 
@@ -121,6 +121,8 @@ class ListModelsPrinter(db.Model, ModelInterface):
     __sql_query_amount_rows__ = 1
     id = db.Column(db.Integer, primary_key=True)
     model = db.Column(db.String(15), unique=True)
+
+    printer_id = db.relationship("Printer")
 
     def __repr__(self):
         return '<ListModelsPrinter %r>' % self.id

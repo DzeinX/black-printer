@@ -26,6 +26,7 @@
                            type="text"
                            class="enter"
                            name="model">
+                    <input type="hidden" name="model_id" value="${-items}">
                 </td>`;
             tdThird.innerHTML = `
                 <td>
@@ -54,6 +55,14 @@
     {% endwith %}
     <form method="POST">
         <div class="form" id="items">
+            <div class="was_data">
+                {% for model in list_models %}
+                    <div class="model">
+                        <input type="hidden" name="was_model_name" value="{{ model.model }}">
+                        <input type="hidden" name="was_model_id" value="{{ model.id }}">
+                    </div>
+                {% endfor %}
+            </div>
             {% set counter = namespace(value=1) %}
             <table id="table">
                 <colgroup>
@@ -89,6 +98,7 @@
                                    value="{{ model.model }}"
                                    name="model"
                                    class="enter">
+                            <input type="hidden" name="model_id" value="{{ model.id }}">
                         </td>
                         <td style="">
                             <input type="button" value="✕" class="delete_btn"

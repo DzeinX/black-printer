@@ -75,31 +75,61 @@ class MainURLs:
                                    counter_division=counter_division)
 
         if request.method == "POST":
-            list_division = request.form.getlist('division')
+            list_divisions = request.form.getlist('divisions')
+            divisions_id = request.form.getlist('divisions_id')
+            was_division_name = request.form.getlist('was_division_name')
+            was_division_id = request.form.getlist('was_division_id')
+            divisions_id = list(map(int, divisions_id))
+            was_division_id = list(map(int, was_division_id))
 
-            list_division = prevent_valid(var_type='str',
-                                          variables=list_division)
-            if type(list_division) is not list:
-                return list_division
+            will_data = dict(zip(divisions_id, list_divisions))
+            was_data = dict(zip(was_division_id, was_division_name))
 
-            if len(list_division) == 0:
-                flash('Нельзя удалить все подразделения', 'warning')
-                return redirect(url_for('main_urls.main_page'))
+            if was_data == will_data:
+                flash(f'Изменений не замечено', 'warning')
+                return redirect(url_for('main_urls.add_divisions'))
 
-            model_controller.delete_all_entries_in_model(model_name="Division")
-            try:
-                for division in list_division:
+            # Создание новых моделей
+            copy_will_data = will_data.copy()
+            for pk, name in copy_will_data.items():
+                if pk < 0:
+                    existed_entry = model_controller.filter_by_model(model_name="Division",
+                                                                     mode="first",
+                                                                     division=name.strip())
+                    if existed_entry is None:
+                        new_entry = model_controller.create(model_name="Division", division=name)
+                        model_controller.add_in_session(model_entry=new_entry)
+                    else:
+                        flash(f'Подразделение {name} уже существует. Поэтому не было добавлена', 'warning')
 
-                    is_not_available = model_controller.filter_by_model(model_name="Division",
-                                                                        mode="first",
-                                                                        division=division.strip()) is None
-                    if division != '' and not division.isspace() and is_not_available:
-                        division = model_controller.create(model_name="Division",
-                                                           division=division)
-                        model_controller.add_in_session(model_entry=division)
-            except Exception as e:
-                flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
-                return redirect(url_for('main_urls.main_page'))
+                    del will_data[pk]
+            model_controller.commit_session()
+
+            # Удалили записи моделей
+            i = 0
+            while len(will_data) != len(was_data):
+                i += 1
+                if i in will_data and i in was_data:
+                    continue
+
+                entry = model_controller.get_model_by_id(model_name="Division",
+                                                         pk=i)
+                if entry is None:
+                    continue
+
+                model_controller.delete_entry(model_entry=entry)
+                del was_data[i]
+
+            # Изменение существующих моделей
+            for pk in was_data:
+                if will_data[pk] == was_data[pk]:
+                    continue
+
+                entry = model_controller.filter_by_model(model_name="Division",
+                                                         mode="first",
+                                                         division=was_data[pk])
+                model_controller.update(model_entry=entry,
+                                        division=will_data[pk])
 
             return try_to_commit(redirect_to='main_urls.add_divisions')
 
@@ -121,30 +151,61 @@ class MainURLs:
                                    counter_building=counter_building)
 
         if request.method == "POST":
-            list_buildings = request.form.getlist('building')
+            list_buildings = request.form.getlist('buildings')
+            buildings_id = request.form.getlist('buildings_id')
+            was_building_name = request.form.getlist('was_building_name')
+            was_building_id = request.form.getlist('was_building_id')
+            buildings_id = list(map(int, buildings_id))
+            was_building_id = list(map(int, was_building_id))
 
-            list_buildings = prevent_valid(var_type='str',
-                                           variables=list_buildings)
-            if type(list_buildings) is not list:
-                return list_buildings
+            will_data = dict(zip(buildings_id, list_buildings))
+            was_data = dict(zip(was_building_id, was_building_name))
 
-            if len(list_buildings) == 0:
-                flash('Нельзя удалить все корпусы', 'warning')
-                return redirect(url_for('main_urls.main_page'))
+            if was_data == will_data:
+                flash(f'Изменений не замечено', 'warning')
+                return redirect(url_for('main_urls.add_buildings'))
 
-            model_controller.delete_all_entries_in_model(model_name="Buildings")
-            try:
-                for building in list_buildings:
-                    is_not_available = model_controller.filter_by_model(model_name="Buildings",
-                                                                        mode='first',
-                                                                        building=building.strip()) is None
-                    if building != '' and not building.isspace() and is_not_available:
-                        building = model_controller.create(model_name="Buildings",
-                                                           building=building)
-                        model_controller.add_in_session(building)
-            except Exception as e:
-                flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
-                return redirect(url_for('main_urls.main_page'))
+            # Создание новых моделей
+            copy_will_data = will_data.copy()
+            for pk, name in copy_will_data.items():
+                if pk < 0:
+                    existed_entry = model_controller.filter_by_model(model_name="Buildings",
+                                                                     mode="first",
+                                                                     building=name.strip())
+                    if existed_entry is None:
+                        new_entry = model_controller.create(model_name="Buildings", building=name)
+                        model_controller.add_in_session(model_entry=new_entry)
+                    else:
+                        flash(f'Строение {name} уже существует. Поэтому не было добавлена', 'warning')
+
+                    del will_data[pk]
+            model_controller.commit_session()
+
+            # Удалили записи моделей
+            i = 0
+            while len(will_data) != len(was_data):
+                i += 1
+                if i in will_data and i in was_data:
+                    continue
+
+                entry = model_controller.get_model_by_id(model_name="Buildings",
+                                                         pk=i)
+                if entry is None:
+                    continue
+
+                model_controller.delete_entry(model_entry=entry)
+                del was_data[i]
+
+            # Изменение существующих моделей
+            for pk in was_data:
+                if will_data[pk] == was_data[pk]:
+                    continue
+
+                entry = model_controller.filter_by_model(model_name="Buildings",
+                                                         mode="first",
+                                                         building=was_data[pk])
+                model_controller.update(model_entry=entry,
+                                        building=will_data[pk])
 
             return try_to_commit(redirect_to='main_urls.add_buildings')
 
@@ -193,12 +254,8 @@ class MainURLs:
                     dict(StatusSettings.Printer.__dict__),
                 ]
 
-            buildings = []
-            locations = []
             actions = {}
             statuses = {}
-            users = []
-            entries_type = {}
             buildings = model_controller.get_all_entries(model_name="Buildings")
             locations = model_controller.get_all_entries(model_name="Division")
             users = model_controller.get_all_entries(model_name="User")
@@ -230,7 +287,6 @@ class MainURLs:
                 for name, value in statuses_list[i].items():
                     if name not in statuses:
                         statuses[name] = value
-            print(actions)
 
             return render_template("Main_urls/AllHistory.html",
                                    all_history=all_history,

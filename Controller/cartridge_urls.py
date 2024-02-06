@@ -36,27 +36,61 @@ class CartridgeURLs:
                                    counter_works=counter_works)
 
         if request.method == "POST":
-            all_works_cartridges = request.form.getlist('works')
+            list_models = request.form.getlist('works')
+            works_id = request.form.getlist('works_id')
+            was_work_name = request.form.getlist('was_work_name')
+            was_work_id = request.form.getlist('was_work_id')
+            works_id = list(map(int, works_id))
+            was_work_id = list(map(int, was_work_id))
 
-            if len(all_works_cartridges) == 0:
-                flash('Нельзя удалить все модели', 'warning')
+            will_data = dict(zip(works_id, list_models))
+            was_data = dict(zip(was_work_id, was_work_name))
+
+            if was_data == will_data:
+                flash(f'Изменений не замечено', 'warning')
                 return redirect(url_for('cartridge_urls.add_works_cartridges'))
 
-            model_controller.delete_all_entries_in_model(model_name="AllWorksCartridges")
+            # Создание новых моделей
+            copy_will_data = will_data.copy()
+            for pk, name in copy_will_data.items():
+                if pk < 0:
+                    existed_entry = model_controller.filter_by_model(model_name="AllWorksCartridges",
+                                                                     mode="first",
+                                                                     work=name.strip())
+                    if existed_entry is None:
+                        new_entry = model_controller.create(model_name="AllWorksCartridges", work=name)
+                        model_controller.add_in_session(model_entry=new_entry)
+                    else:
+                        flash(f'Модель {name} уже существует. Поэтому не была добавлена', 'warning')
 
-            try:
-                for work in all_works_cartridges:
-                    work = work.strip()
-                    is_not_available = model_controller.filter_by_model(model_name="AllWorksCartridges",
-                                                                        mode="first",
-                                                                        work=work) is None
-                    if work != '' and is_not_available:
-                        model = model_controller.create(model_name="AllWorksCartridges",
-                                                        work=work)
-                        model_controller.add_in_session(model)
-            except Exception as e:
-                flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
-                return redirect(url_for('main_urls.main_page'))
+                    del will_data[pk]
+            model_controller.commit_session()
+
+            # Удалили записи моделей
+            i = 0
+            while len(will_data) != len(was_data):
+                i += 1
+                if i in will_data and i in was_data:
+                    continue
+
+                entry = model_controller.get_model_by_id(model_name="AllWorksCartridges",
+                                                         pk=i)
+                if entry is None:
+                    continue
+
+                model_controller.delete_entry(model_entry=entry)
+                del was_data[i]
+
+            # Изменение существующих моделей
+            for pk in was_data:
+                if will_data[pk] == was_data[pk]:
+                    continue
+
+                entry = model_controller.filter_by_model(model_name="AllWorksCartridges",
+                                                         mode="first",
+                                                         work=was_data[pk])
+                model_controller.update(model_entry=entry,
+                                        work=will_data[pk])
 
             return try_to_commit(redirect_to='cartridge_urls.add_works_cartridges')
 
@@ -76,25 +110,60 @@ class CartridgeURLs:
 
         if request.method == "POST":
             list_models = request.form.getlist('model')
+            models_id = request.form.getlist('model_id')
+            was_models_name = request.form.getlist('was_model_name')
+            was_models_id = request.form.getlist('was_model_id')
+            models_id = list(map(int, models_id))
+            was_models_id = list(map(int, was_models_id))
 
-            if len(list_models) == 0:
-                flash('Нельзя удалить все модели', 'warning')
+            will_data = dict(zip(models_id, list_models))
+            was_data = dict(zip(was_models_id, was_models_name))
+
+            if was_data == will_data:
+                flash(f'Изменений не замечено', 'warning')
                 return redirect(url_for('cartridge_urls.add_models_cartridge'))
 
-            model_controller.delete_all_entries_in_model(model_name="ListModels")
-            try:
-                for model in list_models:
-                    model = model.strip()
-                    is_not_available = model_controller.filter_by_model(model_name='ListModels',
-                                                                        mode='first',
-                                                                        model=model) is None
-                    if model != '' and not model.isspace() and is_not_available:
-                        model = model_controller.create(model_name='ListModels',
-                                                        model=model)
-                        model_controller.add_in_session(model_entry=model)
-            except Exception as e:
-                flash(f'Не удалось сохранить изменения. Ошибка: {e}', 'error')
-                return redirect(url_for('main_urls.main_page'))
+            # Создание новых моделей
+            copy_will_data = will_data.copy()
+            for pk, name in copy_will_data.items():
+                if pk < 0:
+                    existed_entry = model_controller.filter_by_model(model_name="ListModels",
+                                                                     mode="first",
+                                                                     model=name.strip())
+                    if existed_entry is None:
+                        new_entry = model_controller.create(model_name="ListModels", model=name)
+                        model_controller.add_in_session(model_entry=new_entry)
+                    else:
+                        flash(f'Модель {name} уже существует. Поэтому не была добавлена', 'warning')
+
+                    del will_data[pk]
+            model_controller.commit_session()
+
+            # Удалили записи моделей
+            i = 0
+            while len(will_data) != len(was_data):
+                i += 1
+                if i in will_data and i in was_data:
+                    continue
+
+                entry = model_controller.get_model_by_id(model_name="ListModels",
+                                                         pk=i)
+                if entry is None:
+                    continue
+
+                model_controller.delete_entry(model_entry=entry)
+                del was_data[i]
+
+            # Изменение существующих моделей
+            for pk in was_data:
+                if will_data[pk] == was_data[pk]:
+                    continue
+
+                entry = model_controller.filter_by_model(model_name="ListModels",
+                                                         mode="first",
+                                                         model=was_data[pk])
+                model_controller.update(model_entry=entry,
+                                        model=will_data[pk])
 
             return try_to_commit(redirect_to='cartridge_urls.add_models_cartridge')
 
