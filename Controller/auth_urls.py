@@ -157,9 +157,18 @@ class AuthURLs:
 
         if request.method == "POST":
             buildings_id = request.form.getlist("building")
+            is_responsible_for_buildings = request.form.getlist('is_responsible_for_buildings')
+
+            if is_responsible_for_buildings:
+                model_controller.update(model_entry=current_user,
+                                        is_responsible_for_buildings=False)
+            else:
+                model_controller.update(model_entry=current_user,
+                                        is_responsible_for_buildings=True)
 
             new_buildings = []
-            for building_id in buildings_id:
+            # Чтобы избежать дубликатов в БД обернул в set()
+            for building_id in set(buildings_id):
                 building = model_controller.get_model_by_id(model_name="Buildings",
                                                             pk=int(building_id))
 

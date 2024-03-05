@@ -777,13 +777,26 @@ class CartridgeURLs:
 
         if request.method == "POST":
             cartridge_number = request.form.getlist('cartridge_number')
+            disregards = request.form.getlist('disregard')
+            reasons = request.form.getlist('reason')
             user = current_user.username
 
             if len(cartridge_number) == 0:
                 flash('Не выбрана ни одна модель', 'warning')
                 return redirect(url_for('cartridge_urls.reception_from_a_refuelling'))
 
+            for i in range(0, len(reasons)):
+                if not reasons[i].strip():
+                    flash('Вы не заполнили причину для картриджа номер ' + disregards[i], 'warning')
+                    return redirect(url_for('cartridge_urls.reception_from_a_refuelling'))
+
             for number in cartridge_number:
+                reason = None
+                for i in range(0, len(disregards)):
+                    if number == disregards[i]:
+                        reason = reasons[i]
+                        break
+
                 number = number.strip()
                 cartridge = model_controller.filter_by_model(model_name='Cartridges',
                                                              mode='first',
@@ -811,15 +824,17 @@ class CartridgeURLs:
                                                    status=action_status_history,
                                                    location=last_all_history.location,
                                                    learning_campus=last_all_history.learning_campus,
-                                                   cabinet=last_all_history.cabinet)
+                                                   cabinet=last_all_history.cabinet,
+                                                   reason_to_disregard=reason)
                 if request_redirect is not None:
                     return request_redirect
 
-                new_refills = cartridge.refills + 1
-                new_work_done = cartridge.work_done + 1
-                model_controller.update(model_entry=cartridge,
-                                        refills=new_refills,
-                                        work_done=new_work_done)
+                if number not in disregards:
+                    new_refills = cartridge.refills + 1
+                    new_work_done = cartridge.work_done + 1
+                    model_controller.update(model_entry=cartridge,
+                                            refills=new_refills,
+                                            work_done=new_work_done)
 
             return try_to_commit(redirect_to='cartridge_urls.cartridges')
 

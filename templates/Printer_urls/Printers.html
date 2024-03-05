@@ -85,7 +85,7 @@
             </div>
         </form>
     </div>
-    {% if current_user.buildings_id|length == 0 %}
+    {% if current_user.buildings_id|length == 0 and current_user.is_responsible_for_buildings %}
         <div style="display: flex; justify-content: center; border: goldenrod 1px solid; border-radius: 4px; color: goldenrod; padding: 10px; font-weight: 100">
             У вас не заполнены здания, за которые вы ответственны. Чтобы было удобнее работать
             <a href="{{ url_for('auth_urls.profile') }}">, заполните их</a>.
@@ -102,16 +102,16 @@
         <table style="width: 100%; margin-top: 10px" id="mytable">
             <colgroup>
                 <col span="1" style="width: 5%;">
-                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 15%;">
                 <col span="1" style="width: 20%;">
-                <col span="1" style="width: 25%;">
+                <col span="1" style="width: 20%;">
                 <col span="1" style="width: 20%;">
                 <col span="1" style="width: 20%;">
             </colgroup>
             <thead>
             <tr>
                 <th>№</th>
-                <th>Имя принтера</th>
+                <th>Модель принтера</th>
                 <th>Инвентарный номер</th>
                 <th>Статус</th>
                 <th>Локация</th>
@@ -131,7 +131,7 @@
                         <option>{{ StatusSettings.Printer.restored }}</option>
                     </select>
                 </th>
-                <th></th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
                 <th></th>
             </tr>
             </thead>
@@ -151,7 +151,7 @@
                         <td class="sorted-field">
                             {{ status }}
                         </td>
-                        <td class="5">
+                        <td class="5 sorted-field">
                             {% if status == StatusSettings.Printer.accepted_for_repair or
                                   status == StatusSettings.Printer.in_reserve %}
                                 У нас в подразделении
@@ -183,7 +183,7 @@
         <h2 style="text-align: center; color: #8395a7">
             Принтеры не найдены.
             {% if is_not_find %}
-                Возможно потому, что вы выбрали не тот УК (СК и т.д.). Вы можете исправть это в
+                Возможно потому, что вы выбрали не тот УК (СК и т.д.). Вы можете исправить это в
                 <a href="{{ url_for('auth_urls.profile') }}">профиле</a> или нажать на
                 "<a href="{{ url_for('printer_urls.printers', is_show_own=0) }}">Показать все</a>", чтобы увидеть все картриджи.
             {% endif %}

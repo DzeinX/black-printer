@@ -25,6 +25,11 @@ class APP:
 
         self.app = Flask(import_name=__name__,
                          template_folder='templates')
+
+        self.app.config['SECRET_KEY'] = AppSettings.SECRET_KEY
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = AppSettings.SQLALCHEMY_DATABASE_URI
+        self.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = AppSettings.SQLALCHEMY_TRACK_MODIFICATIONS
+
         self.db.init_app(self.app)
         self.migration = Migrate(self.app, self.db, render_as_batch=True)
 
@@ -34,9 +39,6 @@ class APP:
         self.check_rest_key_db()
 
     def get_config_aup(self):
-        self.app.config['SECRET_KEY'] = AppSettings.SECRET_KEY
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = AppSettings.SQLALCHEMY_DATABASE_URI
-        self.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = AppSettings.SQLALCHEMY_TRACK_MODIFICATIONS
         self.app.config['LDAP_HOST'] = LDAPSettings.AUP_LDAP_HOST
         self.app.config['LDAP_BASE_DN'] = LDAPSettings.AUP_LDAP_BASE_DN
         self.app.config['LDAP_ALWAYS_SEARCH_BIND'] = LDAPSettings.AUP_LDAP_ALWAYS_SEARCH_BIND
@@ -47,9 +49,6 @@ class APP:
         self.app.config['LDAP_BIND_USER_PASSWORD'] = LDAPSettings.AUP_LDAP_BIND_USER_PASSWORD
 
     def get_config_edu(self):
-        self.app.config['SECRET_KEY'] = AppSettings.SECRET_KEY
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = AppSettings.SQLALCHEMY_DATABASE_URI
-        self.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = AppSettings.SQLALCHEMY_TRACK_MODIFICATIONS
         self.app.config['LDAP_HOST'] = LDAPSettings.EDU_LDAP_HOST
         self.app.config['LDAP_BASE_DN'] = LDAPSettings.EDU_LDAP_BASE_DN
         self.app.config['LDAP_ALWAYS_SEARCH_BIND'] = LDAPSettings.EDU_LDAP_ALWAYS_SEARCH_BIND

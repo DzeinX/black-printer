@@ -65,6 +65,26 @@
             checkbox.checked = !checkbox.checked;
         }
     </script>
+    <script>
+        let disregards = document.querySelectorAll(".disregard");
+        disregards.forEach((cb) => {cb.addEventListener("change", (e) => {
+            let reason = e.target.parentNode.parentNode.parentNode.querySelector(".reason");
+            reason.toggleAttribute("disabled");
+            if (reason.hasAttribute("placeholder")) {
+                reason.removeAttribute("placeholder");
+            } else {
+                reason.setAttribute("placeholder", "Обязательно введите причину");
+            }
+
+            Highlight(e.target.parentNode.parentNode.parentNode);
+        })})
+    </script>
+    <script>
+        let reasons = document.querySelectorAll(".reason");
+        reasons.forEach((cb) => {cb.addEventListener("click", (e) => {
+            Highlight(e.target.parentNode.parentNode);
+        })})
+    </script>
 {% endblock %}
 
 
@@ -124,19 +144,25 @@
         <table style="width: 100%; margin-top: 10px" id="mytable">
             <colgroup>
                 <col span="1" style="width: 5%;">
+                <col span="1" style="width: 15%;">
                 <col span="1" style="width: 10%;">
-                <col span="1" style="width: 40%;">
+                <col span="1" style="width: 5%;">
+                <col span="1" style="width: 25%;">
             </colgroup>
             <thead>
             <tr>
                 <th>№</th>
                 <th>Имя принтера</th>
                 <th>Инвентарный номер</th>
+                <th>Не учитывать</th>
+                <th>Причина</th>
             </tr>
             <tr style="background: lightblue">
                 <th><i class="fa-solid fa-magnifying-glass"></i></th>
                 <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch2" class="enter"></th>
                 <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
+                <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody id="searched-fields">
@@ -155,6 +181,14 @@
                         </td>
                         <td class="sorted-field">
                             {{ printer.num_inventory }}
+                        </td>
+                        <td style="text-align: center">
+                            <label>
+                                <input type="checkbox" name="disregard" class="disregard" value="{{ printer.num_inventory }}">
+                            </label>
+                        </td>
+                        <td>
+                            <textarea name="reason" class="reason" disabled></textarea>
                         </td>
                     </tr>
                     {% set counter.value = counter.value + 1 %}

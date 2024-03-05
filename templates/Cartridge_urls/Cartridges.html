@@ -117,7 +117,7 @@
             </div>
         </form>
     </div>
-    {% if current_user.buildings_id|length == 0 %}
+    {% if current_user.buildings_id|length == 0 and current_user.is_responsible_for_buildings %}
         <div style="display: flex; justify-content: center; border: goldenrod 1px solid; border-radius: 4px; color: goldenrod; padding: 10px; font-weight: 100">
             У вас не заполнены здания, за которые вы ответственны. Чтобы было удобнее работать
             <a href="{{ url_for('auth_urls.profile') }}">, заполните их</a>.
@@ -165,7 +165,7 @@
                         <option>{{ StatusSettings.Cartridge.restored }}</option>
                     </select>
                 </th>
-                <th></th>
+                <th class="search-table-item"><input type="text" placeholder="Начните вводить" id="sch3" class="enter"></th>
                 <th></th>
             </tr>
             </thead>
@@ -198,7 +198,7 @@
                         <td class="sorted-field">
                             {{ status }}
                         </td>
-                        <td class="5">
+                        <td class="5 sorted-field">
                             {% if status == StatusSettings.Cartridge.accepted_for_refuel or status == StatusSettings.Cartridge.in_reserve %}
                                 У нас в подразделении
                             {% else %}

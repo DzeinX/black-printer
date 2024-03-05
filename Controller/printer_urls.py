@@ -264,10 +264,13 @@ class PrinterURLs:
                         history = model_controller.filter_by_model(model_name="AllHistory",
                                                                    mode="all",
                                                                    printer_id=printer.id)
-                        history.sort(key=lambda h: h.date,
-                                     reverse=True)
-                        status = history[0].status
-                        printers_data.append([printer, status])
+                        self_history = []
+                        for hist in history:
+                            if hist.cartridge_id is None:
+                                self_history.append(hist)
+                        self_history.sort(key=lambda h: h.date,
+                                          reverse=True)
+                        printers_data.append([printer, self_history[0].status])
 
                 if amount_finding == 0:
                     is_not_find = True
@@ -276,10 +279,14 @@ class PrinterURLs:
                     history = model_controller.filter_by_model(model_name="AllHistory",
                                                                mode="all",
                                                                printer_id=printer.id)
-                    history.sort(key=lambda h: h.date,
-                                 reverse=True)
-                    status = history[0].status
-                    printers_data.append([printer, status])
+                    self_history = []
+                    for hist in history:
+                        if hist.cartridge_id is None:
+                            self_history.append(hist)
+                    self_history.sort(key=lambda h: h.date,
+                                      reverse=True)
+
+                    printers_data.append([printer, self_history[0].status])
 
             buildings = model_controller.get_all_entries(model_name="Buildings")
             divisions = model_controller.get_all_entries(model_name="Division")
@@ -477,6 +484,7 @@ class PrinterURLs:
                                                         mode="all",
                                                         efficiency=1)
 
+            printers_info = []
             printers_data = []
             for printer in printers:
                 all_history = model_controller.filter_by_model(model_name='AllHistory',
@@ -485,19 +493,30 @@ class PrinterURLs:
                 status = all_history[-1].status
                 printers_data.append([printer, status])
 
+                printers_info.append({
+                    "id": str(printer.id),
+                    "location_now": printer.location_now,
+                    "learning_campus_now": printer.learning_campus_now,
+                    "cabinet_now": printer.cabinet_now,
+                    "name": printer.name,
+                    "num_inventory": printer.num_inventory,
+                    "status": status
+                })
+
             buildings = model_controller.get_all_entries(model_name="Buildings")
             divisions = model_controller.get_all_entries(model_name="Division")
             return render_template('Printer_urls/BroughtAPrinter.html',
                                    printers_data=printers_data,
                                    buildings=buildings,
                                    divisions=divisions,
-                                   StatusSettings=StatusSettings)
+                                   StatusSettings=StatusSettings,
+                                   printers_info=printers_info)
 
         if request.method == "POST":
-            printer_num = request.form.getlist('num_inventory')
+            printers_id = request.form.getlist('num_inventory')
             id_form = request.form['id_form'].strip()
 
-            if len(printer_num) == 0:
+            if len(printers_id) == 0:
                 flash('Не выбрана ни одна модель', 'warning')
                 return redirect(url_for('printer_urls.brought_a_printer'))
 
@@ -507,10 +526,10 @@ class PrinterURLs:
                 cabinet = request.form['cabinet'].strip()
                 user = current_user.username
 
-                for number in printer_num:
+                for number in printers_id:
                     printer = model_controller.filter_by_model(model_name="Printer",
                                                                mode="first",
-                                                               num_inventory=number)
+                                                               id=number)
                     name_history = number
                     action_history = StatusSettings.Printer.accepted_for_repair
                     type_history = StatusSettings.Types.printer
@@ -530,14 +549,14 @@ class PrinterURLs:
                 return try_to_commit(redirect_to='printer_urls.printers')
 
             if id_form == "2":
-                for number in printer_num:
+                for number in printers_id:
                     location = request.form[f'location{number}'].strip()
                     learning_campus = request.form[f'learning_campus{number}'].strip()
                     cabinet = request.form[f'cabinet{number}'].strip()
                     user = current_user.username
                     printer = model_controller.filter_by_model(model_name="Printer",
                                                                mode="first",
-                                                               num_inventory=number)
+                                                               id=number)
 
                     name_history = number
 
@@ -680,14 +699,27 @@ class PrinterURLs:
         if request.method == "POST":
             id_form = request.form['id_form'].strip()
             printer_num = request.form.getlist('num_inventory')
+            disregards = request.form.getlist('disregard')
+            reasons = request.form.getlist('reason')
             user = current_user.username
 
             if len(printer_num) == 0:
                 flash('Не выбрана ни одна модель', 'warning')
                 return redirect(url_for('printer_urls.reception_from_a_repairing'))
 
+            for i in range(0, len(reasons)):
+                if not reasons[i].strip():
+                    flash('Вы не заполнили причину для принтера номер ' + disregards[i], 'warning')
+                    return redirect(url_for('printer_urls.reception_from_a_repairing'))
+
             if id_form == "1":
                 for number in printer_num:
+                    reason = None
+                    for i in range(0, len(disregards)):
+                        if number == disregards[i]:
+                            reason = reasons[i]
+                            break
+
                     printer = model_controller.filter_by_model(model_name="Printer",
                                                                mode="first",
                                                                num_inventory=number)
@@ -709,7 +741,8 @@ class PrinterURLs:
                                                        status=action_history,
                                                        location=printer.location_now,
                                                        learning_campus=printer.learning_campus_now,
-                                                       cabinet=printer.cabinet_now)
+                                                       cabinet=printer.cabinet_now,
+                                                       reason_to_disregard=reason)
                     if request_redirect is not None:
                         return request_redirect
 
@@ -721,6 +754,12 @@ class PrinterURLs:
 
             if id_form == "2":
                 for number in printer_num:
+                    reason = None
+                    for i in range(0, len(disregards)):
+                        if number == disregards[i]:
+                            reason = reasons[i]
+                            break
+
                     printer = model_controller.filter_by_model(model_name="Printer",
                                                                mode="first",
                                                                num_inventory=number)
@@ -742,13 +781,15 @@ class PrinterURLs:
                                                        status=action_history,
                                                        location=printer.location_now,
                                                        learning_campus=printer.learning_campus_now,
-                                                       cabinet=printer.cabinet_now)
+                                                       cabinet=printer.cabinet_now,
+                                                       reason_to_disregard=reason)
                     if request_redirect is not None:
                         return request_redirect
 
-                    new_work_done = printer.work_done + 1
-                    model_controller.update(model_entry=printer,
-                                            work_done=new_work_done)
+                    if number not in disregards:
+                        new_work_done = printer.work_done + 1
+                        model_controller.update(model_entry=printer,
+                                                work_done=new_work_done)
 
                 return try_to_commit(redirect_to='printer_urls.printers')
 
@@ -766,6 +807,7 @@ class PrinterURLs:
             printers = model_controller.filter_by_model(model_name="Printer",
                                                         mode="all",
                                                         efficiency=1)
+            printers_info = []
             printers_data = []
             for printer in printers:
                 all_history = model_controller.filter_by_model(model_name='AllHistory',
@@ -774,20 +816,31 @@ class PrinterURLs:
                 last_history = all_history[-1]
                 printers_data.append([printer, last_history])
 
+                printers_info.append({
+                    "id": str(printer.id),
+                    "location_now": printer.location_now,
+                    "learning_campus_now": printer.learning_campus_now,
+                    "cabinet_now": printer.cabinet_now,
+                    "name": printer.name,
+                    "num_inventory": printer.num_inventory,
+                    "status": last_history.status
+                })
+
             buildings = model_controller.get_all_entries(model_name="Buildings")
             divisions = model_controller.get_all_entries(model_name="Division")
             return render_template('Printer_urls/IssuancePrinters.html',
                                    printers_data=printers_data,
                                    buildings=buildings,
                                    divisions=divisions,
-                                   StatusSettings=StatusSettings)
+                                   StatusSettings=StatusSettings,
+                                   printers_info=printers_info)
 
         if request.method == "POST":
-            printer_num = request.form.getlist('num_inventory')
+            printers_id = request.form.getlist('num_inventory')
             id_form = request.form['id_form']
             user = current_user.username
 
-            if len(printer_num) == 0:
+            if len(printers_id) == 0:
                 flash('Не выбрана ни одна модель', 'warning')
                 return redirect(url_for('printer_urls.issuance_printers'))
 
@@ -799,10 +852,10 @@ class PrinterURLs:
                 action_history = StatusSettings.Printer.in_division
                 type_history = StatusSettings.Types.cartridge
 
-                for number in printer_num:
+                for number in printers_id:
                     printer = model_controller.filter_by_model(model_name="Printer",
                                                                mode="first",
-                                                               num_inventory=number)
+                                                               id=number)
                     model_controller.update(model_entry=printer,
                                             location_now=location,
                                             learning_campus_now=learning_campus,
@@ -828,13 +881,13 @@ class PrinterURLs:
                 action_history = StatusSettings.Printer.in_division
                 type_history = StatusSettings.Types.cartridge
 
-                for number in printer_num:
+                for number in printers_id:
                     location = request.form[f'location{number}'].strip()
                     learning_campus = request.form[f'learning_campus{number}'].strip()
                     cabinet = request.form[f'cabinet{number}'].strip()
                     printer = model_controller.filter_by_model(model_name="Printer",
                                                                mode="first",
-                                                               num_inventory=number)
+                                                               id=number)
 
                     model_controller.update(model_entry=printer,
                                             location_now=location,

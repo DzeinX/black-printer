@@ -2,13 +2,24 @@ from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from abc import ABCMeta
 
+from sqlalchemy import MetaData
+
+convention = {
+    "ix": 'ix_%(column_0_label)s',
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s"
+}
+
+metadata = MetaData(naming_convention=convention)
 
 class ModelInterface:
     __metaclass__ = ABCMeta
     __sql_query_amount_rows__ = ...
 
 
-db = SQLAlchemy()
+db = SQLAlchemy(metadata=metadata)
 
 
 association_table_1 = db.Table('association', db.Model.metadata,
@@ -36,6 +47,7 @@ class AllHistory(db.Model, ModelInterface):
     location = db.Column(db.String(30))
     learning_campus = db.Column(db.String(30))
     cabinet = db.Column(db.String(20))
+    reason_to_disregard = db.Column(db.String(512), nullable=True)
 
     cartridge_id = db.Column(db.Integer, db.ForeignKey("cartridges.id"))
     printer_id = db.Column(db.Integer, db.ForeignKey("printer.id"))
@@ -319,6 +331,7 @@ class User(UserMixin, db.Model, ModelInterface):
     username = db.Column(db.String(35), nullable=False)
     is_boss = db.Column(db.Boolean, nullable=False, default=0)
     is_admin = db.Column(db.Boolean, nullable=True, default=0)
+    is_responsible_for_buildings = db.Column(db.Boolean, default=True, nullable=False)
 
     buildings_id = db.relationship("Buildings", secondary=association_table_2)
 

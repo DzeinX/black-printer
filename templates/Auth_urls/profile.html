@@ -109,7 +109,20 @@
                     {% endfor %}
                     </tbody>
                 </table>
-                <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add">
+                {% if not current_buildings %}
+                    <div class="toggles">
+                        <div class="toggle">
+                            <input type="checkbox"
+                                   name="is_responsible_for_buildings"
+                                   id="is_responsible_for_buildings"
+                                   {{ "checked" if not current_user.is_responsible_for_buildings else "" }}>
+                            <label for="is_responsible_for_buildings">Отключить предупреждение</label>
+                        </div>
+                    </div>
+                {% endif %}
+                <input type="button" value="Добавить поле" class="add_field" onclick="AddItem();" id="add"
+                       {{ "disabled" if not current_user.is_responsible_for_buildings else "" }}
+                       title="{{ "Вы не можете добавить новое здание, так как выбрана галочка 'Отключить предупреждение'" if not current_user.is_responsible_for_buildings else "" }}">
                 <input type="submit" value="Обновить" class="add_btn">
             </div>
         </form>

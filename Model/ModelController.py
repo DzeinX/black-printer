@@ -99,7 +99,7 @@ class ModelController(ModelControllerInterface, metaclass=MetaSingleton):
             return None
         filter_args = [text(f'{self._get_model_name(model)}.{row} == "{k}"') for row, k in filters.items()]
         if mode == "all":
-            filter_entry = model.query.filter(*filter_args).all()
+            filter_entry = model.query.filter(*filter_args).order_by().all()
         elif mode == "first":
             filter_entry = model.query.filter(*filter_args).first()
         else:
