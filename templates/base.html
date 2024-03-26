@@ -152,7 +152,31 @@
                                 {% endif %}
                             </ul>
                         {% else %}
-                            <a href="/add_models" class="nav-link">Модели</a>
+{#                            <a href="/add_models" class="nav-link">Модели</a>#}
+                             <a href="#" class="nav-link">
+                                <i class="fa-solid fa-circle-chevron-down"></i>
+                                <div class="label">Модели</div>
+                            </a>
+                            <ul class="submenu">
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">Модели</a>
+                                    {% if current_user.is_boss or current_user.is_admin %}
+                                        <hr style="margin-top: 10px; border-color: #2e86de">
+                                    {% endif %}
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/add_models_cartridge" class="nav-link">Модели картриджей</a>
+                                    {% if current_user.is_boss or current_user.is_admin %}
+                                        <hr style="margin-top: 10px; border-color: #2e86de">
+                                    {% endif %}
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/add_models_printer" class="nav-link">Модели принтеров</a>
+                                    {% if current_user.is_boss or current_user.is_admin %}
+                                        <hr style="margin-top: 10px; border-color: #2e86de">
+                                    {% endif %}
+                                </li>
+                            </ul>
                         {% endif %}
                     </li>
                     <li class="nav-item">
